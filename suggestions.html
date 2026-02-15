@@ -7,13 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="suggestions">
 
 <div class="app-container">
-  
   <aside class="sidebar">
     <div class="logo-area">
       <div class="logo-icon">S</div>
@@ -21,19 +19,15 @@
     </div>
 
     <nav class="nav-menu">
-      <a href="index.html" class="nav-item">
-        <span class="nav-icon">🚀</span> Setup
-      </a>
-      <a href="intelligence.html" class="nav-item">
-        <span class="nav-icon">📊</span> Insights
-      </a>
-      <a href="suggestions.html" class="nav-item active">
-        <span class="nav-icon">💡</span> Actions
-      </a>
-      <a href="workspace.html" class="nav-item">
-        <span class="nav-icon">⚡</span> Copilot
-      </a>
+      <a href="index.html" class="nav-item"><span class="nav-icon">🚀</span> Setup</a>
+      <a href="intelligence.html" class="nav-item"><span class="nav-icon">📊</span> Insights</a>
+      <a href="suggestions.html" class="nav-item active"><span class="nav-icon">💡</span> Actions</a>
+      <a href="workspace.html" class="nav-item"><span class="nav-icon">⚡</span> Copilot</a>
     </nav>
+
+    <div style="margin-top: auto; padding: 20px 0; border-top: 1px solid var(--border-soft);">
+        <button id="themeToggle" class="btn-fun secondary" style="width:100%;">Theme: Light</button>
+    </div>
 
     <div class="pro-card">
       <div class="pro-shine"></div>
@@ -47,44 +41,40 @@
     <header class="top-header">
       <div class="page-title">Recommended Actions</div>
       <div style="display:flex; gap:12px;">
-        <a href="intelligence.html" class="btn-fun" style="background:var(--bg-app); color:var(--text-main); text-decoration:none; padding:12px 24px; font-size:14px; border:1px solid var(--border-soft);">Back</a>
+        <button onclick="window.print()" class="btn-fun secondary">Export Plan ↓</button>
+        <a href="intelligence.html" class="btn-fun primary" style="text-decoration:none;">Review Insights</a>
       </div>
     </header>
 
     <div class="fun-strip">
-      <div class="strip-badge" style="background:var(--accent-fun)">Step 3</div>
+      <div class="strip-badge" style="background:var(--accent-primary)">Step 3</div>
       <div class="strip-text">Strategic Next Steps</div>
       <div class="strip-sub">Actionable intelligence to stabilize your delivery.</div>
     </div>
 
     <div class="content-scroll">
-      <div class="grid-split" style="grid-template-columns: 1.3fr 0.7fr;">
+      <div class="grid-split" style="grid-template-columns: 1.3fr 0.7fr; gap: 32px;">
         
         <div>
           <div class="section-title"><span>🔥</span> Priority Actions</div>
-          
-          <div id="suggestionsList" style="display:flex; flex-direction:column; gap:24px;">
-            <div style="padding:60px; background:var(--bg-app); border-radius:var(--radius-lg); text-align:center; border: 2px dashed var(--border-soft);">
-              <b style="font-size:20px; color:var(--text-main);">Analyzing signals...</b><br>
-              <span style="font-size:16px; color:var(--text-muted);">Generating context-aware recommendations for your sprint.</span>
-            </div>
-          </div>
+          <div id="suggestionsList" style="display:flex; flex-direction:column; gap:16px;">
+              </div>
         </div>
 
         <aside style="display:flex; flex-direction:column; gap:24px;">
           <div class="section-title"><span>🌱</span> Pro Tips</div>
           
-          <div class="action-card" style="cursor:default;">
+          <div class="action-card" style="cursor:default; background: var(--bg-card); border: 1px solid var(--border-soft);">
             <div style="font-weight:800; font-size:18px; margin-bottom:12px;">Why these actions?</div>
             <p style="font-size:15px; color:var(--text-muted); line-height:1.7; margin-bottom:16px;">
               Scrummer prioritizes interventions that maximize <b>Velocity Predictability</b> and minimize team burnout.
             </p>
-            <div class="kpi-tag tag-good" style="font-size:12px; padding:6px 16px;">AI Optimized</div>
+            <div class="kpi-tag tag-good" style="font-size:11px; padding:6px 16px; background: #e0f2fe; color: #0369a1;">AI Optimized</div>
           </div>
 
-          <div class="action-card" style="cursor:default; background:var(--success-bg); border:2px solid rgba(16, 185, 129, 0.1);">
-            <div style="font-weight:800; font-size:18px; margin-bottom:12px; color:var(--success);">Delivery Secret</div>
-            <p style="font-size:15px; color:var(--success); opacity: 0.9; line-height:1.7;">
+          <div class="action-card" style="cursor:default; background:rgba(16, 185, 129, 0.05); border:1px solid rgba(16, 185, 129, 0.2);">
+            <div style="font-weight:800; font-size:18px; margin-bottom:12px; color:#059669;">Delivery Secret</div>
+            <p style="font-size:15px; color:#059669; opacity: 0.9; line-height:1.7;">
               Teams that resolve "Blocked" items within 4 hours maintain a 35% higher throughput than those who wait.
             </p>
           </div>
@@ -96,8 +86,7 @@
 </div>
 
 <script src="js/metrics.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/suggestions.js"></script>
 <script src="js/shell.js"></script>
+<script src="js/suggestions.js"></script>
 </body>
 </html>
