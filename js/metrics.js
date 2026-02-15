@@ -12,20 +12,25 @@
 
   const safeNum = (v) => {
     const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
+    return (Number.isFinite(n) && n >= 0) ? n : 0;
   };
 
   const mean = (arr) => {
-    const a = arr.filter(n => Number.isFinite(n) && n > 0);
+    const a = arr.filter(n => n > 0);
     return a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
   };
 
-  const stdev = (arr) => {
-    const a = arr.filter(n => Number.isFinite(n) && n > 0);
+  /**
+   * Calculates Volatility using Coefficient of Variation (CV)
+   * A higher CV means the team's velocity is unpredictable.
+   */
+  const calculateVolatility = (arr) => {
+    const a = arr.filter(n => n > 0);
     if (a.length < 2) return 0;
     const m = mean(a);
-    const v = a.reduce((s, x) => s + (x - m) * (x - m), 0) / (a.length - 1);
-    return Math.sqrt(v);
+    const variance = a.reduce((s, x) => s + Math.pow(x - m, 2), 0) / (a.length - 1);
+    const sd = Math.sqrt(variance);
+    return m > 0 ? sd / m : 0; // Standard Deviation / Mean
   };
 
   // --- Storage API ---
@@ -43,52 +48,58 @@
    * The core "SaaS Brain" that determines if a sprint is risky.
    */
   function computeSignals(setup) {
-    const sprintDays = safeNum(setup.sprintDays);
-    const teamMembers = safeNum(setup.teamMembers);
-    const leaveDays = safeNum(setup.leaveDays);
+    const sprintDays = safeNum(setup.sprintDays) || 10;
+    const teamMembers = safeNum(setup.teamMembers) || 1;
+    const leaveDays = safeNum(setup.leaveDays || 0);
     const committed = safeNum(setup.committedSP);
 
-    const velocities = [safeNum(setup.v1), safeNum(setup.v2), safeNum(setup.v3)].filter(v => v > 0);
+    // BUG 1 FIX: Ensure all 3 velocity fields are captured
+    const velocities = [
+        safeNum(setup.v1), 
+        safeNum(setup.v2), 
+        safeNum(setup.v3)
+    ].filter(v => v > 0);
+    
     const avgVelocity = mean(velocities);
-    const vol = avgVelocity > 0 ? (stdev(velocities) / avgVelocity) : 0;
+    const vol = calculateVolatility(velocities);
 
     // --- Capacity Logic ---
-    // Ideal Capacity: Total person-days available in a perfect world.
     const idealPD = sprintDays * teamMembers;
-    // Available Capacity: Adjusted for holidays and leave.
     const availablePD = Math.max(0, idealPD - leaveDays);
     const availabilityRatio = idealPD > 0 ? (availablePD / idealPD) : 0;
 
-    // Effective Capacity in Story Points:
-    // This scales historical performance against current availability.
+    // Effective Capacity: Scaled by current team availability
     const capacitySP = avgVelocity > 0 ? (avgVelocity * availabilityRatio) : 0;
 
     // --- Ratios & Signals ---
-    const overcommitRatio = avgVelocity > 0 ? (committed / avgVelocity) : 0;
-    const capacityShortfallRatio = capacitySP > 0 ? (committed / capacitySP) : 0;
-    const focusFactor = availabilityRatio; // Available time vs Total time
+    const overcommitRatio = avgVelocity > 0 ? (committed / avgVelocity) : 1;
+    const capacityShortfallRatio = capacitySP > 0 ? (committed / capacitySP) : 1;
+    const focusFactor = availabilityRatio; 
 
     // --- Risk Scoring (0-100) ---
-    // 1. Overcommit (Weight 50%): Penalty for planning more than average performance.
+    // 1. Overcommit (50% weight): Planning > Historical Avg
     const overPenalty = clamp((overcommitRatio - 1) * 60, 0, 50);
-    // 2. Capacity (Weight 35%): Penalty for planning more than availability allows.
+    
+    // 2. Capacity (35% weight): Planning > Current Availability
     const capPenalty = clamp((capacityShortfallRatio - 1) * 50, 0, 35);
-    // 3. Volatility (Weight 15%): Penalty for unstable performance history.
-    const volPenalty = clamp(vol * 30, 0, 15);
+    
+    // 3. Volatility (15% weight): Stability of the 3 historical sprints
+    // A volatility (CV) of 0.3 (30%) is considered high in Agile.
+    const volPenalty = clamp(vol * 50, 0, 15);
 
-    const riskScore = clamp(overPenalty + capPenalty + volPenalty, 0, 100);
+    const riskScore = Math.round(clamp(overPenalty + capPenalty + volPenalty, 0, 100));
 
     // --- Confidence Calculation ---
+    // Perfect confidence = Capacity matches or exceeds commitment, minus volatility stability.
     const baseConf = committed > 0 ? (capacitySP / committed) * 100 : 0;
-    const confidence = clamp(baseConf - (volPenalty * 2), 0, 100);
+    const confidence = Math.round(clamp(baseConf - (vol * 100), 0, 100));
 
     // --- Labels ---
-    let capacityHealth = "—";
-    if (committed > 0 && capacitySP > 0) {
-      const ratio = capacitySP / committed;
-      if (ratio >= 1.0) capacityHealth = "Healthy";
-      else if (ratio >= 0.85) capacityHealth = "At Risk";
-      else capacityHealth = "Critical";
+    let capacityHealth = "Stable";
+    if (committed > 0) {
+      if (capacityShortfallRatio > 1.15) capacityHealth = "Critical";
+      else if (capacityShortfallRatio > 1.0) capacityHealth = "At Risk";
+      else capacityHealth = "Healthy";
     }
 
     const riskBand = riskScore <= 30 ? "Low" : (riskScore <= 60 ? "Moderate" : "High");
@@ -106,8 +117,7 @@
   const loadSnapshots = () => {
     try {
       const raw = localStorage.getItem(SNAP_KEY);
-      const arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr : [];
+      return raw ? JSON.parse(raw) : [];
     } catch { return []; }
   };
 
