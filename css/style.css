@@ -203,7 +203,44 @@ body.dark-mode .fun-input {
     color: white;
     border-color: #334155;
 }
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: var(--radius-m);
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 15px;
+    transition: 0.2s all ease;
+}
+
+.nav-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text-main);
+}
+
+.nav-item.active {
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 10px 20px rgba(11, 87, 208, 0.15);
+}
+
+.nav-icon {
+    font-size: 18px;
+}
+
+/* Dark Mode adjustment for hover */
+body.dark-mode .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
 /* BUG 7 & 8: Launchpad Layout */
 .prog-bar-mini {
     display: flex;
