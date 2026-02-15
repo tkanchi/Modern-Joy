@@ -1,146 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrummer — Copilot</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body data-page="workspace">
+/**
+ * SCRUMMER — Copilot Logic
+ */
+(() => {
+    const $ = (id) => document.getElementById(id);
+    const compute = window.Scrummer?.computeSignals;
+    const setupApi = window.Scrummer?.setup;
 
-<div class="app-container">
-  
-  <aside class="sidebar">
-    <div class="logo-area">
-      <div class="logo-icon">S</div>
-      <div class="logo-text">Scrummer</div>
-    </div>
+    const ceremonyData = {
+        planning: {
+            title: "Sprint Planning Guide",
+            why: "Focus on balancing commitment against the historical average to protect delivery confidence.",
+            points: (s) => [
+                `Current load is ${Math.round(s.overcommitRatio * 100)}% of capacity. Discuss if this is sustainable.`,
+                `Velocity volatility is ${Math.round(s.vol * 100)}%. Recommend a 10% buffer for unknown technical debt.`,
+                `Capacity health is ${s.capacityHealth}. Prioritize 'Must-Have' items first.`
+            ]
+        },
+        daily: {
+            title: "Daily Standup Guide",
+            why: "Use these signals to identify hidden blockers before they become delays.",
+            points: (s) => [
+                `Focus Factor is ${Math.round(s.focusFactor * 100)}%. Are meetings distracting from development?`,
+                `Risk is ${s.riskScore}%. Identify the single biggest ticket blocking the Sprint Goal.`,
+                `Ask: 'If we could only finish ONE thing today, what would it be?'`
+            ]
+        },
+        refine: {
+            title: "Backlog Refinement",
+            why: "Aim to reduce volatility by improving story slicing.",
+            points: (s) => [
+                `Volatility is high. Look for stories > 5SP and split them into smaller units.`,
+                `Ensure 'Definition of Ready' is met for the next ${Math.round(s.avgVelocity)} points of work.`,
+                `Validate acceptance criteria for the top 3 items.`
+            ]
+        }
+    };
 
-    <nav class="nav-menu">
-      <a href="index.html" class="nav-item">
-        <span class="nav-icon">🚀</span> Setup
-      </a>
-      <a href="intelligence.html" class="nav-item">
-        <span class="nav-icon">📊</span> Insights
-      </a>
-      <a href="suggestions.html" class="nav-item">
-        <span class="nav-icon">💡</span> Actions
-      </a>
-      <a href="workspace.html" class="nav-item active">
-        <span class="nav-icon">⚡</span> Copilot
-      </a>
-    </nav>
+    function updateCopilot(tab) {
+        const s = compute(setupApi.loadSetup());
+        const data = ceremonyData[tab] || ceremonyData.planning;
 
-    <div class="pro-card">
-      <div class="pro-shine"></div>
-      <div class="pro-title">Scrummer Gold</div>
-      <div class="pro-sub">Unlock AI Analysis</div>
-      <button class="pro-btn">Upgrade ✨</button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="top-header">
-      <div class="page-title">Ceremony Copilot</div>
-      <div class="kpi-tag tag-good" id="copilotRecommended" style="font-weight: 800; font-size: 14px; padding: 10px 20px;">Analyzing Signals...</div>
-    </header>
-
-    <div class="fun-strip">
-      <div class="strip-badge" style="background:var(--accent-fun)">AI Guide</div>
-      <div class="strip-text">Real-time Ritual Support</div>
-      <div class="strip-sub">Select a ceremony below to focus your team's energy.</div>
-    </div>
-
-    <div class="content-scroll">
-      
-      <div class="grid-4" style="margin-bottom:32px; gap:20px;">
-        <div class="kpi-card" style="padding:20px; text-align:center;">
-          <div class="kpi-label" style="font-size:11px;">Scope Pressure</div>
-          <div id="briefScope" class="kpi-val" style="font-size:32px; margin:8px 0;">—</div>
-        </div>
-        <div class="kpi-card" style="padding:20px; text-align:center;">
-          <div class="kpi-label" style="font-size:11px;">Cap Ratio</div>
-          <div id="briefCapRatio" class="kpi-val" style="font-size:32px; margin:8px 0;">—</div>
-        </div>
-        <div class="kpi-card" style="padding:20px; text-align:center;">
-          <div class="kpi-label" style="font-size:11px;">Confidence</div>
-          <div id="briefConf" class="kpi-val" style="font-size:32px; margin:8px 0;">—</div>
-        </div>
-        <div class="kpi-card" style="padding:20px; text-align:center;">
-          <div class="kpi-label" style="font-size:11px;">Risk Score</div>
-          <div id="briefRisk" class="kpi-val" style="font-size:32px; margin:8px 0; color:var(--danger);">—</div>
-        </div>
-      </div>
-
-      <div class="segTabs" id="ceremonyTabs" style="margin-bottom:32px; padding:10px;">
-        <button class="segBtn" data-tab="planning">Planning</button>
-        <button class="segBtn" data-tab="daily">Daily</button>
-        <button class="segBtn" data-tab="refine">Refine</button>
-        <button class="segBtn" data-tab="review">Review</button>
-        <button class="segBtn" data-tab="retro">Retro</button>
-      </div>
-
-      
-
-      <div class="grid-split" style="grid-template-columns: 1.4fr 0.6fr; gap:32px;">
+        $("panelTitle").innerText = data.title;
+        $("panelWhy").innerText = data.why;
         
-        <div>
-          <div class="section-title"><span>🤖</span> AI Guidance</div>
-          <div class="action-card" style="cursor:default; min-height:400px; padding:40px;">
-            <h3 id="panelTitle" style="margin:0 0 16px 0; font-size:24px; font-weight:800;">Select a Ceremony</h3>
-            <p id="panelWhy" style="color:var(--text-muted); font-size:16px; line-height:1.7; margin-bottom:32px;">
-              Scrummer’s AI analyzes your current metrics to highlight the most critical discussion points for your team.
-            </p>
-            
-            <div style="font-size:12px; font-weight:800; color:var(--text-main); margin-bottom:16px; text-transform:uppercase; letter-spacing:1.5px;">Discussion Points</div>
-            <ul id="panelList" style="padding-left:24px; font-size:16px; color:var(--text-muted); line-height:2.0;">
-              <li>Waiting for your selection...</li>
-            </ul>
-          </div>
-        </div>
+        const listHtml = data.points(s).map(p => `<li>${p}</li>`).join('');
+        $("panelList").innerHTML = listHtml;
 
-        <div>
-          <div class="section-title"><span>📝</span> Decisions</div>
-          <div class="kpi-card" style="border: 2px solid var(--bg-app); box-shadow: none; padding:32px;">
-            <div id="decisionFields" style="display:grid; gap:20px;">
-                </div>
-            
-            <div style="margin-top:32px; display:flex; flex-direction:column; gap:12px;">
-              <button id="copilotSave" class="btn-fun" style="width:100%; background:var(--accent-fun); height:54px;">Save Decisions</button>
-              <button id="copilotClear" class="btn-fun" style="width:100%; background:transparent; color:var(--text-muted); border:2px solid var(--border-soft);">Reset Form</button>
-            </div>
-            
-            <div id="copilotMsg" style="margin-top:20px; text-align:center; font-size:14px; font-weight:700; display:none;"></div>
-          </div>
-        </div>
+        // Update Brief KPIs
+        $("briefScope").innerText = `${Math.round(s.overcommitRatio * 100)}%`;
+        $("briefCapRatio").innerText = `${Math.round(s.focusFactor * 100)}%`;
+        $("briefConf").innerText = `${s.confidence}%`;
+        $("briefRisk").innerText = `${s.riskScore}%`;
+    }
 
-      </div>
-
-    </div>
-  </main>
-</div>
-
-<script src="js/metrics.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/shell.js"></script>
-<script src="js/copilot.js"></script>
-
-<script>
-  // UI Logic for Interactive Ceremony Tabs
-  (function(){
-    const tabs = document.querySelectorAll('#ceremonyTabs .segBtn');
-    tabs.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabs.forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-      });
+    // Tab Switching
+    document.querySelectorAll('.segBtn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.segBtn').forEach(b => b.classList.remove('active', 'is-active'));
+            btn.classList.add('is-active');
+            updateCopilot(btn.getAttribute('data-tab'));
+        };
     });
-  })();
-</script>
 
-</body>
-</html>
+    // Initialize
+    if (compute && setupApi) {
+        updateCopilot('planning');
+    }
+})();
