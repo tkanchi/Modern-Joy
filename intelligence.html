@@ -1,35 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Scrummer — Insights</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrummer — Insights</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="intelligence">
 <div class="app-container">
     <aside class="sidebar">
-        <div class="logo-area"><div class="logo-icon">S</div><div class="logo-text">Scrummer</div></div>
+        <div class="logo-area">
+            <div class="logo-icon">S</div>
+            <div class="logo-text">Scrummer</div>
+        </div>
         <nav class="nav-menu">
             <a href="index.html" class="nav-item"><span class="nav-icon">🚀</span> Setup</a>
             <a href="intelligence.html" class="nav-item active"><span class="nav-icon">📊</span> Insights</a>
         </nav>
+        <div class="sidebar-footer">
+            <button id="themeToggle" class="btn-fun secondary" style="width:100%;">Theme: Light</button>
+        </div>
     </aside>
 
     <main class="main">
-        <header class="top-header"><div class="page-title">Sprint Intelligence</div></header>
+        <header class="top-header">
+            <div class="page-title">Sprint Intelligence</div>
+            <a href="suggestions.html" class="btn-fun primary" style="text-decoration:none;">Next: Actions ➔</a>
+        </header>
+
         <div class="content-scroll">
             <div class="grid-4">
-                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Risk Score</div><div id="kpiRisk" class="kpi-val" style="color:var(--danger);">—</div></div>
-                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Confidence</div><div id="kpiConfidence" class="kpi-val">—</div></div>
-                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Focus Factor</div><div id="kpiFocus" class="kpi-val">—</div></div>
-                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Health</div><div id="kpiCapacity" class="kpi-val">—</div></div>
+                <div class="kpi-card highlight">
+                    <div class="kpi-label">Risk Score</div>
+                    <div id="kpiRisk" class="kpi-val">—</div>
+                    <div class="fun-bar-bg"><div id="barRisk" class="fun-bar-fill"></div></div>
+                </div>
+                <div class="kpi-card highlight">
+                    <div class="kpi-label">Confidence</div>
+                    <div id="kpiConfidence" class="kpi-val">—</div>
+                    <div class="fun-bar-bg"><div id="barConfidence" class="fun-bar-fill"></div></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Focus Factor</div>
+                    <div id="kpiFocus" class="kpi-val">—</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Health</div>
+                    <div id="kpiCapacity" class="kpi-val">—</div>
+                </div>
             </div>
+
             <div class="grid-split">
-                <div class="kpi-card"><div class="section-title">Risk Drivers</div><div id="driversList"></div></div>
-                <div class="kpi-card"><div class="section-title">Signals</div><div id="sigScope">Scope: —</div></div>
+                <div class="kpi-card">
+                    <div class="section-title">Risk Drivers</div>
+                    <div id="driversEmpty" style="display:none; text-align:center; padding:20px; color:var(--text-muted);">No data available.</div>
+                    <div id="driversList"></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="section-title">Signals</div>
+                    <div class="signal-item" id="sigScope">Scope: —</div>
+                    <div class="signal-item" id="sigVolatility">Volatility: —</div>
+                </div>
             </div>
         </div>
     </main>
 </div>
-<script src="js/metrics.js"></script><script src="js/intelligence.js"></script><script src="js/shell.js"></script>
+
+<script src="js/metrics.js"></script>
+<script src="js/intelligence.js"></script>
+<script src="js/shell.js"></script>
 </body>
 </html>
