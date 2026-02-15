@@ -165,3 +165,47 @@ body.dark-mode .kpi-card { background: #1e293b; }
 .btn-fun:hover { transform: translateY(-2px); filter: brightness(1.1); }
 .btn-fun.primary { background: var(--accent-primary); }
 .btn-fun.secondary { background: var(--border-soft); color: var(--text-main); }
+
+/* BUG 4: The Clipping Fix */
+body {
+    overflow-y: auto !important; /* Allow scroll */
+    height: auto;
+    min-height: 100vh;
+}
+
+.content-scroll {
+    flex: 1;
+    padding: 40px;
+    padding-bottom: 120px !important; /* Extra space so nothing is cut off */
+}
+
+/* BUG 6: Theme Toggle Styles */
+body.dark-mode {
+    --bg-app: #0f172a;
+    --bg-card: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-soft: rgba(255,255,255,0.1);
+    background: var(--bg-app);
+}
+
+body.dark-mode .sidebar, 
+body.dark-mode .main, 
+body.dark-mode div[style*="background:white"],
+body.dark-mode div[style*="background:#fff"] {
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-soft) !important;
+}
+
+body.dark-mode .fun-input {
+    background: #0f172a;
+    color: white;
+    border-color: #334155;
+}
+
+/* BUG 7 & 8: Launchpad Layout */
+.prog-bar-mini {
+    display: flex;
+    gap: 8px;
+}
