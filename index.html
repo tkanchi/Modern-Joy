@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="launchpad">
@@ -36,9 +35,8 @@
     </nav>
 
     <div class="pro-card">
-      <div class="pro-shine"></div>
       <div class="pro-title">Scrummer Gold</div>
-      <div class="pro-sub">Unlock AI & Unlimited History</div>
+      <div class="pro-sub">Unlock Unlimited History</div>
       <button class="pro-btn">Upgrade ✨</button>
     </div>
   </aside>
@@ -46,51 +44,50 @@
   <main class="main">
     <header class="top-header">
       <div class="page-title">Launchpad</div>
-      <button id="themeToggle" class="btn-fun" style="background:var(--bg-app); color:var(--text-main); border:1px solid var(--border-soft);">
+      <button id="themeToggle" class="btn-fun" style="background:var(--bg-app); color:var(--text-main); font-size:14px; border:1px solid var(--border-soft);">
         Theme: <span id="themeMode">Light</span>
       </button>
     </header>
 
     <div class="fun-strip">
       <div class="strip-badge">Step 1</div>
-      <div class="strip-text">Sprint Setup</div>
-      <div class="strip-sub">Initialize your metrics to unlock delivery intelligence.</div>
+      <div class="strip-text">Sprint Configuration</div>
+      <div class="strip-sub">Configure your capacity and history to generate AI signals.</div>
     </div>
 
     <div class="content-scroll">
       
       <div class="action-card" style="margin-bottom:32px;">
         <div class="section-title"><span>💡</span> Quick Start</div>
-        <p style="color:var(--text-muted); font-size:15px; margin-bottom:20px;">
-            Don't have data handy? Load a simulation to see how the intelligence engine reacts.
+        <p style="color:var(--text-muted); font-size:16px; margin-bottom:24px;">
+            Load a pre-configured simulation to see how Scrummer identifies delivery risks.
         </p>
         <div class="segTabs" id="demoTabs">
-          <button id="demoExcellent" class="segBtn" data-mode="excellent">Excellent Sprint</button>
-          <button id="demoNormal" class="segBtn" data-mode="normal">Balanced Load</button>
-          <button id="demoRisky" class="segBtn" data-mode="risky">High Risk Warning</button>
+          <button id="demoExcellent" class="segBtn">Excellent Sprint</button>
+          <button id="demoNormal" class="segBtn">Balanced Load</button>
+          <button id="demoRisky" class="segBtn">High Risk Warning</button>
         </div>
       </div>
 
       <div class="grid-split">
-        
         <section>
           <div class="kpi-card">
-            <div class="section-title">Core Sprint Metrics</div>
+            <div class="section-title">Core Metrics</div>
             <div style="display:grid; gap:24px; margin-top:24px;">
               <div class="input-group">
-                <label class="kpi-label">Sprint Length (Working Days)</label>
+                <label class="kpi-label">Sprint Length (Days)</label>
                 <input id="sprintDays" type="number" placeholder="10" class="fun-input">
               </div>
               <div class="input-group">
-                <label class="kpi-label">Team Members (Active count)</label>
+                <label class="kpi-label">Team Members</label>
                 <input id="teamMembers" type="number" placeholder="7" class="fun-input">
               </div>
               <div class="input-group">
-                <label class="kpi-label">Planned Leave (Total team days off)</label>
+                <label class="kpi-label">Planned Leave (Days)</label>
                 <input id="leaveDays" type="number" placeholder="0" class="fun-input">
               </div>
               <div class="input-group">
-                <label class="kpi-label">Current Commitment (Story Points)</label>
+                <label class="kpi-label">Committed Points</label>
                 <input id="committedSP" type="number" placeholder="40" class="fun-input">
               </div>
             </div>
@@ -100,30 +97,29 @@
         <aside style="display:flex; flex-direction:column; gap:24px;">
           <div class="kpi-card">
             <div class="section-title">Velocity History</div>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Used to calculate historical stability.</p>
+            <p style="font-size:14px; color:var(--text-muted); margin-bottom:20px;">Performance from last 3 sprints.</p>
             <div style="display:grid; gap:16px;">
               <div class="input-group">
                 <label class="kpi-label">Latest Sprint (N-1)</label>
-                <input id="v1" type="number" placeholder="Points" class="fun-input">
+                <input id="v1" type="number" class="fun-input">
               </div>
               <div class="input-group">
                 <label class="kpi-label">Sprint N-2</label>
-                <input id="v2" type="number" placeholder="Points" class="fun-input">
+                <input id="v2" type="number" class="fun-input">
               </div>
               <div class="input-group">
                 <label class="kpi-label">Sprint N-3</label>
-                <input id="v3" type="number" placeholder="Points" class="fun-input">
+                <input id="v3" type="number" class="fun-input">
               </div>
             </div>
           </div>
 
-          <div class="action-card" style="text-align:center;">
-             <div id="setupMsg" style="margin-bottom:12px; font-weight:800; font-size:14px; display:none;"></div>
-             <button id="saveSetup" class="btn-fun" style="width:100%; height:60px; font-size:18px; background:var(--accent-fun);">Save & View Insights ➔</button>
-             <button id="resetSetup" style="margin-top:16px; background:none; border:none; color:var(--text-light); font-weight:700; cursor:pointer; font-family:inherit;">Reset Form to Blank</button>
+          <div style="text-align:center;">
+             <div id="setupMsg" style="margin-bottom:16px; font-weight:800; font-size:15px; display:none; color:var(--accent-primary);"></div>
+             <button id="saveSetup" class="btn-fun" style="width:100%; height:64px; font-size:18px; background:var(--accent-fun);">Save & Analyze ➔</button>
+             <button id="resetSetup" style="margin-top:16px; background:none; border:none; color:var(--text-light); font-weight:700; cursor:pointer;">Clear Form</button>
           </div>
         </aside>
-
       </div>
     </div>
   </main>
@@ -144,10 +140,10 @@
     function showMsg(text) {
       const el = $("setupMsg");
       el.style.display = "block"; el.textContent = text;
-      setTimeout(() => { el.style.display = "none"; }, 2500);
+      setTimeout(() => { el.style.display = "none"; }, 2000);
     }
 
-    // Prefill form
+    // Prefill form from current logic
     const data = setupApi.loadSetup();
     fields.forEach(k => { if ($(k) && data[k]) $(k).value = data[k]; });
 
@@ -160,11 +156,19 @@
       setTimeout(() => { window.location.href = "intelligence.html"; }, 800);
     };
 
+    // Reset Logic
+    $("resetSetup").onclick = () => {
+      setupApi.saveSetup({});
+      fields.forEach(k => { if ($(k)) $(k).value = ""; });
+      document.querySelectorAll('.segBtn').forEach(b => b.classList.remove('is-active'));
+      showMsg("Data Cleared.");
+    };
+
     // Demo Data Engine
     const applyDemo = (d, btnId) => {
       Object.keys(d).forEach(k => { if ($(k)) $(k).value = d[k]; });
       document.querySelectorAll('.segBtn').forEach(b => b.classList.remove('is-active'));
-      $(btnId).classList.add('is-active');
+      document.getElementById(btnId).classList.add('is-active');
       showMsg("Simulation Loaded.");
     };
 
