@@ -11,10 +11,33 @@
 <div class="app-container">
     <aside class="sidebar">
         <div style="font-weight:900; font-size:26px; margin-bottom:40px;">SCRUMMER</div>
-        <nav style="display:grid; gap:8px; margin-bottom:auto;">
-            <a href="index.html" class="nav-item active" style="text-decoration:none;">🚀 Setup</a>
-            <a href="intelligence.html" class="nav-item" style="text-decoration:none;">📊 Insights</a>
-        </nav>
+        <aside class="sidebar">
+    <div style="font-weight:900; font-size:26px; margin-bottom:40px; letter-spacing:-1px;">SCRUMMER</div>
+    
+    <nav class="nav-menu" style="display:grid; gap:8px; margin-bottom:auto;">
+        <a href="index.html" class="nav-item" data-page="launchpad">
+            <span class="nav-icon">🚀</span> Setup
+        </a>
+        <a href="intelligence.html" class="nav-item" data-page="intelligence">
+            <span class="nav-icon">📊</span> Insights
+        </a>
+        <a href="suggestions.html" class="nav-item" data-page="suggestions">
+            <span class="nav-icon">💡</span> Actions
+        </a>
+        <a href="workspace.html" class="nav-item" data-page="workspace">
+            <span class="nav-icon">⚡</span> Copilot
+        </a>
+    </nav>
+
+    <div style="padding:20px 0; border-top:1px solid var(--border-soft); margin-top:20px;">
+        <button id="themeToggle" class="btn-fun secondary" style="width:100%;">Theme: Light</button>
+    </div>
+
+    <div class="pro-card" style="margin-top:20px;">
+        <div class="pro-title">Scrummer Gold</div>
+        <button class="pro-btn">Upgrade ✨</button>
+    </div>
+</aside>
 
         <div style="padding:20px 0; border-top:1px solid var(--border-soft);">
             <button id="themeToggle" class="btn-fun" style="width:100%;">Theme: Light</button>
