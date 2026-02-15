@@ -1,111 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrummer — Launchpad</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body data-page="launchpad">
+/* =========================================================
+   THE "MODERN JOY" MASTER THEME
+   Aesthetic: Apple-esque, Soft Shadows, Vibrant Accents
+   ========================================================= */
+:root {
+  --bg-app: #F2F4F8;
+  --bg-card: rgba(255, 255, 255, 0.9); 
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
 
-<div class="app-container">
-    <aside class="sidebar">
-        <div class="logo-area">
-            <div class="logo-icon">S</div>
-            <div class="logo-text">Scrummer</div>
-        </div>
-        <nav class="nav-menu">
-            <a href="index.html" class="nav-item active"><span class="nav-icon">🚀</span> Setup</a>
-            <a href="intelligence.html" class="nav-item"><span class="nav-icon">📊</span> Insights</a>
-            <a href="suggestions.html" class="nav-item"><span class="nav-icon">💡</span> Actions</a>
-            <a href="workspace.html" class="nav-item"><span class="nav-icon">⚡</span> Copilot</a>
-        </nav>
-        <div class="pro-card">
-            <div class="pro-title">Scrummer Gold</div>
-            <div class="pro-sub">Unlock AI Analysis</div>
-            <button class="pro-btn">Upgrade ✨</button>
-        </div>
-    </aside>
+  --accent-primary: #8B5CF6;  
+  --accent-fun: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  --accent-bg: #F5F3FF;
 
-    <main class="main">
-        <header class="top-header">
-            <div class="page-title">Launchpad</div>
-            <button id="themeToggle" class="btn-fun" style="background:white; color:black; font-size:12px;">Theme: Light</button>
-        </header>
+  --success: #10B981;
+  --success-bg: #D1FAE5;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --danger-bg: #FEE2E2;
 
-        <div class="fun-strip">
-            <div class="strip-badge">Step 1</div>
-            <div class="strip-text">Sprint Configuration</div>
-            <div class="strip-sub">Enter metrics to calibrate the intelligence engine.</div>
-        </div>
+  --radius-l: 28px;
+  --radius-m: 18px;
+  --radius-s: 14px;
+  --sidebar-w: 280px;
 
-        <div class="content-scroll">
-            <div class="grid-split">
-                <div class="kpi-card">
-                    <div class="section-title"><span>📝</span> Current Sprint Data</div>
-                    <div style="display:grid; gap:20px; margin-top:20px;">
-                        <div>
-                            <label class="kpi-label">Sprint Days</label>
-                            <input id="sprintDays" type="number" placeholder="10" class="fun-input">
-                        </div>
-                        <div>
-                            <label class="kpi-label">Team Members</label>
-                            <input id="teamMembers" type="number" placeholder="7" class="fun-input">
-                        </div>
-                        <div>
-                            <label class="kpi-label">Planned Leave (Days)</label>
-                            <input id="leaveDays" type="number" placeholder="0" class="fun-input">
-                        </div>
-                        <div>
-                            <label class="kpi-label">Committed Points</label>
-                            <input id="committedSP" type="number" placeholder="40" class="fun-input">
-                        </div>
-                    </div>
-                </div>
+  --shadow-soft: 0 10px 40px -10px rgba(0,0,0,0.08);
+  --shadow-float: 0 20px 50px -12px rgba(139, 92, 246, 0.25);
+}
 
-                <div style="display:flex; flex-direction:column; gap:20px;">
-                    <div class="kpi-card">
-                        <div class="section-title"><span>⏳</span> History</div>
-                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Last 3 Sprints (Velocity)</p>
-                        <div style="display:grid; gap:10px;">
-                            <input id="v1" type="number" placeholder="N-1" class="fun-input" style="padding:10px;">
-                            <input id="v2" type="number" placeholder="N-2" class="fun-input" style="padding:10px;">
-                            <input id="v3" type="number" placeholder="N-3" class="fun-input" style="padding:10px;">
-                        </div>
-                    </div>
+* { box-sizing: border-box; }
 
-                    <div style="padding:10px;">
-                        <button id="saveSetup" class="btn-fun" style="width:100%; background:var(--accent-fun); height:50px;">Save & Analyze ➔</button>
-                        <button id="resetSetup" style="width:100%; background:none; border:none; color:var(--text-light); margin-top:12px; cursor:pointer; font-weight:700;">Reset Form</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-</div>
+body {
+  margin: 0; padding: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(circle at 10% 10%, rgba(236, 72, 153, 0.1), transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15), transparent 40%),
+              #F2F4F8;
+}
 
-<script src="js/metrics.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/shell.js"></script>
-<script>
-    (function(){
-        const $ = (id) => document.getElementById(id);
-        const setupApi = window.Scrummer?.setup;
-        if(!setupApi) return;
-        
-        const fields = ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"];
-        
-        // Prefill
-        const data = setupApi.loadSetup();
-        fields.forEach(k => { if($(k) && data[k]) $(k).value = data[k]; });
+.app-container { display: flex; width: 100%; height: 100%; padding: 24px; gap: 24px; }
 
-        $("saveSetup").onclick = () => {
-            const newData = {};
-            fields.forEach(k => newData[k] = $(k).value);
-            setupApi.saveSetup(newData);
-            window.location.href = "intelligence.html";
-        };
-    })();
-</script>
-</body>
-</html>
+.sidebar {
+  width: var(--sidebar-w); background: var(--bg-card); backdrop-filter: blur(20px);
+  border-radius: var(--radius-l); padding: 32px 24px; display: flex; flex-direction: column;
+  box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.5); flex-shrink: 0;
+}
+
+.main {
+  flex: 1; background: var(--bg-card); backdrop-filter: blur(20px);
+  border-radius: var(--radius-l); border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: var(--shadow-soft); display: flex; flex-direction: column;
+  overflow: hidden; position: relative;
+}
+
+/* BRAND & NAV */
+.logo-area { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; padding-left: 8px; }
+.logo-icon {
+  width: 44px; height: 44px; border-radius: 14px; background: var(--accent-fun);
+  color: white; display: grid; place-items: center; font-size: 22px; font-weight: 800;
+  box-shadow: 0 8px 16px rgba(139, 92, 246, 0.3);
+}
+.logo-text { font-weight: 800; font-size: 24px; letter-spacing: -1.2px; }
+
+.nav-menu { display: flex; flex-direction: column; gap: 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+  border-radius: var(--radius-m); color: var(--text-muted); font-weight: 700;
+  font-size: 16px; text-decoration: none; transition: 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.nav-item:hover, .nav-item.active { background: white; color: var(--accent-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+/* CONTENT HEADER */
+.top-header { height: 100px; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.page-title { font-size: 34px; font-weight: 800; letter-spacing: -1.5px; }
+
+.fun-strip {
+  margin: 0 32px 32px; padding: 16px 24px; background: white; border-radius: var(--radius-m);
+  display: flex; align-items: center; gap: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);
+}
+.strip-badge { background: var(--accent-bg); color: var(--accent-primary); font-weight: 800; font-size: 11px; padding: 6px 14px; border-radius: 99px; }
+
+.content-scroll { flex: 1; overflow-y: auto; padding: 0 40px 40px; }
+
+/* GRID & CARDS */
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px; }
+.kpi-card { background: white; padding: 32px; border-radius: var(--radius-l); border: 1px solid var(--border-soft); box-shadow: var(--shadow-soft); transition: 0.25s; }
+.kpi-label { font-size: 13px; font-weight: 800; color: var(--text-light); text-transform: uppercase; letter-spacing: 1.5px; }
+.kpi-val { font-size: 52px; font-weight: 800; color: var(--text-main); margin: 8px 0; letter-spacing: -2.5px; }
+
+.grid-split { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; }
+.section-title { font-size: 22px; font-weight: 800; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+
+/* INPUTS */
+.fun-input {
+  width: 100%; padding: 18px 22px; border-radius: var(--radius-md); border: 2px solid var(--border-soft);
+  background: var(--bg-app); font-family: inherit; font-size: 18px; font-weight: 600; transition: 0.25s;
+}
+.fun-input:focus { outline: none; border-color: var(--accent-primary); background: white; box-shadow: 0 0 0 6px var(--accent-bg); }
+
+.btn-fun {
+  background: var(--text-main); color: white; padding: 16px 32px; border-radius: 99px;
+  font-weight: 800; font-size: 16px; border: none; cursor: pointer; transition: 0.2s;
+}
+.btn-fun:hover { transform: translateY(-3px); box-shadow: var(--shadow-float); }
+
+.segTabs { background: var(--bg-app); padding: 8px; border-radius: var(--radius-md); display: flex; gap: 10px; }
+.segBtn {
+  flex: 1; border: none; background: transparent; padding: 14px; border-radius: var(--radius-md); 
+  font-weight: 700; font-size: 15px; color: var(--text-muted); cursor: pointer;
+}
+.segBtn.is-active { background: var(--accent-fun); color: white; box-shadow: var(--shadow-float); }
