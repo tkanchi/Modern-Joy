@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scrummer — Actions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="suggestions">
+
+<div class="app-container">
+  
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">S</div>
+      <div class="logo-text">Scrummer</div>
+    </div>
+
+    <nav class="nav-menu">
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">🚀</span> Setup
+      </a>
+      <a href="intelligence.html" class="nav-item">
+        <span class="nav-icon">📊</span> Insights
+      </a>
+      <a href="suggestions.html" class="nav-item active">
+        <span class="nav-icon">💡</span> Actions
+      </a>
+      <a href="workspace.html" class="nav-item">
+        <span class="nav-icon">⚡</span> Copilot
+      </a>
+    </nav>
+
+    <div class="pro-card">
+      <div class="pro-shine"></div>
+      <div class="pro-title">Scrummer Gold</div>
+      <div class="pro-sub">Unlock AI & Unlimited History</div>
+      <button class="pro-btn">Upgrade ✨</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    
+    <header class="top-header">
+      <div class="page-title">Recommended Actions</div>
+      
+      <div style="display:flex; gap:12px;">
+        <a href="intelligence.html" class="btn-fun" style="background:white; color:var(--text-muted); border:1px solid #E5E7EB; font-size:12px; text-decoration:none;">Back</a>
+      </div>
+    </header>
+
+    <div class="fun-strip">
+      <div class="strip-badge">Step 3</div>
+      <div class="strip-text">Next Steps</div>
+      <div class="strip-sub">Actionable items based on your signals.</div>
+    </div>
+
+    <div class="content-scroll">
+      
+      <div class="grid-split">
+        
+        <div>
+          <div class="section-title"><span>🔥</span> Priority Actions</div>
+          
+          <div id="suggestionsList" style="display:flex; flex-direction:column; gap:16px;">
+            <div style="font-size:13px; color:var(--text-muted); padding:20px; background:white; border-radius:16px; text-align:center;">
+              Analyzing signals...
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title"><span>🌱</span> Pro Tips</div>
+          
+          <div class="action-card" style="cursor:default;">
+            <div style="font-weight:700; font-size:14px; margin-bottom:8px;">Why these actions?</div>
+            <p style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:12px;">
+              Scrummer prioritizes actions that have the highest impact on <b>Velocity Stability</b> and <b>Team Health</b>.
+            </p>
+            <div class="kpi-tag tag-good">AI Optimized</div>
+          </div>
+
+          <div class="action-card" style="cursor:default; background:#F0FDF4; border:1px solid #DCFCE7;">
+            <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:#166534;">Did you know?</div>
+            <p style="font-size:13px; color:#166534; line-height:1.6;">
+              Teams that address "Scope Creep" in the first 3 days of a sprint are 40% more likely to meet their goals.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="js/metrics.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/suggestions.js"></script>
+<script src="js/shell.js"></script>
+</body>
+</html>
