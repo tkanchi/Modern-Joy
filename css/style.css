@@ -3,22 +3,33 @@
    Aesthetic: Google Material 3 (Airy, Structured, Reliable)
    ========================================================= */
 
+/* Premium Theme Smoothing - Optimized */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-delay: 0s !important;
+}
+
 /* -----------------------------
    Theme variables
 ------------------------------ */
 :root {
-  /* Google Blue Palette */
-  --bg-primary: #f0f4f8;        /* Page background (Behind sidebar) */
-  --bg-secondary: #ffffff;      /* Main Surface (Floating Sheet) */
-  --bg-elevated: #f8f9fa;       /* Hover / Sub-panel states */
+  --bg-primary: #f0f4f8;        
+  --bg-secondary: #ffffff;      
+  --bg-elevated: #f8f9fa;       
 
-  --text-primary: #1f1f1f;      /* Material Dark Grey */
+  --text-primary: #1f1f1f;      
   --text-muted: #444746;
   --text-light: #747775;
 
-  --accent: #0b57d0;            /* Google Blue */
+  --accent: #0b57d0;            
   --accent-strong: #0842a0;
-  --accent-bg: #d3e3fd;         /* Active Pill BG */
+  --accent-bg: #d3e3fd;         
 
   --success: #146c2e;
   --warning: #ea8600;
@@ -27,13 +38,12 @@
   --border-soft: #e0e3e7;
   --border-strong: #c4c7c5;
 
-  /* Premium Depth */
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
 
-  --radius-lg: 24px;            /* Main Container rounding */
-  --radius-md: 16px;            /* Card rounding */
+  --radius-lg: 24px;            
+  --radius-md: 16px;            
   --radius-sm: 12px;
   --radius-pill: 999px;
 
@@ -73,29 +83,33 @@ html[data-theme="dark"] {
    Base + Typography
 ------------------------------ */
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+html, body { height: 100%; margin: 0; }
 body {
-  margin: 0;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: "Inter", "Google Sans", sans-serif;
+  font-family: "Inter", "Google Sans", -apple-system, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 /* -----------------------------
-   Shell Layout (The Floating Sheet)
+   Shell Layout
 ------------------------------ */
-.app { display: flex; height: 100vh; overflow: hidden; }
+.app { 
+  display: flex; 
+  height: 100vh; 
+  overflow: hidden; 
+}
 
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
-  padding: 18px 14px;
-  background: var(--bg-primary); /* Sits outside the sheet */
+  padding: 24px 16px;
+  background: var(--bg-primary); 
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
 }
 
 .main {
@@ -104,7 +118,7 @@ body {
   flex-direction: column;
   min-width: 0;
   background: var(--bg-secondary);
-  margin: 12px 12px 12px 0; /* Creates the floating effect */
+  margin: 12px 12px 12px 0; 
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -112,12 +126,48 @@ body {
 }
 
 /* -----------------------------
-   Topbar (Integrated into Sheet)
+   Navigation (Google Pill Style)
+------------------------------ */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--trans-fast);
+}
+
+.nav a:hover { 
+  background: rgba(0, 0, 0, 0.04); 
+  color: var(--text-primary); 
+}
+
+.nav a.active { 
+  background: var(--accent-bg); 
+  color: var(--accent-strong); 
+  font-weight: 600; 
+}
+
+[data-theme="dark"] .nav a:hover { background: rgba(255, 255, 255, 0.05); }
+
+/* -----------------------------
+   Content & Layout
 ------------------------------ */
 .topbar {
-  padding: 18px 32px;
+  padding: 16px 32px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   z-index: 10;
 }
 
@@ -125,51 +175,18 @@ body {
   flex: 1;
   padding: 32px;
   overflow-y: auto;
-  animation: fadeInUp 0.4s var(--trans-med);
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  scrollbar-width: thin;
 }
 
 /* -----------------------------
-   ✅ THE PREMIUM STRIP (Google Banner)
+   Components (KPIs & Cards)
 ------------------------------ */
-.topbarLeft .headerBrand {
-  width: 100%;
-  display: flex;
-  align-items: center;
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-sm); /* Rectangular but Material-compliant */
 }
 
-.hbLine { font-weight: 700; font-size: 14px; color: var(--accent); }
-.hbSub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-/* -----------------------------
-   Nav (Pills)
------------------------------- */
-.nav a {
-  padding: 12px 16px;
-  border-radius: var(--radius-pill);
-  color: var(--text-muted);
-  font-weight: 500;
-  transition: all var(--trans-fast);
-  margin-bottom: 4px;
-}
-
-.nav a:hover { background: rgba(0,0,0,0.04); color: var(--text-primary); }
-.nav a.active { background: var(--accent-bg); color: var(--accent-strong); font-weight: 600; }
-.nav a.active::before { display: none; } /* Remove the old bar-style indicator */
-
-/* -----------------------------
-   KPI Mini Boxes
------------------------------- */
 .kpi {
   background: var(--bg-secondary);
   border: 1px solid var(--border-soft);
@@ -177,72 +194,81 @@ body {
   padding: 20px;
   transition: transform var(--trans-fast), box-shadow var(--trans-fast);
 }
-.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.kpiValue { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; }
-.kpiMeta { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.kpi:hover { 
+  transform: translateY(-2px); 
+  box-shadow: var(--shadow-md); 
+  border-color: var(--border-strong);
+}
+
+.kpiValue { 
+  font-size: 28px; 
+  font-weight: 700; 
+  margin: 8px 0 4px;
+}
 
 /* -----------------------------
-   Signal Colors + Bars
+   Premium Tagline Strip
 ------------------------------ */
-.bar { height: 6px; background: #e0e3e7; border-radius: 99px; overflow: hidden; border: none; }
-.barFill { border-radius: 99px; background: var(--accent); }
-.barFill.danger { background: var(--danger); }
-.barFill.warn { background: var(--warning); }
-.barFill.ok { background: var(--success); }
-
-/* -----------------------------
-   Action Cards (Google Suggestions)
------------------------------- */
-.actionCard {
-  border-radius: var(--radius-md);
-  padding: 16px;
+.headerBrand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-soft);
-  transition: all var(--trans-fast);
-}
-.actionCard:hover { border-color: var(--border-strong); background: var(--bg-secondary); }
-.actionCard.danger { border-left: 4px solid var(--danger); background: rgba(186, 26, 26, 0.02); }
-.actionCard.warn { border-left: 4px solid var(--warning); background: rgba(234, 134, 0, 0.02); }
-
-/* -----------------------------
-   Copilot Workspace (The Command Center)
------------------------------- */
-.briefKpi {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
-  padding: 16px;
+  margin-bottom: 24px;
 }
-.segTabs { background: var(--bg-elevated); padding: 4px; border-radius: var(--radius-pill); display: inline-flex; }
-.segBtn { border: none; background: transparent; padding: 8px 16px; border-radius: var(--radius-pill); font-weight: 500; }
-.segBtn.is-active { background: var(--bg-secondary); box-shadow: var(--shadow-sm); color: var(--accent); }
 
 /* -----------------------------
    Buttons
 ------------------------------ */
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 40px;
   padding: 0 24px;
   border-radius: var(--radius-pill);
   font-weight: 500;
+  cursor: pointer;
   transition: all var(--trans-fast);
   border: 1px solid var(--border-soft);
   background: var(--bg-secondary);
+  color: var(--text-primary);
+  text-decoration: none;
 }
+
 .btnPrimary {
   background: var(--accent);
-  color: #fff;
+  color: #ffffff;
   border: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
-.btnPrimary:hover { background: var(--accent-strong); transform: none; box-shadow: var(--shadow-md); }
+
+.btnPrimary:hover {
+  background: var(--accent-strong);
+  box-shadow: var(--shadow-md);
+}
 
 /* -----------------------------
-   Responsive
+   Responsive Logic
 ------------------------------ */
+@media (max-width: 1100px) {
+  .grid4 { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 860px) {
   .app { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; border-right: none; }
-  .main { margin: 0; border-radius: 0; }
-  .grid4 { grid-template-columns: repeat(2, 1fr); }
+  .sidebar { 
+    width: 100%; 
+    height: auto; 
+    padding: 16px;
+    border-bottom: 1px solid var(--border-soft); 
+  }
+  .main { 
+    margin: 0; 
+    border-radius: 0; 
+  }
+  .content { padding: 20px; }
 }
