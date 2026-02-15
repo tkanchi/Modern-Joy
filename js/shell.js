@@ -3,6 +3,24 @@
    Core Engine: Handles Math, Storage, UI, and Theme Logic
    ========================================================= */
 
+// Theme Toggle Handler
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'themeToggle') {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('scrummer-theme', isDark ? 'dark' : 'light');
+        e.target.innerText = isDark ? "Theme: Dark" : "Theme: Light";
+    }
+});
+
+// Load Theme on Startup
+if (localStorage.getItem('scrummer-theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    setTimeout(() => {
+        if(document.getElementById('themeToggle')) 
+            document.getElementById('themeToggle').innerText = "Theme: Dark";
+    }, 10);
+}
+
 (() => {
   // ----------------------------
   // 1) Active Sidebar & Theme Logic
