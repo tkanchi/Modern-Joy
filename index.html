@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scrummer — Launchpad</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="launchpad">
@@ -140,10 +142,6 @@
 <script>
   (function(){
     const $ = (id) => document.getElementById(id);
-    // Note: We don't have a 'nextInsightsBtn' in the new layout 
-    // because the flow is: Fill Form -> Click Save -> Auto Redirect.
-    // But we keep the logic just in case you add it back.
-    
     const setup = window.Scrummer?.setup;
     if (!setup) return;
 
