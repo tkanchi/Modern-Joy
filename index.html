@@ -5,60 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrummer — Launchpad</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* CSS FIXES */
-        
-        /* Bug 4: Fix clipping at the bottom */
-        .content-scroll {
-            padding-bottom: 100px !important; 
-        }
-
-        /* Bug 5: Theme Toggle Styles */
-        body.dark-mode {
-            background-color: #111827;
-            color: #f9fafb;
-        }
-        body.dark-mode .sidebar { background: #1f2937; border-right-color: #374151; }
-        body.dark-mode aside { color: white; }
-        body.dark-mode div[style*="background:white"], 
-        body.dark-mode div[style*="background:#fff"] { 
-            background: #1f2937 !important; 
-            border-color: #374151 !important; 
-            color: white !important;
-        }
-        body.dark-mode .fun-input { background: #374151; color: white; border-color: #4b5563; }
-        body.dark-mode .kpi-label { color: #d1d5db; }
-
-        /* Bug 7: Positioning Next button next to steps */
-        .launchpad-header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 24px;
-        }
-        .steps-box {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-    </style>
 </head>
 <body data-page="launchpad">
 
 <div class="app-container">
     <aside class="sidebar">
         <div style="font-weight:900; font-size:26px; margin-bottom:40px;">SCRUMMER</div>
-        
         <nav style="display:grid; gap:8px; margin-bottom:auto;">
-            <a href="index.html" class="step-pill active" style="text-decoration:none; display:block; text-align:center;">🚀 Setup</a>
-            <a href="intelligence.html" class="step-pill" style="text-decoration:none; display:block; text-align:center; margin-top:8px;">📊 Insights</a>
+            <a href="index.html" class="nav-item active" style="text-decoration:none;">🚀 Setup</a>
+            <a href="intelligence.html" class="nav-item" style="text-decoration:none;">📊 Insights</a>
         </nav>
 
-        <div style="padding:20px 0; border-top:1px solid #eee;">
-            <button id="themeToggle" class="btn-fun" style="width:100%; background:#f3f4f6; color:#111;">Theme: Light</button>
+        <div style="padding:20px 0; border-top:1px solid var(--border-soft);">
+            <button id="themeToggle" class="btn-fun" style="width:100%;">Theme: Light</button>
         </div>
 
-        <div style="padding:24px; background:linear-gradient(135deg, #6366f1, #a855f7); border-radius:20px; color:white;">
+        <div class="pro-card" style="padding:24px; background:linear-gradient(135deg, #6366f1, #a855f7); border-radius:20px; color:white;">
             <div style="font-weight:800; font-size:15px; margin-bottom:12px;">Scrummer Gold</div>
             <button class="btn-fun" style="background:white; color:black; font-size:11px; width:100%;">Upgrade ✨</button>
         </div>
@@ -68,82 +30,59 @@
         <header class="top-header">
             <div style="display:flex; flex-direction:column; gap:4px;">
                 <div style="font-size:22px; font-weight:800;">Know what's happening. Know what to do next.</div>
-                <div style="font-size:14px; color:#6B7280;">AI-powered delivery intelligence for teams.</div>
+                <div style="font-size:14px; color:var(--text-muted);">AI-powered delivery intelligence for teams.</div>
             </div>
-            </header>
+        </header>
 
         <div class="content-scroll">
-            <div class="launchpad-header-container">
-                <div>
-                    <h1 style="font-size:42px; font-weight:900; margin:0; letter-spacing:-2px;">Launchpad</h1>
-                    <div class="prog-bar" style="margin-top:12px; background:none; padding:0;">
+            <div class="launchpad-section">
+                <h1 style="font-size:42px; font-weight:900; margin:0 0 8px 0; letter-spacing:-2px;">Launchpad</h1>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:32px;">
+                    <div class="prog-bar-mini">
                         <div class="step-pill active">Step 1: Setup</div>
                         <div class="step-pill">Step 2: Insights</div>
                         <div class="step-pill">Step 3: Actions</div>
                     </div>
+                    <button id="headerNext" class="btn-fun primary">Next Insights ➔</button>
                 </div>
-                <button id="headerNext" class="btn-fun primary">Next: Insights ➔</button>
             </div>
-            
-            <div style="background:#f8f9fa; border-left:4px solid var(--accent-primary); padding:12px 24px; border-radius:8px; margin-bottom:32px;">
+
+            <div style="background:var(--bg-app); border-left:4px solid var(--accent-primary); padding:12px 24px; border-radius:8px; margin-bottom:32px;">
                 <div style="font-weight:800; color:var(--accent-primary); font-size:14px; text-transform:uppercase;">Sprint Setup</div>
-                <div style="font-size:14px; color:#666;">Initialize your capacity and velocity history below.</div>
+                <div style="font-size:14px; color:var(--text-muted);">These fields power Risk Score + Confidence %.</div>
             </div>
 
             <div class="grid-main">
-                <div style="background:white; border:1px solid #eee; padding:40px; border-radius:28px; box-shadow:0 4px 20px rgba(0,0,0,0.02);">
-                    <h2 style="font-size:24px; font-weight:800; margin-bottom:4px;">Sprint Setup</h2>
-                    <p style="font-size:13px; color:#6B7280; margin-bottom:32px;">These fields power Risk Score + Confidence %.</p>
+                <div style="background:white; border:1px solid var(--border-soft); padding:40px; border-radius:var(--radius-l); box-shadow:var(--shadow-soft);">
+                    <h2 style="font-size:24px; font-weight:800; margin-bottom:32px;">Sprint Setup</h2>
                     
-                    <div class="input-group">
-                        <label class="kpi-label">Sprint Length (Working Days)</label>
-                        <input id="sprintDays" type="number" class="fun-input" value="10">
-                    </div>
-
-                    <div class="input-group">
-                        <label class="kpi-label">Team Members</label>
-                        <input id="teamMembers" type="number" class="fun-input" value="7">
-                    </div>
-
-                    <div class="input-group">
-                        <label class="kpi-label">Committed Story Points</label>
-                        <input id="committedSP" type="number" class="fun-input" placeholder="40">
-                    </div>
+                    <div class="input-group"><label class="kpi-label">Sprint Length (Working Days)</label><input id="sprintDays" type="number" class="fun-input" value="10"></div>
+                    <div class="input-group"><label class="kpi-label">Team Members</label><input id="teamMembers" type="number" class="fun-input" value="7"></div>
+                    <div class="input-group"><label class="kpi-label">Committed Points</label><input id="committedSP" type="number" class="fun-input" placeholder="40"></div>
                 </div>
 
                 <div style="display:flex; flex-direction:column; gap:24px;">
-                    <div style="background:#fff; border:1px solid #eee; padding:24px; border-radius:24px;">
+                    <div style="background:#fff; border:1px solid var(--border-soft); padding:24px; border-radius:var(--radius-m);">
                         <div style="font-weight:800; font-size:15px; margin-bottom:4px;">Demo Data</div>
-                        <div style="font-size:11px; color:#9CA3AF; margin-bottom:12px;">Load sample inputs to test Excellent, Normal, and Risky scenarios.</div>
-                        <div style="display:flex; gap:8px;">
-                            <button id="demoExcellent" class="btn-fun" style="flex:1; background:#f0fdf4; color:#166534; font-size:12px;">Excellent</button>
-                            <button id="demoNormal" class="btn-fun" style="flex:1; background:#f0f9ff; color:#075985; font-size:12px;">Normal</button>
-                            <button id="demoRisky" class="btn-fun" style="flex:1; background:#fef2f2; color:#991b1b; font-size:12px;">Risky</button>
+                        <div style="font-size:11px; color:var(--text-light); margin-bottom:16px;">Load sample inputs to test Excellent, Normal, and Risky scenarios.</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                            <button id="demoExcellent" class="btn-fun" style="font-size:11px; padding:10px;">Excellent</button>
+                            <button id="demoNormal" class="btn-fun" style="font-size:11px; padding:10px; background:#f3f4f6; color:#111;">Normal</button>
+                            <button id="demoRisky" class="btn-fun" style="font-size:11px; padding:10px; background:#fee2e2; color:#991b1b;">Risky</button>
                         </div>
                     </div>
 
-                    <div style="background:white; border:1px solid #eee; padding:24px; border-radius:24px;">
+                    <div style="background:white; border:1px solid var(--border-soft); padding:24px; border-radius:var(--radius-m);">
                         <div style="font-weight:800; font-size:15px; margin-bottom:4px;">Last 3 Sprint Velocities (completed SP)</div>
-                        <div style="font-size:11px; color:#9CA3AF; margin-bottom:16px;">Used to compute average velocity + volatility.</div>
+                        <div style="font-size:11px; color:var(--text-light); margin-bottom:16px;">Used to compute average velocity + volatility.</div>
                         
-                        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
-                            <div class="input-group">
-                                <label class="kpi-label" style="font-size:10px;">N-1</label>
-                                <input id="v1" type="number" class="fun-input" style="padding:10px; font-size:14px;">
-                            </div>
-
-                            <div class="input-group">
-                                <label class="kpi-label" style="font-size:10px;">N-2</label>
-                                <input id="v2" type="number" class="fun-input" style="padding:10px; font-size:14px;">
-                            </div>
-
-                            <div class="input-group">
-                                <label class="kpi-label" style="font-size:10px;">N-3</label>
-                                <input id="v3" type="number" class="fun-input" style="padding:10px; font-size:14px;">
-                            </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                            <div class="input-group"><label class="kpi-label" style="font-size:10px;">N-1</label><input id="v1" type="number" class="fun-input" style="padding:10px;"></div>
+                            <div class="input-group"><label class="kpi-label" style="font-size:10px;">N-2</label><input id="v2" type="number" class="fun-input" style="padding:10px;"></div>
+                            <div class="input-group"><label class="kpi-label" style="font-size:10px;">N-3</label><input id="v3" type="number" class="fun-input" style="padding:10px;"></div>
                         </div>
 
-                        <button id="saveSetup" class="btn-fun primary" style="width:100%; height:54px; margin-top:12px;">Save Setup ➔</button>
+                        <button id="saveSetup" class="btn-fun primary" style="width:100%; height:54px; margin-top:12px;">Save & Continue ➔</button>
                     </div>
                 </div>
             </div>
@@ -151,23 +90,11 @@
     </main>
 </div>
 
-<script src="js/metrics.js"></script>
 <script src="js/shell.js"></script>
 <script>
     (function(){
         const $ = (id) => document.getElementById(id);
         const setupApi = window.Scrummer?.setup;
-
-        // Bug 5: Theme Toggle Logic
-        const themeBtn = $("themeToggle");
-        themeBtn.onclick = () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            themeBtn.innerText = isDark ? "Theme: Dark" : "Theme: Light";
-            themeBtn.style.background = isDark ? "#374151" : "#f3f4f6";
-            themeBtn.style.color = isDark ? "white" : "#111";
-        };
-
         if (!setupApi) return;
 
         $("saveSetup").onclick = () => {
@@ -175,9 +102,7 @@
                 sprintDays: $("sprintDays").value,
                 teamMembers: $("teamMembers").value,
                 committedSP: $("committedSP").value,
-                v1: $("v1").value,
-                v2: $("v2").value,
-                v3: $("v3").value // Bug 1: Added 3rd field
+                v1: $("v1").value, v2: $("v2").value, v3: $("v3").value
             };
             setupApi.saveSetup(data);
             window.location.href = 'intelligence.html';
@@ -185,18 +110,17 @@
 
         $("headerNext").onclick = () => $("saveSetup").click();
 
-        // Bug 3: Updated Demo Loaders
         $("demoExcellent").onclick = () => {
             $("sprintDays").value = 10; $("teamMembers").value = 8; $("committedSP").value = 60;
-            $("v1").value = 62; $("v2").value = 60; $("v3").value = 65;
+            $("v1").value = 62; $("v2").value = 60; $("v3").value = 64;
         };
         $("demoNormal").onclick = () => {
-            $("sprintDays").value = 10; $("teamMembers").value = 7; $("committedSP").value = 40;
-            $("v1").value = 38; $("v2").value = 40; $("v3").value = 42;
+            $("sprintDays").value = 10; $("teamMembers").value = 7; $("committedSP").value = 45;
+            $("v1").value = 42; $("v2").value = 45; $("v3").value = 44;
         };
         $("demoRisky").onclick = () => {
             $("sprintDays").value = 10; $("teamMembers").value = 6; $("committedSP").value = 90;
-            $("v1").value = 55; $("v2").value = 50; $("v3").value = 40;
+            $("v1").value = 55; $("v2").value = 50; $("v3").value = 48;
         };
     })();
 </script>
