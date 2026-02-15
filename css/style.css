@@ -331,3 +331,47 @@ html, body {
     padding-bottom: 200px !important; 
     scroll-behavior: smooth;
 }
+
+/* BUG 5: THE CLIPPING FIX */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Prevents the window from scrolling; we scroll the content instead */
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden; /* Important: prevents the container from growing */
+}
+
+.content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+    /* This padding is the most important part of the fix */
+    padding-bottom: 120px !important; 
+    box-sizing: border-box;
+}
+
+/* Ensure the grid doesn't break the layout */
+.grid-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 32px;
+    align-items: start;
+}
+
+/* Optional buffer div for extra safety */
+.scroll-buffer {
+    height: 50px;
+    width: 100%;
+}
