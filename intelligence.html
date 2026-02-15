@@ -1,126 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrummer — Insights</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8"><title>Scrummer — Insights</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="intelligence">
-
 <div class="app-container">
-  
-  <aside class="sidebar">
-    <div class="logo-area">
-      <div class="logo-icon">S</div>
-      <div class="logo-text">Scrummer</div>
-    </div>
+    <aside class="sidebar">
+        <div class="logo-area"><div class="logo-icon">S</div><div class="logo-text">Scrummer</div></div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item"><span class="nav-icon">🚀</span> Setup</a>
+            <a href="intelligence.html" class="nav-item active"><span class="nav-icon">📊</span> Insights</a>
+        </nav>
+    </aside>
 
-    <nav class="nav-menu">
-      <a href="index.html" class="nav-item">
-        <span class="nav-icon">🚀</span> Setup
-      </a>
-      <a href="intelligence.html" class="nav-item active">
-        <span class="nav-icon">📊</span> Insights
-      </a>
-      <a href="suggestions.html" class="nav-item">
-        <span class="nav-icon">💡</span> Actions
-      </a>
-      <a href="workspace.html" class="nav-item">
-        <span class="nav-icon">⚡</span> Copilot
-      </a>
-    </nav>
-
-    <div class="pro-card">
-      <div class="pro-shine"></div>
-      <div class="pro-title">Scrummer Gold</div>
-      <div class="pro-sub">Unlock AI & Unlimited History</div>
-      <button class="pro-btn">Upgrade ✨</button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="top-header">
-      <div class="page-title">Sprint Intelligence</div>
-      <div style="display:flex; gap:12px;">
-        <a href="index.html" class="btn-fun" style="background:var(--bg-app); color:var(--text-main); text-decoration:none; padding:12px 24px;">Back</a>
-        <a href="suggestions.html" class="btn-fun" style="text-decoration:none; padding:12px 24px; background:var(--accent-fun);">View Actions ➔</a>
-      </div>
-    </header>
-
-    <div class="fun-strip">
-      <div class="strip-badge">Step 2</div>
-      <div class="strip-text">Analysis Live</div>
-      <div class="strip-sub">Risk signals generated based on current commitment and history.</div>
-    </div>
-
-    <div class="content-scroll">
-      
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px;">
-        <div class="kpi-card" style="text-align: center;">
-          <div class="kpi-label">Risk Score</div>
-          <div id="kpiRisk" class="kpi-val" style="color:var(--danger);">—</div>
-          <div class="fun-bar-bg" style="height:12px; margin-top:10px;"><div id="barRisk" class="fun-bar-fill" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card" style="text-align: center;">
-          <div class="kpi-label">Confidence</div>
-          <div id="kpiConfidence" class="kpi-val">—</div>
-          <div class="fun-bar-bg" style="height:12px; margin-top:10px;"><div id="barConfidence" class="fun-bar-fill" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card" style="text-align: center;">
-          <div class="kpi-label">Focus Factor</div>
-          <div id="kpiFocus" class="kpi-val">—</div>
-          <div class="kpi-tag tag-good" id="focusTag" style="margin-top:10px;">—</div>
-        </div>
-        <div class="kpi-card" style="text-align: center;">
-          <div class="kpi-label">Delivery Health</div>
-          <div id="kpiCapacity" class="kpi-val" style="font-size: 28px;">—</div>
-          <div class="kpi-tag" id="healthTag" style="margin-top:10px; background:var(--bg-app);">—</div>
-        </div>
-      </div>
-
-      <div class="grid-split">
-        
-        <section>
-          <div class="kpi-card" style="min-height: 400px;">
-            <div class="section-title"><span>📉</span> Top Risk Drivers</div>
-            <p style="color:var(--text-muted); font-size:15px; margin-bottom:24px;">Why the score is what it is.</p>
-            
-            <div id="driversEmpty" style="padding:40px; text-align:center; background:var(--bg-app); border-radius:18px; color:var(--text-light);">
-              No data detected. Return to Setup to begin.
+    <main class="main">
+        <header class="top-header"><div class="page-title">Sprint Intelligence</div></header>
+        <div class="content-scroll">
+            <div class="grid-4">
+                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Risk Score</div><div id="kpiRisk" class="kpi-val" style="color:var(--danger);">—</div></div>
+                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Confidence</div><div id="kpiConfidence" class="kpi-val">—</div></div>
+                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Focus Factor</div><div id="kpiFocus" class="kpi-val">—</div></div>
+                <div class="kpi-card" style="text-align:center;"><div class="kpi-label">Health</div><div id="kpiCapacity" class="kpi-val">—</div></div>
             </div>
-            <div id="driversList" style="display:grid; gap:20px;"></div>
-          </div>
-        </section>
-
-        <aside style="display:flex; flex-direction:column; gap:24px;">
-          <div class="kpi-card">
-            <div class="section-title">🚦 Signals</div>
-            <div style="display:grid; gap:12px;">
-              <div id="sigScope" class="kpi-tag" style="padding:14px; font-size:14px; justify-content:flex-start; background:var(--bg-app); width:100%;">Scope: —</div>
-              <div id="sigCapacity" class="kpi-tag" style="padding:14px; font-size:14px; justify-content:flex-start; background:var(--bg-app); width:100%;">Capacity: —</div>
-              <div id="sigFlow" class="kpi-tag" style="padding:14px; font-size:14px; justify-content:flex-start; background:var(--bg-app); width:100%;">Flow: —</div>
+            <div class="grid-split">
+                <div class="kpi-card"><div class="section-title">Risk Drivers</div><div id="driversList"></div></div>
+                <div class="kpi-card"><div class="section-title">Signals</div><div id="sigScope">Scope: —</div></div>
             </div>
-          </div>
-
-          <div class="action-card" style="background:var(--text-main); color:white;">
-            <div style="font-weight:800; font-size:18px; margin-bottom:8px;">Save Snapshot</div>
-            <p style="font-size:13px; opacity:0.7; margin-bottom:16px;">Log these metrics to track trends over time.</p>
-            <button id="saveSnapshot" class="btn-fun" style="background:white; color:black; width:100%;">Log Performance</button>
-          </div>
-        </aside>
-
-      </div>
-    </div>
-  </main>
+        </div>
+    </main>
 </div>
-
-<script src="js/metrics.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/intelligence.js"></script>
-<script src="js/shell.js"></script>
+<script src="js/metrics.js"></script><script src="js/intelligence.js"></script><script src="js/shell.js"></script>
 </body>
 </html>
