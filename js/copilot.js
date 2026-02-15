@@ -7,285 +7,197 @@
   const $ = (id) => document.getElementById(id);
   const setupApi = window.Scrummer?.setup;
   const computeSignals = window.Scrummer?.computeSignals;
-
   const COPILOT_KEY = "scrummer-copilot-v1";
 
-  function loadCopilot(){
-    try{
+  // --- Persistence ---
+  const loadCopilot = () => {
+    try {
       const raw = localStorage.getItem(COPILOT_KEY);
-      const v = raw ? JSON.parse(raw) : {};
-      return (v && typeof v === "object") ? v : {};
-    }catch{ return {}; }
-  }
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  };
 
-  function saveCopilot(obj){
-    try{ localStorage.setItem(COPILOT_KEY, JSON.stringify(obj)); }catch(e){}
-  }
+  const saveCopilot = (obj) => localStorage.setItem(COPILOT_KEY, JSON.stringify(obj));
 
   /* -----------------------------
-     Modern Joy: Active Tab Styling
+      UI Interaction Helpers
   ------------------------------ */
-  function setActiveTab(tab){
+  function setActiveTab(tab) {
     document.querySelectorAll(".segBtn").forEach(b => {
       const isActive = b.dataset.tab === tab;
       b.classList.toggle("is-active", isActive);
       
-      // Applying Modern Joy specific styles
+      // Syncing with Modern Joy CSS variables
       if (isActive) {
-        b.style.background = 'var(--text-main)';
+        b.style.background = 'var(--accent-primary)';
         b.style.color = 'white';
-        b.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
       } else {
-        b.style.background = 'var(--bg-app)';
+        b.style.background = 'var(--border-soft)';
         b.style.color = 'var(--text-muted)';
-        b.style.boxShadow = 'none';
       }
     });
   }
 
-  function showMsg(text, type = "success"){
+  function showMsg(text, type = "success") {
     const el = $("copilotMsg");
     if (!el) return;
     el.style.display = "block";
-    el.style.color = type === "success" ? "var(--success)" : "var(--danger)";
+    el.style.color = type === "success" ? "#059669" : "#dc2626";
     el.innerHTML = `<b>${text}</b>`;
-    setTimeout(()=>{ el.style.display="none"; }, 1800);
+    setTimeout(() => { el.style.display = "none"; }, 1800);
   }
 
-  // --- Recommendation logic ---
-  function recommend(signals){
+  // --- AI Recommendation Logic ---
+  function recommend(signals) {
     const over = signals.overcommitRatio || 0;
-    const capRatio = (signals.avgVelocity > 0) ? (signals.capacitySP / signals.avgVelocity) : 0;
     const focus = signals.focusFactor || 0;
     const vol = signals.vol || 0;
     const conf = signals.confidence || 0;
 
-    if (over > 1.10 || capRatio < 1.0) return "planning";
-    if (focus < 0.90) return "daily";
-    if (vol > 0.18) return "retro";
-    if (conf < 70) return "review";
-    return "planning";
+    if (over > 1.15) return "planning"; // Too much scope
+    if (focus < 0.85) return "daily";    // Too many distractions
+    if (vol > 0.20) return "refine";    // Unstable velocity
+    if (conf < 75) return "retro";      // Low confidence
+    return "daily"; 
   }
 
-  function setRecommendationUI(tab){
-    const map = {
-      planning: ["badgePlanning", "Planning"],
-      daily: ["badgeDaily", "Daily"],
-      refine: ["badgeRefine", "Refinement"],
-      review: ["badgeReview", "Review"],
-      retro: ["badgeRetro", "Retro"]
-    };
-
-    Object.keys(map).forEach(k=>{
-      const el = $(map[k][0]);
-      if (el) el.style.display = (k === tab) ? "inline-flex" : "none";
-    });
-
+  function setRecommendationUI(tab) {
     const badge = $("copilotRecommended");
+    const names = { planning: "Planning", daily: "Daily", refine: "Refinement", review: "Review", retro: "Retro" };
     if (badge) {
-        badge.textContent = "AI Recommendation: " + (map[tab]?.[1] || "—");
-        badge.className = "kpi-tag tag-good";
+        badge.textContent = "AI Suggests: " + (names[tab] || "Daily");
+        badge.style.background = "#f0fdf4";
+        badge.style.color = "#166534";
     }
   }
 
-  function fmtX(n){
-    if (!Number.isFinite(n)) return "—";
-    return n.toFixed(2) + "x";
-  }
-
-  function renderBrief(s){
-    if ($("briefScope")) $("briefScope").textContent = fmtX(s.overcommitRatio);
-    
-    const capRatio = (s.avgVelocity > 0) ? (s.capacitySP / s.avgVelocity) : 0;
-    if ($("briefCapRatio")) $("briefCapRatio").textContent = fmtX(capRatio);
-
+  function renderBrief(s) {
+    if ($("briefScope")) $("briefScope").textContent = Math.round(s.overcommitRatio * 100) + "%";
+    if ($("briefCapRatio")) $("briefCapRatio").textContent = Math.round(s.focusFactor * 100) + "%";
     if ($("briefConf")) $("briefConf").textContent = Math.round(s.confidence) + "%";
-    if ($("briefRisk")) $("briefRisk").textContent = String(Math.round(s.riskScore));
+    if ($("briefRisk")) {
+        const risk = Math.round(s.riskScore);
+        $("briefRisk").textContent = risk;
+        $("briefRisk").style.color = risk > 60 ? "#ef4444" : risk > 30 ? "#f59e0b" : "#10b981";
+    }
   }
 
-  // Content templates
-  function contentFor(tab, s){
-    const over = s.overcommitRatio || 0;
-    const capRatio = (s.avgVelocity > 0) ? (s.capacitySP / s.avgVelocity) : 0;
-    const focus = s.focusFactor || 0;
-    const vol = s.vol || 0;
-    const conf = s.confidence || 0;
-
+  // Content Template Generator
+  function contentFor(tab, s) {
     const base = {
       planning: {
         title: "Sprint Planning",
-        why: "Align scope with reality. Signals suggest checking commitment pressure.",
+        why: "Scope pressure is high. Use this ritual to negotiate a realistic commitment.",
         list: [
-          "Validate scope against average velocity.",
-          "Confirm availability assumptions (leave/holidays).",
-          "Identify optional backlog items for de-scoping."
+          "Compare planned SP against the 3-sprint average.",
+          "Identify 'Stretch Goals' to move to the next sprint.",
+          "Check for overlapping holidays or team leave."
         ],
-        fields: [
-          { id:"finalCommit", label:"Final Commitment (SP)", type:"number", placeholder:"e.g. 40" },
-          { id:"riskAcceptance", label:"Risk Acceptance", type:"select", options:["Low","Medium","High"] }
-        ]
+        fields: [{ id: "finalCommit", label: "Agreed Commitment", type: "number", placeholder: "SP" }]
       },
       daily: {
         title: "Daily Standup",
-        why: "Protect flow. Unblock tickets fast and swarm on critical items.",
+        why: "Focus factor is low. Use today to swarm on blockers and stop starting new work.",
         list: [
-          "Remove blockers with owners.",
-          "Limit parallel work (WIP).",
-          "Escalate dependencies early."
+          "Identify tickets older than 3 days.",
+          "Is anyone 'blocked' but not 'flagged'?",
+          "Review the WIP (Work In Progress) limit."
         ],
-        fields: [
-          { id:"blockerOwner", label:"Blocker Owner", type:"text", placeholder:"Name" },
-          { id:"wipMove", label:"WIP Decision", type:"select", options:["No change","Reduce WIP","Pause new work"] }
-        ]
+        fields: [{ id: "blocker", label: "Critical Blocker", type: "text", placeholder: "Task ID" }]
       },
       refine: {
-        title: "Refinement",
-        why: "Reduce future surprises. Break down large stories now.",
+        title: "Backlog Refinement",
+        why: "Velocity volatility is high. Stories need better slicing and 'Ready' criteria.",
         list: [
-          "Confirm acceptance criteria.",
-          "Split oversized items.",
-          "Ensure top items are 'Ready'."
+          "Break stories > 5SP into smaller units.",
+          "Clarify Acceptance Criteria for top 5 items.",
+          "Estimate technical complexity for new requests."
         ],
-        fields: [
-          { id:"readyCount", label:"Items marked Ready", type:"number", placeholder:"0" }
-        ]
+        fields: [{ id: "readyCount", label: "Ready Items", type: "number", placeholder: "Qty" }]
       },
       review: {
         title: "Sprint Review",
-        why: "Make progress visible. Reset priorities based on demo feedback.",
-        list: [
-          "Highlight shipped vs committed.",
-          "Capture stakeholder feedback.",
-          "Confirm priority for next sprint."
-        ],
-        fields: [
-          { id:"shipped", label:"Status", type:"select", options:["Ahead","On track","Behind"] }
-        ]
+        why: "Confidence is lagging. Showcase what's 'Done' and reset expectations.",
+        list: ["Demo completed features.", "Gather stakeholder sentiment.", "Capture new items for the backlog."],
+        fields: [{ id: "stakeholder", label: "Stakeholder Sentiment", type: "text", placeholder: "Feedback" }]
       },
       retro: {
         title: "Retrospective",
-        why: "Improve the system. Pick ONE experiment to reduce risk next time.",
-        list: [
-          "Identify biggest system constraint.",
-          "Choose one measurable experiment.",
-          "Assign owner + review date."
-        ],
-        fields: [
-          { id:"experiment", label:"Chosen Experiment", type:"text", placeholder:"e.g. Max 3 WIP" }
-        ]
+        why: "Delivery predictability is dropping. Pick one process experiment.",
+        list: ["What slowed us down?", "What was our 'Win'?", "One experiment for next sprint."],
+        fields: [{ id: "experiment", label: "Next Experiment", type: "text", placeholder: "e.g. Pair Programming" }]
       }
     };
-
-    // Signal-driven adjustments
-    if (tab === "planning" && over > 1.10) base.planning.list.unshift("🔥 High Scope Pressure: Re-check commitment!");
-    if (tab === "daily" && focus < 0.90) base.daily.list.unshift("⚠️ Low Focus: Reduce WIP immediately.");
-
-    return base[tab];
+    return base[tab] || base.planning;
   }
 
   /* -----------------------------
-     Modern Joy: Panel Rendering
+      Panel Rendering
   ------------------------------ */
-  function renderPanel(tab, s){
+  function renderPanel(tab, s) {
     const c = contentFor(tab, s);
+    const store = loadCopilot();
 
     if ($("panelTitle")) $("panelTitle").textContent = c.title;
     if ($("panelWhy")) $("panelWhy").textContent = c.why;
 
     const ul = $("panelList");
-    if (ul){
-      ul.innerHTML = "";
-      c.list.forEach(t=>{
-        const li = document.createElement("li");
-        li.style.marginBottom = "8px";
-        li.textContent = t;
-        ul.appendChild(li);
-      });
+    if (ul) {
+      ul.innerHTML = c.list.map(t => `<li style="margin-bottom:12px;">${t}</li>`).join('');
     }
 
     const grid = $("decisionFields");
-    if (!grid) return;
-    grid.innerHTML = "";
+    if (grid) {
+      grid.innerHTML = "";
+      c.fields.forEach(f => {
+        const wrap = document.createElement("div");
+        wrap.className = "input-group";
+        
+        const val = store[tab]?.[f.id] || "";
+        wrap.innerHTML = `
+          <label class="kpi-label">${f.label}</label>
+          <input id="cp_${f.id}" type="${f.type}" class="fun-input" value="${val}" placeholder="${f.placeholder}">
+        `;
+        grid.appendChild(wrap);
+      });
+    }
 
-    const store = loadCopilot();
-    const saved = store[tab] || {};
-
-    c.fields.forEach(f=>{
-      const wrap = document.createElement("div");
-      wrap.style.marginBottom = "16px";
-
-      const label = document.createElement("label");
-      label.style.display = "block";
-      label.style.fontSize = "11px";
-      label.style.fontWeight = "800";
-      label.style.color = "var(--text-muted)";
-      label.style.textTransform = "uppercase";
-      label.style.marginBottom = "6px";
-      label.textContent = f.label;
-      wrap.appendChild(label);
-
-      let input;
-      const commonStyle = "width:100%; padding:10px; border-radius:12px; border:1px solid #E5E7EB; background:#F9FAFB; font-family:inherit; font-size:13px;";
-
-      if (f.type === "select"){
-        input = document.createElement("select");
-        input.setAttribute('style', commonStyle);
-        (f.options || []).forEach(opt=>{
-          const o = document.createElement("option");
-          o.value = opt; o.textContent = opt;
-          input.appendChild(o);
-        });
-      } else {
-        input = document.createElement("input");
-        input.type = f.type || "text";
-        input.placeholder = f.placeholder || "";
-        input.setAttribute('style', commonStyle);
-      }
-
-      input.id = "cp_" + f.id;
-      if (saved[f.id]) input.value = saved[f.id];
-
-      wrap.appendChild(input);
-      grid.appendChild(wrap);
-    });
-
-    // Save/Clear Handlers
+    // Save/Clear Listeners
     $("copilotSave").onclick = () => {
-      const store = loadCopilot();
+      const currentStore = loadCopilot();
       const obj = {};
       c.fields.forEach(f => {
         const el = $("cp_" + f.id);
         obj[f.id] = el ? el.value : "";
       });
-      store[tab] = obj;
-      saveCopilot(store);
-      showMsg("Notes Saved!");
+      currentStore[tab] = obj;
+      saveCopilot(currentStore);
+      showMsg("Decisions Saved! ✨");
     };
 
     $("copilotClear").onclick = () => {
-      const store = loadCopilot();
-      delete store[tab];
-      saveCopilot(store);
+      const currentStore = loadCopilot();
+      delete currentStore[tab];
+      saveCopilot(currentStore);
       renderPanel(tab, s);
-      showMsg("Cleared", "danger");
+      showMsg("Form Reset", "danger");
     };
   }
 
-  function init(){
+  function init() {
     if (!setupApi || !computeSignals) return;
-    const setup = setupApi.loadSetup();
-    const s = computeSignals(setup);
+    const s = computeSignals(setupApi.loadSetup());
 
     renderBrief(s);
     const rec = recommend(s);
     setRecommendationUI(rec);
 
-    document.querySelectorAll(".segBtn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".segBtn").forEach(btn => {
+      btn.onclick = () => {
         const tab = btn.dataset.tab;
         setActiveTab(tab);
         renderPanel(tab, s);
-      });
+      };
     });
 
     setActiveTab(rec);
