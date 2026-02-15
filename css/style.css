@@ -4,98 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrummer — Launchpad</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="launchpad">
 
 <div class="app-container">
-    <aside class="sidebar">
-        <div style="font-weight:900; font-size:26px; margin-bottom:40px; color:var(--text-main);">SCRUMMER</div>
-        <nav style="display:grid; gap:8px;">
-            <a href="index.html" class="nav-item active">🚀 Setup</a>
-            <a href="intelligence.html" class="nav-item">📊 Insights</a>
-            <a href="suggestions.html" class="nav-item">💡 Actions</a>
-            <a href="workspace.html" class="nav-item">⚡ Copilot</a>
+    <aside class="sidebar" style="width:280px; background:white; border-radius:28px; padding:32px; box-shadow:0 10px 40px rgba(0,0,0,0.05);">
+        <div style="font-weight:900; font-size:24px; margin-bottom:40px;">SCRUMMER</div>
+        <nav style="display:grid; gap:12px;">
+            <a href="index.html" style="text-decoration:none; font-weight:800; color:#0b57d0;">🚀 Setup</a>
+            <a href="intelligence.html" style="text-decoration:none; font-weight:800; color:#666;">📊 Insights</a>
         </nav>
-        <div style="margin-top:auto; padding:24px; background:var(--accent-fun); border-radius:20px; color:white;">
-            <div style="font-weight:800; font-size:15px; margin-bottom:4px;">Scrummer Gold</div>
-            <div style="font-size:12px; opacity:0.9; margin-bottom:12px;">Unlock AI Analysis</div>
-            <button class="btn-fun" style="background:white; color:black; font-size:11px; padding:8px 16px;">Upgrade ✨</button>
-        </div>
     </aside>
 
     <main class="main">
         <header class="top-header">
-            <div class="tagline-box">
-                <div class="tagline-main">Know what's happening. Know what to do next.</div>
-                <div class="tagline-sub">AI-powered delivery intelligence for modern Agile teams.</div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+                <div style="font-size:22px; font-weight:800;">Know what's happening. Know what to do next.</div>
+                <div style="font-size:14px; color:#6B7280;">AI-powered delivery intelligence for teams.</div>
             </div>
-            <div style="display:flex; gap:16px; align-items:center;">
-                <button id="themeToggle" class="btn-fun" style="background:white; color:black; border:1px solid #ddd;">Theme: Light</button>
-                <button id="headerNext" class="btn-fun primary">Next: Insights ➔</button>
+            <div style="display:flex; gap:16px;">
+                <button class="btn-fun" style="background:white; color:black; border:1px solid #ddd;">Theme: Light</button>
+                <button onclick="window.location.href='intelligence.html'" class="btn-fun primary">Next: Insights ➔</button>
             </div>
         </header>
 
         <div class="prog-bar">
-            <div class="step-pill active">● Step 1: Setup</div>
-            <div class="step-pill">○ Step 2: Insights</div>
-            <div class="step-pill">○ Step 3: Actions</div>
+            <div class="step-pill active">Step 1: Setup</div>
+            <div class="step-pill">Step 2: Insights</div>
+            <div class="step-pill">Step 3: Actions</div>
         </div>
 
         <div class="content-scroll">
-            <div style="font-size:38px; font-weight:800; margin-bottom:40px; letter-spacing:-1.5px;">Launchpad</div>
+            <div style="font-size:38px; font-weight:800; margin-bottom:40px;">Launchpad</div>
 
-            <div class="kpi-card" style="margin-bottom:32px; display:flex; justify-content:space-between; align-items:center; background:#fbfbfb;">
-                <div style="max-width:500px;">
-                    <div style="font-weight:800; font-size:20px; margin-bottom:8px;">Demo Data</div>
-                    <div style="font-size:15px; color:var(--text-muted); line-height:1.5;">Load sample inputs to test Excellent, Normal, and Risky scenarios.</div>
+            <div class="kpi-card" style="margin-bottom:32px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:800; font-size:18px;">Demo Data</div>
+                    <div style="font-size:14px; color:#6B7280;">Test different sprint scenarios instantly.</div>
                 </div>
                 <div style="display:flex; gap:12px;">
-                    <button id="demoExcellent" class="demo-btn">Excellent</button>
-                    <button id="demoNormal" class="demo-btn">Normal</button>
-                    <button id="demoRisky" class="demo-btn">Risky</button>
+                    <button class="btn-fun" style="background:#eee; color:#666; font-size:12px;">Excellent</button>
+                    <button class="btn-fun" style="background:#eee; color:#666; font-size:12px;">Normal</button>
+                    <button class="btn-fun" style="background:#eee; color:#666; font-size:12px;">Risky</button>
                 </div>
             </div>
 
             <div class="grid-split">
                 <div class="kpi-card">
-                    <div class="section-title">Sprint Metrics</div>
+                    <div style="font-size:22px; font-weight:800; margin-bottom:24px;">Sprint Metrics</div>
                     <div class="input-group">
-                        <label class="kpi-label">Sprint Length (Days)</label>
-                        <input id="sprintDays" type="number" class="fun-input" value="10">
+                        <label class="kpi-label">Sprint Days</label>
+                        <input type="number" class="fun-input" value="10">
                     </div>
                     <div class="input-group">
                         <label class="kpi-label">Team Members</label>
-                        <input id="teamMembers" type="number" class="fun-input" value="7">
-                    </div>
-                    <div class="input-group">
-                        <label class="kpi-label">Planned Leave (Days)</label>
-                        <input id="leaveDays" type="number" class="fun-input" value="0">
+                        <input type="number" class="fun-input" value="7">
                     </div>
                     <div class="input-group">
                         <label class="kpi-label">Committed Points</label>
-                        <input id="committedSP" type="number" class="fun-input" value="40">
+                        <input type="number" class="fun-input" value="40">
                     </div>
                 </div>
 
-                <div class="kpi-card" style="display:flex; flex-direction:column;">
-                    <div class="section-title">Velocity History</div>
-                    <p style="font-size:14px; color:var(--text-muted); margin-bottom:24px;">Used to calculate historical stability.</p>
+                <div class="kpi-card">
+                    <div style="font-size:22px; font-weight:800; margin-bottom:24px;">Velocity History</div>
                     <div class="input-group">
-                        <label class="kpi-label">Latest Sprint (N-1)</label>
-                        <input id="v1" type="number" class="fun-input" placeholder="Points">
+                        <label class="kpi-label">Sprint N-1</label>
+                        <input type="number" class="fun-input" placeholder="Points">
                     </div>
                     <div class="input-group">
                         <label class="kpi-label">Sprint N-2</label>
-                        <input id="v2" type="number" class="fun-input" placeholder="Points">
+                        <input type="number" class="fun-input" placeholder="Points">
                     </div>
-                    <div class="input-group">
-                        <label class="kpi-label">Sprint N-3</label>
-                        <input id="v3" type="number" class="fun-input" placeholder="Points">
-                    </div>
-                    <button id="saveSetup" class="btn-fun primary" style="width:100%; margin-top:auto; height:64px;">Save & Continue ➔</button>
+                    <button class="btn-fun primary" style="width:100%; margin-top:12px; height:60px;">Save & Continue ➔</button>
                 </div>
             </div>
         </div>
@@ -104,32 +86,5 @@
 
 <script src="js/metrics.js"></script>
 <script src="js/shell.js"></script>
-<script>
-    (function(){
-        const $ = (id) => document.getElementById(id);
-        const setupApi = window.Scrummer?.setup;
-        if (!setupApi) return;
-
-        const handleSave = () => {
-            const data = {};
-            ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"].forEach(k => data[k] = $(k).value);
-            setupApi.saveSetup(data);
-            window.location.href = "intelligence.html";
-        };
-
-        $("saveSetup").onclick = handleSave;
-        $("headerNext").onclick = handleSave;
-
-        const applyDemo = (d, btnId) => {
-            Object.keys(d).forEach(k => { if ($(k)) $(k).value = d[k]; });
-            document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
-            $(btnId).classList.add('active');
-        };
-
-        $("demoExcellent").onclick = () => applyDemo({ sprintDays:10, teamMembers:8, leaveDays:1, committedSP:60, v1:62, v2:60, v3:61 }, "demoExcellent");
-        $("demoNormal").onclick = () => applyDemo({ sprintDays:10, teamMembers:7, leaveDays:3, committedSP:70, v1:66, v2:72, v3:68 }, "demoNormal");
-        $("demoRisky").onclick = () => applyDemo({ sprintDays:10, teamMembers:6, leaveDays:8, committedSP:90, v1:55, v2:60, v3:50 }, "demoRisky");
-    })();
-</script>
 </body>
 </html>
