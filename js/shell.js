@@ -1,24 +1,48 @@
 /* =========================================================
    Scrummer — shell.js (Modern Joy Edition)
-   Core Engine: Handles Math, Storage, and UI Navigation
+   Core Engine: Handles Math, Storage, UI, and Theme Logic
    ========================================================= */
 
 (() => {
   // ----------------------------
-  // 1) Active Sidebar Highlighting
+  // 1) Active Sidebar & Theme Logic
   // ----------------------------
-  const initNavigation = () => {
+  const initUI = () => {
+    // Navigation Highlighting
     const page = document.body?.getAttribute("data-page") || "";
     if (page) {
-      // Modern Joy uses .nav-item instead of .nav a
       document.querySelectorAll(".nav-item").forEach(link => {
-        // Match based on data-page attribute or href inclusion
         const linkPage = link.getAttribute("data-page") || link.getAttribute("href");
         if (linkPage && linkPage.includes(page)) {
           link.classList.add("active");
         } else {
           link.classList.remove("active");
         }
+      });
+    }
+
+    // BUG 5 FIX: Theme Toggle Logic
+    const themeBtn = document.getElementById('themeToggle');
+    const applyTheme = (theme) => {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+      if (themeBtn) themeBtn.innerText = `Theme: ${theme === 'dark' ? 'Dark' : 'Light'}`;
+    };
+
+    // Initialize Theme from Storage
+    const savedTheme = localStorage.getItem('scrummer-theme') || 'light';
+    applyTheme(savedTheme);
+
+    // Toggle Listener
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark-mode');
+        const currentTheme = isDark ? 'dark' : 'light';
+        localStorage.setItem('scrummer-theme', currentTheme);
+        applyTheme(currentTheme);
       });
     }
   };
@@ -40,7 +64,7 @@
     }
   };
 
-  initNavigation();
+  initUI();
   initTransitions();
 })();
 
@@ -54,13 +78,15 @@
   // --- Utility Helpers ---
   function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
   function safeNum(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+  
   function mean(arr){
-    const a = arr.filter(n => Number.isFinite(n));
+    const a = arr.filter(n => Number.isFinite(n) && n > 0);
     if (!a.length) return 0;
     return a.reduce((x,y)=>x+y,0) / a.length;
   }
+  
   function stdev(arr){
-    const a = arr.filter(n => Number.isFinite(n));
+    const a = arr.filter(n => Number.isFinite(n) && n > 0);
     if (a.length < 2) return 0;
     const m = mean(a);
     const v = a.reduce((s,x)=>s + (x-m)*(x-m), 0) / (a.length - 1);
@@ -78,7 +104,6 @@
 
   /**
    * 🧮 COMPUTE SIGNALS
-   * The brain of Scrummer. Converts raw points into delivery risk.
    */
   function computeSignals(setup){
     const sprintDays = safeNum(setup.sprintDays);
@@ -86,14 +111,15 @@
     const leaveDays = safeNum(setup.leaveDays);
     const committed = safeNum(setup.committedSP);
 
-    const v1 = safeNum(setup.v1);
-    const v2 = safeNum(setup.v2);
-    const v3 = safeNum(setup.v3);
-    const velocities = [v1, v2, v3].filter(n => n > 0);
+    // Velocity History Logic (3 fields)
+    const velocities = [
+      safeNum(setup.v1), 
+      safeNum(setup.v2), 
+      safeNum(setup.v3)
+    ].filter(n => n > 0);
 
     const avgVelocity = mean(velocities);
-
-    // 
+    const vol = (avgVelocity > 0) ? (stdev(velocities) / avgVelocity) : 0;
 
     // Ideal person-days vs Availability
     const idealPD = sprintDays * teamMembers;
@@ -106,9 +132,7 @@
     // Ratios for Signal Detection
     const overcommitRatio = avgVelocity > 0 ? (committed / avgVelocity) : 0;
     const capacityShortfallRatio = capacitySP > 0 ? (committed / capacitySP) : 0;
-    const focusFactor = avgVelocity > 0 ? (capacitySP / avgVelocity) : availabilityRatio;
-
-    const vol = (avgVelocity > 0) ? (stdev(velocities) / avgVelocity) : 0;
+    const focusFactor = availabilityRatio;
 
     // Risk components (Weighted for 0..100 Score)
     const over = clamp((overcommitRatio - 1) * 60, 0, 50);
@@ -117,7 +141,7 @@
 
     const riskScore = clamp(over + cap + vola, 0, 100);
     const base = committed > 0 ? (capacitySP / committed) * 100 : 0;
-    const confidence = clamp(base - (vola * 2), 0, 100);
+    const confidence = clamp(base - (vol * 50), 0, 100); // Volatility penalty
 
     let capacityHealth = "—";
     if (committed > 0 && capacitySP > 0){
@@ -152,7 +176,7 @@
   function addSnapshot(snapshot){
     const arr = loadSnapshots();
     arr.unshift(snapshot);
-    saveSnapshots(arr.slice(0, 30)); // Keep last 30
+    saveSnapshots(arr.slice(0, 30));
     return arr;
   }
 
