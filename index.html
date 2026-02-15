@@ -4,185 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrummer — Launchpad</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="launchpad">
-
 <div class="app-container">
-  
-  <aside class="sidebar">
-    <div class="logo-area">
-      <div class="logo-icon">S</div>
-      <div class="logo-text">Scrummer</div>
-    </div>
+    <aside class="sidebar">
+        <div class="logo-area"><div class="logo-icon">S</div><div class="logo-text">Scrummer</div></div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item active"><span class="nav-icon">🚀</span> Setup</a>
+            <a href="intelligence.html" class="nav-item"><span class="nav-icon">📊</span> Insights</a>
+            <a href="suggestions.html" class="nav-item"><span class="nav-icon">💡</span> Actions</a>
+            <a href="workspace.html" class="nav-item"><span class="nav-icon">⚡</span> Copilot</a>
+        </nav>
+    </aside>
 
-    <nav class="nav-menu">
-      <a href="index.html" class="nav-item active">
-        <span class="nav-icon">🚀</span> Setup
-      </a>
-      <a href="intelligence.html" class="nav-item">
-        <span class="nav-icon">📊</span> Insights
-      </a>
-      <a href="suggestions.html" class="nav-item">
-        <span class="nav-icon">💡</span> Actions
-      </a>
-      <a href="workspace.html" class="nav-item">
-        <span class="nav-icon">⚡</span> Copilot
-      </a>
-    </nav>
-
-    <div class="pro-card">
-      <div class="pro-shine"></div>
-      <div class="pro-title">Scrummer Gold</div>
-      <div class="pro-sub">Unlock AI & Unlimited History</div>
-      <button class="pro-btn">Upgrade ✨</button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="top-header">
-      <div class="page-title">Launchpad</div>
-      <button id="themeToggle" class="btn-fun" style="background:var(--bg-app); color:var(--text-main); border:1px solid var(--border-soft);">
-        Theme: <span id="themeMode">Light</span>
-      </button>
-    </header>
-
-    <div class="fun-strip">
-      <div class="strip-badge">Step 1</div>
-      <div class="strip-text">Sprint Setup</div>
-      <div class="strip-sub">Initialize your metrics to unlock delivery intelligence.</div>
-    </div>
-
-    <div class="content-scroll">
-      
-      <div class="action-card" style="margin-bottom:32px;">
-        <div class="section-title"><span>💡</span> Quick Start</div>
-        <p style="color:var(--text-muted); font-size:15px; margin-bottom:20px;">
-            Load a pre-configured simulation to see how Scrummer identifies risk drivers.
-        </p>
-        <div class="segTabs" id="demoTabs">
-          <button id="demoExcellent" class="segBtn" data-mode="excellent">Excellent Sprint</button>
-          <button id="demoNormal" class="segBtn" data-mode="normal">Balanced Load</button>
-          <button id="demoRisky" class="segBtn" data-mode="risky">High Risk Warning</button>
+    <main class="main">
+        <header class="top-header"><div class="page-title">Launchpad</div></header>
+        <div class="fun-strip">
+            <div class="strip-badge">Step 1</div>
+            <div class="strip-text">Sprint Setup</div>
+            <div class="strip-sub">Enter metrics to unlock delivery intelligence.</div>
         </div>
-      </div>
 
-      <div class="grid-split">
-        
-        <section>
-          <div class="kpi-card">
-            <div class="section-title">Core Sprint Metrics</div>
-            
-            <div style="display:grid; gap:24px; margin-top:24px;">
-              <div class="input-group">
-                <label class="kpi-label">Sprint Length (Working Days)</label>
-                <input id="sprintDays" type="number" placeholder="10" class="fun-input">
-              </div>
-              <div class="input-group">
-                <label class="kpi-label">Team Members (Active count)</label>
-                <input id="teamMembers" type="number" placeholder="7" class="fun-input">
-              </div>
-              <div class="input-group">
-                <label class="kpi-label">Planned Leave (Total team days off)</label>
-                <input id="leaveDays" type="number" placeholder="0" class="fun-input">
-              </div>
-              <div class="input-group">
-                <label class="kpi-label">Current Commitment (Story Points)</label>
-                <input id="committedSP" type="number" placeholder="40" class="fun-input">
-              </div>
+        <div class="content-scroll">
+            <div class="grid-split">
+                <div class="kpi-card">
+                    <div class="section-title"><span>📝</span> Current Sprint</div>
+                    <div style="display:grid; gap:24px; margin-top:24px;">
+                        <div><label class="kpi-label">Sprint Length (Days)</label><input id="sprintDays" type="number" placeholder="10" class="fun-input"></div>
+                        <div><label class="kpi-label">Team Members</label><input id="teamMembers" type="number" placeholder="7" class="fun-input"></div>
+                        <div><label class="kpi-label">Planned Leave (Days)</label><input id="leaveDays" type="number" placeholder="0" class="fun-input"></div>
+                        <div><label class="kpi-label">Committed Points</label><input id="committedSP" type="number" placeholder="40" class="fun-input"></div>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:24px;">
+                    <div class="kpi-card">
+                        <div class="section-title">Velocity History</div>
+                        <div style="display:grid; gap:16px;">
+                            <div><label class="kpi-label">Latest Sprint (N-1)</label><input id="v1" type="number" class="fun-input"></div>
+                            <div><label class="kpi-label">Sprint N-2</label><input id="v2" type="number" class="fun-input"></div>
+                            <div><label class="kpi-label">Sprint N-3</label><input id="v3" type="number" class="fun-input"></div>
+                        </div>
+                    </div>
+                    <button id="saveSetup" class="btn-fun" style="background:var(--accent-fun);">Save & View Insights ➔</button>
+                </div>
             </div>
-          </div>
-        </section>
-
-        <aside style="display:flex; flex-direction:column; gap:24px;">
-          <div class="kpi-card">
-            <div class="section-title">Velocity History</div>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">Enter past performance to calculate stability.</p>
-            <div style="display:grid; gap:16px;">
-              <div class="input-group">
-                <label class="kpi-label">Latest Sprint (N-1)</label>
-                <input id="v1" type="number" placeholder="Points" class="fun-input">
-              </div>
-              <div class="input-group">
-                <label class="kpi-label">Sprint N-2</label>
-                <input id="v2" type="number" placeholder="Points" class="fun-input">
-              </div>
-              <div class="input-group">
-                <label class="kpi-label">Sprint N-3</label>
-                <input id="v3" type="number" placeholder="Points" class="fun-input">
-              </div>
-            </div>
-          </div>
-
-          <div class="action-card" style="text-align:center;">
-             <div id="setupMsg" style="margin-bottom:12px; font-weight:800; font-size:14px; display:none;"></div>
-             <button id="saveSetup" class="btn-fun" style="width:100%; height:54px; font-size:16px; background:var(--accent-fun);">Save & View Insights ➔</button>
-             <button id="resetSetup" style="margin-top:16px; background:none; border:none; color:var(--text-light); font-weight:700; cursor:pointer; font-family:inherit;">Reset Form to Blank</button>
-          </div>
-        </aside>
-
-      </div>
-    </div>
-  </main>
+        </div>
+    </main>
 </div>
-
-<script src="js/metrics.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/shell.js"></script>
-
-<script>
-  (function(){
-    const $ = (id) => document.getElementById(id);
-    const setupApi = window.Scrummer?.setup;
-    if (!setupApi) return;
-
-    const fields = ["sprintDays", "teamMembers", "leaveDays", "committedSP", "v1", "v2", "v3"];
-
-    function showMsg(text, isError = false) {
-      const el = $("setupMsg");
-      el.style.display = "block";
-      el.textContent = text;
-      el.style.color = isError ? "var(--danger)" : "var(--accent-primary)";
-      setTimeout(() => { el.style.display = "none"; }, 2500);
-    }
-
-    // Prefill form from localStorage
-    const data = setupApi.loadSetup();
-    fields.forEach(k => { if ($(k) && data[k]) $(k).value = data[k]; });
-
-    // Save Logic
-    $("saveSetup").onclick = () => {
-      const newData = {};
-      fields.forEach(k => newData[k] = $(k).value);
-      setupApi.saveSetup(newData);
-      showMsg("Setup Synchronized!");
-      setTimeout(() => { window.location.href = "intelligence.html"; }, 800);
-    };
-
-    // Reset Logic
-    $("resetSetup").onclick = () => {
-      setupApi.saveSetup({});
-      fields.forEach(k => { if ($(k)) $(k).value = ""; });
-      document.querySelectorAll('.segBtn').forEach(b => b.classList.remove('is-active'));
-      showMsg("Data Cleared.");
-    };
-
-    // Demo Data Logic
-    const applyDemo = (d, btnId) => {
-      Object.keys(d).forEach(k => { if ($(k)) $(k).value = d[k]; });
-      document.querySelectorAll('.segBtn').forEach(b => b.classList.remove('is-active'));
-      $(btnId).classList.add('is-active');
-      showMsg("Simulation Loaded.");
-    };
-
-    $("demoExcellent").onclick = () => applyDemo({ sprintDays:10, teamMembers:8, leaveDays:1, committedSP:60, v1:62, v2:60, v3:61 }, "demoExcellent");
-    $("demoNormal").onclick = () => applyDemo({ sprintDays:10, teamMembers:7, leaveDays:3, committedSP:70, v1:66, v2:72, v3:68 }, "demoNormal");
-    $("demoRisky").onclick = () => applyDemo({ sprintDays:10, teamMembers:6, leaveDays:8, committedSP:90, v1:55, v2:60, v3:50 }, "demoRisky");
-  })();
-</script>
+<script src="js/metrics.js"></script><script src="js/shell.js"></script>
 </body>
 </html>
