@@ -157,3 +157,51 @@
   window.Scrummer.setup = { loadSetup, saveSetup, STORAGE_KEY };
   window.Scrummer.computeSignals = computeSignals;
 })();
+(function() {
+    const STORAGE_KEY = "scrummer-setup-v1";
+
+    // Theme Logic (BUG 6 FIX)
+    const initTheme = () => {
+        const themeBtn = document.getElementById('themeToggle');
+        const applyTheme = (theme) => {
+            document.body.classList.toggle('dark-mode', theme === 'dark');
+            if (themeBtn) themeBtn.innerText = `Theme: ${theme === 'dark' ? 'Dark' : 'Light'}`;
+        };
+
+        const savedTheme = localStorage.getItem('scrummer-theme') || 'light';
+        applyTheme(savedTheme);
+
+        if (themeBtn) {
+            themeBtn.onclick = () => {
+                const isDark = document.body.classList.toggle('dark-mode');
+                const nextTheme = isDark ? 'dark' : 'light';
+                localStorage.setItem('scrummer-theme', nextTheme);
+                applyTheme(nextTheme);
+            };
+        }
+    };
+
+    // Math Engine for 3 Velocity Fields (BUG 1 FIX)
+    function computeSignals(setup) {
+        const vels = [Number(setup.v1 || 0), Number(setup.v2 || 0), Number(setup.v3 || 0)].filter(v => v > 0);
+        const avg = vels.length ? (vels.reduce((a, b) => a + b) / vels.length) : 0;
+        
+        let vol = 0;
+        if (vels.length > 1) {
+            const variance = vels.reduce((s, x) => s + Math.pow(x - avg, 2), 0) / (vels.length - 1);
+            vol = Math.sqrt(variance) / avg;
+        }
+
+        return { avgVelocity: avg, volatility: vol };
+    }
+
+    window.Scrummer = {
+        setup: {
+            loadSetup: () => JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"),
+            saveSetup: (data) => localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+        },
+        computeSignals
+    };
+
+    initTheme();
+})();
