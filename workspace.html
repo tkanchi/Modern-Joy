@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scrummer — Copilot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="workspace">
@@ -45,72 +47,74 @@
     
     <header class="top-header">
       <div class="page-title">Ceremony Copilot</div>
-      <div class="kpi-tag tag-good" id="copilotRecommended">Active</div>
+      <div class="kpi-tag tag-good" id="copilotRecommended" style="font-weight: 800;">Analyzing Signals...</div>
     </header>
+
+    <div class="fun-strip">
+      <div class="strip-badge" style="background:var(--accent-fun)">AI Guide</div>
+      <div class="strip-text">Real-time Ritual Support</div>
+      <div class="strip-sub">Select a ceremony below to focus your team's energy.</div>
+    </div>
 
     <div class="content-scroll">
       
-      <div class="grid-4" style="margin-bottom:24px;">
-        <div class="kpi-card" style="padding:16px;">
-          <div class="kpi-label">Scope Pressure</div>
-          <div id="briefScope" class="kpi-val" style="font-size:24px;">—</div>
+      <div class="grid-4" style="margin-bottom:32px; gap:16px;">
+        <div class="kpi-card" style="padding:16px; text-align:center;">
+          <div class="kpi-label" style="font-size:10px;">Scope Pressure</div>
+          <div id="briefScope" class="kpi-val" style="font-size:20px; margin:4px 0;">—</div>
         </div>
-        <div class="kpi-card" style="padding:16px;">
-          <div class="kpi-label">Capacity Ratio</div>
-          <div id="briefCapRatio" class="kpi-val" style="font-size:24px;">—</div>
+        <div class="kpi-card" style="padding:16px; text-align:center;">
+          <div class="kpi-label" style="font-size:10px;">Capacity Ratio</div>
+          <div id="briefCapRatio" class="kpi-val" style="font-size:20px; margin:4px 0;">—</div>
         </div>
-        <div class="kpi-card" style="padding:16px;">
-          <div class="kpi-label">Confidence</div>
-          <div id="briefConf" class="kpi-val" style="font-size:24px;">—</div>
+        <div class="kpi-card" style="padding:16px; text-align:center;">
+          <div class="kpi-label" style="font-size:10px;">Confidence</div>
+          <div id="briefConf" class="kpi-val" style="font-size:20px; margin:4px 0;">—</div>
         </div>
-        <div class="kpi-card" style="padding:16px;">
-          <div class="kpi-label">Risk Score</div>
-          <div id="briefRisk" class="kpi-val" style="font-size:24px;">—</div>
+        <div class="kpi-card" style="padding:16px; text-align:center;">
+          <div class="kpi-label" style="font-size:10px;">Risk Score</div>
+          <div id="briefRisk" class="kpi-val" style="font-size:20px; margin:4px 0;">—</div>
         </div>
       </div>
 
-      <div class="driver-list">
+      <div class="segTabs" style="display:flex; gap:8px; margin-bottom:32px; background:var(--bg-app); padding:6px; border-radius:16px;">
+        <button class="segBtn btn-fun" data-tab="planning" style="flex:1; font-size:11px;">Planning</button>
+        <button class="segBtn btn-fun" data-tab="daily" style="flex:1; font-size:11px;">Daily</button>
+        <button class="segBtn btn-fun" data-tab="refine" style="flex:1; font-size:11px;">Refine</button>
+        <button class="segBtn btn-fun" data-tab="review" style="flex:1; font-size:11px;">Review</button>
+        <button class="segBtn btn-fun" data-tab="retro" style="flex:1; font-size:11px;">Retro</button>
+      </div>
+
+      <div class="grid-split" style="grid-template-columns: 1.4fr 0.6fr;">
         
-        <div class="segTabs" role="tablist" style="display:flex; gap:8px; margin-bottom:24px; border-bottom:1px solid #E5E7EB; padding-bottom:16px; overflow-x:auto;">
-          <button class="btn-fun" data-tab="planning" style="background:var(--bg-app); color:var(--text-muted); font-size:12px;">Planning</button>
-          <button class="btn-fun" data-tab="daily" style="background:var(--bg-app); color:var(--text-muted); font-size:12px;">Daily</button>
-          <button class="btn-fun" data-tab="refine" style="background:var(--bg-app); color:var(--text-muted); font-size:12px;">Refinement</button>
-          <button class="btn-fun" data-tab="review" style="background:var(--bg-app); color:var(--text-muted); font-size:12px;">Review</button>
-          <button class="btn-fun" data-tab="retro" style="background:var(--bg-app); color:var(--text-muted); font-size:12px;">Retro</button>
+        <div>
+          <div class="section-title"><span>🤖</span> Delivery Guidance</div>
+          <div class="action-card" style="cursor:default; min-height:300px;">
+            <h3 id="panelTitle" style="margin:0 0 12px 0; font-size:18px;">Select a Ceremony</h3>
+            <p id="panelWhy" style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:24px;">
+              Choose a ritual above to receive signal-driven talking points.
+            </p>
+            
+            <div style="font-size:11px; font-weight:800; color:var(--text-main); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Discussion Points</div>
+            <ul id="panelList" style="padding-left:18px; font-size:14px; color:var(--text-muted); line-height:1.8;">
+              <li>Scrummer is analyzing your current sprint metrics...</li>
+            </ul>
+          </div>
         </div>
 
-        <div class="grid-split">
-          
-          <div>
-            <div class="section-title"><span>🤖</span> AI Guidance</div>
-            <div class="action-card" style="cursor:default; background:#F8FAFC; border:none;">
-              <h3 id="panelTitle" style="margin:0 0 8px 0; font-size:16px;">Select a Ceremony</h3>
-              <p id="panelWhy" style="color:var(--text-muted); font-size:13px; line-height:1.6; margin-bottom:16px;">
-                Choose a tab above to get tailored advice based on your sprint signals.
-              </p>
-              
-              <div style="font-size:12px; font-weight:700; color:var(--text-main); margin-bottom:8px; text-transform:uppercase;">Discussion Points</div>
-              <ul id="panelList" style="padding-left:20px; font-size:13px; color:var(--text-muted); line-height:1.6;">
-                <li>Waiting for selection...</li>
-              </ul>
-            </div>
-          </div>
-
-          <div>
-            <div class="section-title"><span>📝</span> Decisions</div>
-            <div class="kpi-card" style="box-shadow:none; border:1px solid #E5E7EB;">
-              <div id="decisionFields" style="display:grid; gap:12px;">
-                </div>
-              
-              <div style="margin-top:16px; display:flex; gap:8px;">
-                <button id="copilotSave" class="btn-fun" style="font-size:11px; width:100%;">Save Note</button>
-                <button id="copilotClear" class="btn-fun" style="font-size:11px; background:white; color:var(--text-muted); border:1px solid #E5E7EB;">Clear</button>
+        <div>
+          <div class="section-title"><span>📝</span> Decisions</div>
+          <div class="kpi-card" style="border: 2px solid var(--bg-app); box-shadow: none;">
+            <div id="decisionFields" style="display:grid; gap:16px;">
               </div>
-              
-              <div id="copilotMsg" style="margin-top:12px; font-size:12px; color:var(--success); display:none;">Saved!</div>
+            
+            <div style="margin-top:24px; display:flex; flex-direction:column; gap:10px;">
+              <button id="copilotSave" class="btn-fun" style="width:100%; background:var(--text-main);">Save Decisions</button>
+              <button id="copilotClear" class="btn-fun" style="width:100%; background:transparent; color:var(--text-muted); border:1px solid var(--border-soft);">Reset Form</button>
             </div>
+            
+            <div id="copilotMsg" style="margin-top:16px; text-align:center; font-size:12px; display:none;"></div>
           </div>
-
         </div>
 
       </div>
@@ -124,18 +128,5 @@
 <script src="js/shell.js"></script>
 <script src="js/copilot.js"></script>
 
-<script>
-  // Small helper to toggle active class on the new buttons
-  document.querySelectorAll('.segTabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.segTabs button').forEach(b => {
-        b.style.background = 'var(--bg-app)';
-        b.style.color = 'var(--text-muted)';
-      });
-      btn.style.background = 'var(--text-main)';
-      btn.style.color = 'white';
-    });
-  });
-</script>
 </body>
 </html>
