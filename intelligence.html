@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scrummer — Insights</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrummer — Insights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="intelligence">
 
@@ -44,139 +43,77 @@
   </aside>
 
   <main class="main">
-    
     <header class="top-header">
       <div class="page-title">Sprint Intelligence</div>
-      
       <div style="display:flex; gap:12px;">
-        <a href="index.html" class="btn-fun" style="background:white; color:var(--text-muted); border:1px solid #E5E7EB; font-size:12px; text-decoration:none;">Back</a>
-        <a href="suggestions.html" class="btn-fun" style="background:var(--accent-primary); font-size:12px; text-decoration:none;">Next: Actions ➔</a>
+        <a href="index.html" class="btn-fun" style="background:var(--bg-app); color:var(--text-main); text-decoration:none; padding:12px 24px;">Back</a>
+        <a href="suggestions.html" class="btn-fun" style="text-decoration:none; padding:12px 24px; background:var(--accent-fun);">View Actions ➔</a>
       </div>
     </header>
 
     <div class="fun-strip">
       <div class="strip-badge">Step 2</div>
-      <div class="strip-text">Analysis Complete</div>
-      <div class="strip-sub">Review your risk score and key drivers below.</div>
+      <div class="strip-text">Analysis Live</div>
+      <div class="strip-sub">Risk signals generated based on current commitment and history.</div>
     </div>
 
     <div class="content-scroll">
       
-      <div id="summaryBanner" class="action-card" style="display:none; border-left:4px solid var(--accent-primary); margin-bottom:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <div id="summaryTitle" style="font-weight:800; font-size:16px; margin-bottom:4px;">—</div>
-            <p id="summaryText" style="margin:0; font-size:13px; opacity:0.8;">—</p>
-          </div>
-          <span id="summaryBadge" class="kpi-tag" style="background:var(--bg-app);">—</span>
-        </div>
-      </div>
-
-      <div class="grid-4">
-        
-        <div class="kpi-card">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px;">
+        <div class="kpi-card" style="text-align: center;">
           <div class="kpi-label">Risk Score</div>
-          <div id="kpiRisk" class="kpi-val">—</div>
-          <div class="fun-bar-bg" style="width:100%; margin-top:8px;">
-            <div id="barRisk" class="fun-bar-fill" style="width:0%"></div>
-          </div>
-          <div class="kpi-tag" style="margin-top:8px; font-size:10px; opacity:0.7;">0–100 (Low → High)</div>
+          <div id="kpiRisk" class="kpi-val" style="color:var(--danger);">—</div>
+          <div class="fun-bar-bg" style="height:12px; margin-top:10px;"><div id="barRisk" class="fun-bar-fill" style="width:0%"></div></div>
         </div>
-
-        <div class="kpi-card">
+        <div class="kpi-card" style="text-align: center;">
           <div class="kpi-label">Confidence</div>
           <div id="kpiConfidence" class="kpi-val">—</div>
-          <div class="fun-bar-bg" style="width:100%; margin-top:8px;">
-            <div id="barConfidence" class="fun-bar-fill" style="width:0%"></div>
-          </div>
-          <div class="kpi-tag" style="margin-top:8px; font-size:10px; opacity:0.7;">Delivery Prob.</div>
+          <div class="fun-bar-bg" style="height:12px; margin-top:10px;"><div id="barConfidence" class="fun-bar-fill" style="width:0%"></div></div>
         </div>
-
-        <div class="kpi-card">
+        <div class="kpi-card" style="text-align: center;">
           <div class="kpi-label">Focus Factor</div>
           <div id="kpiFocus" class="kpi-val">—</div>
-          <div class="kpi-tag" style="margin-top:8px; font-size:10px; opacity:0.7;">Capacity ÷ Velocity</div>
+          <div class="kpi-tag tag-good" id="focusTag" style="margin-top:10px;">—</div>
         </div>
-
-        <div class="kpi-card">
-          <div class="kpi-label">Health</div>
-          <div id="kpiCapacity" class="kpi-val">—</div>
-          <div class="kpi-tag" style="margin-top:8px; font-size:10px; opacity:0.7;">Cap vs Load</div>
+        <div class="kpi-card" style="text-align: center;">
+          <div class="kpi-label">Delivery Health</div>
+          <div id="kpiCapacity" class="kpi-val" style="font-size: 28px;">—</div>
+          <div class="kpi-tag" id="healthTag" style="margin-top:10px; background:var(--bg-app);">—</div>
         </div>
-
-      </div>
-
-      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:32px;">
-        <div class="kpi-tag" style="background:white; border:1px solid #E5E7EB;">Overcommit: <b id="detailOvercommit" style="margin-left:4px;">—</b></div>
-        <div class="kpi-tag" style="background:white; border:1px solid #E5E7EB;">Shortfall: <b id="detailCapRatio" style="margin-left:4px;">—</b></div>
-        <div class="kpi-tag" style="background:white; border:1px solid #E5E7EB;">Focus: <b id="detailFocusPct" style="margin-left:4px;">—</b></div>
-        <div class="kpi-tag" style="background:white; border:1px solid #E5E7EB;">Raw Risk: <b id="detailRiskScore" style="margin-left:4px;">—</b></div>
       </div>
 
       <div class="grid-split">
         
-        <div style="display:flex; flex-direction:column; gap:24px;">
-          
-          <div class="driver-list">
+        <section>
+          <div class="kpi-card" style="min-height: 400px;">
             <div class="section-title"><span>📉</span> Top Risk Drivers</div>
-            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Why the score is what it is.</p>
+            <p style="color:var(--text-muted); font-size:15px; margin-bottom:24px;">Why the score is what it is.</p>
             
-            <div id="driversEmpty" style="font-size:13px; color:var(--text-muted); padding:10px; background:#F9FAFB; border-radius:12px;">
-              Add setup on Launchpad to see drivers.
+            <div id="driversEmpty" style="padding:40px; text-align:center; background:var(--bg-app); border-radius:18px; color:var(--text-light);">
+              No data detected. Return to Setup to begin.
             </div>
-            <div id="driversList" style="display:grid; gap:16px;"></div>
+            <div id="driversList" style="display:grid; gap:20px;"></div>
           </div>
+        </section>
 
+        <aside style="display:flex; flex-direction:column; gap:24px;">
           <div class="kpi-card">
-            <div class="section-title" style="font-size:16px;">Velocity Trend</div>
-            <div style="height:200px; background:#F9FAFB; border-radius:12px; border:2px dashed #E5E7EB; display:grid; place-items:center; color:var(--text-light); font-weight:600;">
-              Chart Area (Placeholder)
+            <div class="section-title">🚦 Signals</div>
+            <div style="display:grid; gap:12px;">
+              <div id="sigScope" class="kpi-tag" style="padding:14px; font-size:14px; justify-content:flex-start; background:var(--bg-app); width:100%;">Scope: —</div>
+              <div id="sigCapacity" class="kpi-tag" style="padding:14px; font-size:14px; justify-content:flex-start; background:var(--bg-app); width:100%;">Capacity: —</div>
+              <div id="sigFlow" class="kpi-tag" style="padding:14px; font-size:14px; justify-content:flex-start; background:var(--bg-app); width:100%;">Flow: —</div>
             </div>
           </div>
 
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:24px;">
-          
-          <div class="kpi-card">
-            <div class="section-title" style="font-size:16px;">🚦 Signals</div>
-            <div style="display:grid; gap:10px;">
-              <div id="sigScope" class="kpi-tag" style="background:#F3F4F6; justify-content:flex-start;">Scope: —</div>
-              <div id="sigCapacity" class="kpi-tag" style="background:#F3F4F6; justify-content:flex-start;">Capacity: —</div>
-              <div id="sigFlow" class="kpi-tag" style="background:#F3F4F6; justify-content:flex-start;">Flow: —</div>
-              <div id="sigDeps" class="kpi-tag" style="background:#F3F4F6; justify-content:flex-start;">Dependencies: —</div>
-            </div>
+          <div class="action-card" style="background:var(--text-main); color:white;">
+            <div style="font-weight:800; font-size:18px; margin-bottom:8px;">Save Snapshot</div>
+            <p style="font-size:13px; opacity:0.7; margin-bottom:16px;">Log these metrics to track trends over time.</p>
+            <button id="saveSnapshot" class="btn-fun" style="background:white; color:black; width:100%;">Log Performance</button>
           </div>
-
-          <div class="kpi-card">
-             <div class="section-title" style="font-size:16px;">🔍 Input Data</div>
-             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div style="font-size:11px; color:var(--text-muted);">Avg Vel: <b id="detailAvgVelocity">—</b></div>
-                <div style="font-size:11px; color:var(--text-muted);">Cap (SP): <b id="detailCapacitySP">—</b></div>
-                <div style="font-size:11px; color:var(--text-muted);">Commit: <b id="detailCommitted">—</b></div>
-                <div style="font-size:11px; color:var(--text-muted);">Vol: <b id="detailVol">—</b></div>
-             </div>
-          </div>
-
-          <div class="kpi-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <div class="section-title" style="font-size:16px; margin:0;">Snapshots</div>
-              <div style="display:flex; gap:8px;">
-                <button id="saveSnapshot" class="btn-fun" style="font-size:10px; padding:6px 12px; background:var(--text-main);">Save</button>
-                <button id="clearHistory" class="btn-fun" style="font-size:10px; padding:6px 12px; background:white; color:var(--text-muted); border:1px solid #E5E7EB;">Clear</button>
-              </div>
-            </div>
-            
-            <div id="historyEmpty" style="font-size:12px; color:var(--text-muted); padding:10px; background:#F9FAFB; border-radius:8px;">
-              No snapshots yet.
-            </div>
-            <div id="historyList" style="display:grid; gap:8px;"></div>
-          </div>
-
-        </div>
+        </aside>
 
       </div>
-
     </div>
   </main>
 </div>
