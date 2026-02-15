@@ -1,76 +1,135 @@
-/* =========================================================
-   SCRUMMER — Modern Joy (Master Premium OS)
-   ========================================================= */
-:root {
-  --bg-app: #F2F4F8;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --text-main: #111827;
-  --text-muted: #4B5563;
-  --accent-primary: #8B5CF6;
-  --accent-fun: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  --accent-bg: #F5F3FF;
-  --border-soft: rgba(0,0,0,0.08);
-  --radius-l: 28px;
-  --radius-m: 18px;
-  --shadow-soft: 0 20px 50px -12px rgba(0,0,0,0.1);
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrummer — Launchpad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="launchpad">
 
-* { box-sizing: border-box; }
+<div class="app-container">
+    <aside class="sidebar">
+        <div style="font-weight:900; font-size:26px; margin-bottom:40px; color:var(--text-main);">SCRUMMER</div>
+        <nav style="display:grid; gap:8px;">
+            <a href="index.html" class="nav-item active">🚀 Setup</a>
+            <a href="intelligence.html" class="nav-item">📊 Insights</a>
+            <a href="suggestions.html" class="nav-item">💡 Actions</a>
+            <a href="workspace.html" class="nav-item">⚡ Copilot</a>
+        </nav>
+        <div style="margin-top:auto; padding:24px; background:var(--accent-fun); border-radius:20px; color:white;">
+            <div style="font-weight:800; font-size:15px; margin-bottom:4px;">Scrummer Gold</div>
+            <div style="font-size:12px; opacity:0.9; margin-bottom:12px;">Unlock AI Analysis</div>
+            <button class="btn-fun" style="background:white; color:black; font-size:11px; padding:8px 16px;">Upgrade ✨</button>
+        </div>
+    </aside>
 
-body {
-  margin: 0; padding: 0;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  background: radial-gradient(circle at 10% 10%, rgba(236, 72, 153, 0.05), transparent 40%), var(--bg-app);
-  height: 100vh; width: 100vw; overflow: hidden;
-}
+    <main class="main">
+        <header class="top-header">
+            <div class="tagline-box">
+                <div class="tagline-main">Know what's happening. Know what to do next.</div>
+                <div class="tagline-sub">AI-powered delivery intelligence for modern Agile teams.</div>
+            </div>
+            <div style="display:flex; gap:16px; align-items:center;">
+                <button id="themeToggle" class="btn-fun" style="background:white; color:black; border:1px solid #ddd;">Theme: Light</button>
+                <button id="headerNext" class="btn-fun primary">Next: Insights ➔</button>
+            </div>
+        </header>
 
-.app-container { display: flex; width: 100%; height: 100%; padding: 24px; gap: 24px; }
+        <div class="prog-bar">
+            <div class="step-pill active">● Step 1: Setup</div>
+            <div class="step-pill">○ Step 2: Insights</div>
+            <div class="step-pill">○ Step 3: Actions</div>
+        </div>
 
-/* Sidebar */
-.sidebar {
-  width: 280px; background: var(--bg-card); border-radius: var(--radius-l);
-  padding: 32px 24px; display: flex; flex-direction: column;
-  box-shadow: var(--shadow-soft); flex-shrink: 0;
-}
+        <div class="content-scroll">
+            <div style="font-size:38px; font-weight:800; margin-bottom:40px; letter-spacing:-1.5px;">Launchpad</div>
 
-/* Main Canvas */
-.main {
-  flex: 1; background: var(--bg-card); border-radius: var(--radius-l);
-  box-shadow: var(--shadow-soft); display: flex; flex-direction: column; overflow: hidden;
-}
+            <div class="kpi-card" style="margin-bottom:32px; display:flex; justify-content:space-between; align-items:center; background:#fbfbfb;">
+                <div style="max-width:500px;">
+                    <div style="font-weight:800; font-size:20px; margin-bottom:8px;">Demo Data</div>
+                    <div style="font-size:15px; color:var(--text-muted); line-height:1.5;">Load sample inputs to test Excellent, Normal, and Risky scenarios.</div>
+                </div>
+                <div style="display:flex; gap:12px;">
+                    <button id="demoExcellent" class="demo-btn">Excellent</button>
+                    <button id="demoNormal" class="demo-btn">Normal</button>
+                    <button id="demoRisky" class="demo-btn">Risky</button>
+                </div>
+            </div>
 
-/* Header & Tagline */
-.top-header { height: 120px; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-soft); }
-.tagline-box { display: flex; flex-direction: column; gap: 4px; }
-.tagline-main { font-size: 20px; font-weight: 800; color: var(--text-main); }
-.tagline-sub { font-size: 14px; color: var(--text-muted); }
+            <div class="grid-split">
+                <div class="kpi-card">
+                    <div class="section-title">Sprint Metrics</div>
+                    <div class="input-group">
+                        <label class="kpi-label">Sprint Length (Days)</label>
+                        <input id="sprintDays" type="number" class="fun-input" value="10">
+                    </div>
+                    <div class="input-group">
+                        <label class="kpi-label">Team Members</label>
+                        <input id="teamMembers" type="number" class="fun-input" value="7">
+                    </div>
+                    <div class="input-group">
+                        <label class="kpi-label">Planned Leave (Days)</label>
+                        <input id="leaveDays" type="number" class="fun-input" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label class="kpi-label">Committed Points</label>
+                        <input id="committedSP" type="number" class="fun-input" value="40">
+                    </div>
+                </div>
 
-/* Progress Bar */
-.prog-bar { display: flex; gap: 12px; padding: 20px 40px; background: var(--bg-app); }
-.step-pill { padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 800; border: 1px solid var(--border-soft); background: white; color: var(--text-muted); }
-.step-pill.active { background: var(--accent-fun); color: white; border: none; }
+                <div class="kpi-card" style="display:flex; flex-direction:column;">
+                    <div class="section-title">Velocity History</div>
+                    <p style="font-size:14px; color:var(--text-muted); margin-bottom:24px;">Used to calculate historical stability.</p>
+                    <div class="input-group">
+                        <label class="kpi-label">Latest Sprint (N-1)</label>
+                        <input id="v1" type="number" class="fun-input" placeholder="Points">
+                    </div>
+                    <div class="input-group">
+                        <label class="kpi-label">Sprint N-2</label>
+                        <input id="v2" type="number" class="fun-input" placeholder="Points">
+                    </div>
+                    <div class="input-group">
+                        <label class="kpi-label">Sprint N-3</label>
+                        <input id="v3" type="number" class="fun-input" placeholder="Points">
+                    </div>
+                    <button id="saveSetup" class="btn-fun primary" style="width:100%; margin-top:auto; height:64px;">Save & Continue ➔</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
 
-/* Content Scroll */
-.content-scroll { flex: 1; overflow-y: auto; padding: 40px; }
+<script src="js/metrics.js"></script>
+<script src="js/shell.js"></script>
+<script>
+    (function(){
+        const $ = (id) => document.getElementById(id);
+        const setupApi = window.Scrummer?.setup;
+        if (!setupApi) return;
 
-/* Forms & Inputs */
-.grid-split { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; }
-.kpi-card { background: white; padding: 32px; border-radius: var(--radius-l); border: 1px solid var(--border-soft); }
-.section-title { font-size: 22px; font-weight: 800; margin-bottom: 24px; }
+        const handleSave = () => {
+            const data = {};
+            ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"].forEach(k => data[k] = $(k).value);
+            setupApi.saveSetup(data);
+            window.location.href = "intelligence.html";
+        };
 
-.fun-input {
-  width: 100%; padding: 18px 22px; border-radius: var(--radius-m);
-  border: 2px solid var(--border-soft); background: var(--bg-app);
-  font-size: 18px; font-weight: 600; transition: 0.2s;
-}
+        $("saveSetup").onclick = handleSave;
+        $("headerNext").onclick = handleSave;
 
-/* Buttons */
-.btn-fun {
-  background: var(--text-main); color: white; padding: 14px 28px;
-  border-radius: 99px; font-weight: 800; border: none; cursor: pointer; transition: 0.2s;
-}
-.btn-fun.primary { background: #0b57d0; box-shadow: 0 4px 14px rgba(11, 87, 208, 0.3); }
-.btn-fun.demo { background: white; color: var(--text-muted); border: 1px solid var(--border-soft); font-size: 13px; }
-.btn-fun.demo.active { background: var(--accent-fun); color: white; border: none; }
+        const applyDemo = (d, btnId) => {
+            Object.keys(d).forEach(k => { if ($(k)) $(k).value = d[k]; });
+            document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+            $(btnId).classList.add('active');
+        };
 
-.page-title { font-size: 34px; font-weight: 800; letter-spacing: -1.5px; }
+        $("demoExcellent").onclick = () => applyDemo({ sprintDays:10, teamMembers:8, leaveDays:1, committedSP:60, v1:62, v2:60, v3:61 }, "demoExcellent");
+        $("demoNormal").onclick = () => applyDemo({ sprintDays:10, teamMembers:7, leaveDays:3, committedSP:70, v1:66, v2:72, v3:68 }, "demoNormal");
+        $("demoRisky").onclick = () => applyDemo({ sprintDays:10, teamMembers:6, leaveDays:8, committedSP:90, v1:55, v2:60, v3:50 }, "demoRisky");
+    })();
+</script>
+</body>
+</html>
