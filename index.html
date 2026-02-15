@@ -1,14 +1,28 @@
-/* Forces the white sheet to fill the space and handle scrolling correctly */
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column; /* Header on top, Content below */
-  overflow: hidden; /* Prevents the whole sheet from scrolling */
-  min-width: 0;
+/* Premium Input Styling */
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+
+.fun-input {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border-soft);
+    background: var(--bg-app);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-.content-scroll {
-  flex: 1;
-  overflow-y: auto; /* This makes ONLY the form scroll */
-  padding: 32px;
+.fun-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: white;
+    box-shadow: 0 0 0 4px var(--accent-bg);
+}
+
+/* Active Segmented Buttons */
+.segBtn.is-active {
+    background: var(--accent-fun);
+    color: white;
+    box-shadow: var(--shadow-float);
 }
