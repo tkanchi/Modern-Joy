@@ -1,5 +1,5 @@
 /* =========================================================
-   SCRUMMER XP SYSTEM (Gamified v1 + Cheetah Mood)
+   SCRUMMER XP SYSTEM (Gamified v1 + Cheetah Mood + XP Bump)
    ========================================================= */
 
 (function () {
@@ -20,6 +20,17 @@
 
   const el = (id) => document.getElementById(id);
 
+  /* ---------- Animation helper (Step 4B) ---------- */
+  function bumpXpWidget() {
+    const w = document.querySelector(".xpWidget");
+    if (!w) return;
+    w.classList.remove("xp-bump");
+    // force reflow so animation can re-trigger
+    void w.offsetWidth;
+    w.classList.add("xp-bump");
+    setTimeout(() => w.classList.remove("xp-bump"), 450);
+  }
+
   function todayKey() {
     const d = new Date();
     return d.toISOString().split("T")[0];
@@ -35,6 +46,7 @@
     return Number.isFinite(n) ? n : null;
   }
 
+  /* ---------- Load Setup ---------- */
   function loadSetup() {
     const api = window.Scrummer && window.Scrummer.setup;
     if (api && typeof api.loadSetup === "function") {
@@ -43,6 +55,7 @@
     return safeParse(localStorage.getItem(SETUP_KEY) || "{}", {});
   }
 
+  /* ---------- Fallback Metrics ---------- */
   function computeFallback(setup) {
 
     const sprintDays   = num(setup.sprintDays)   ?? 0;
@@ -107,6 +120,7 @@
     return computeFallback(setup);
   }
 
+  /* ---------- XP State ---------- */
   function loadXpState() {
     const s = safeParse(localStorage.getItem(XP_KEY) || "{}", {});
     return {
@@ -131,6 +145,7 @@
     return { level, inLevel, next: LEVEL_SIZE, title };
   }
 
+  /* ---------- Stability ---------- */
   function isStable(metrics) {
     const risk = Number(metrics.riskScore);
     const conf = Number(metrics.confidence);
@@ -146,7 +161,7 @@
     );
   }
 
-  // 🐆 Mood logic (class-based: calm / alert / sprinting)
+  /* ---------- Mood (class-based) ---------- */
   function mood(metrics) {
     const risk = Number(metrics.riskScore);
     const conf = Number(metrics.confidence);
@@ -171,6 +186,7 @@
     return { kind: "calm", text: "🐆 Calm" };
   }
 
+  /* ---------- XP Award (once/day) ---------- */
   function awardXp(state, metrics) {
 
     const today = todayKey();
@@ -215,6 +231,7 @@
     };
   }
 
+  /* ---------- Render ---------- */
   function render(state, metrics) {
 
     const info = levelInfo(state.totalXp);
@@ -222,9 +239,19 @@
     if (el("xpLevel")) el("xpLevel").textContent = `Level ${info.level}`;
     if (el("xpTitle")) el("xpTitle").textContent = info.title;
 
-    if (el("xpFill")) {
+    // XP fill + bump when changed (Step 4B)
+    const fill = el("xpFill");
+    if (fill) {
       const pct = (info.inLevel / info.next) * 100;
-      el("xpFill").style.width = `${pct}%`;
+      const prev = fill.getAttribute("data-pct");
+      const next = String(Math.round(pct));
+
+      fill.style.width = `${pct}%`;
+      fill.setAttribute("data-pct", next);
+
+      if (prev !== null && prev !== next) {
+        bumpXpWidget();
+      }
     }
 
     if (el("xpText"))
@@ -251,6 +278,7 @@
     }
   }
 
+  /* ---------- Init ---------- */
   function init() {
     if (!el("xpLevel")) return;
 
