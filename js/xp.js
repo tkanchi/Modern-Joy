@@ -1,5 +1,5 @@
 /* =========================================================
-   SCRUMMER XP SYSTEM (Gamified v1)
+   SCRUMMER XP SYSTEM (Gamified v1 + Cheetah Mood)
    ========================================================= */
 
 (function () {
@@ -20,8 +20,6 @@
 
   const el = (id) => document.getElementById(id);
 
-  /* ---------- Utilities ---------- */
-
   function todayKey() {
     const d = new Date();
     return d.toISOString().split("T")[0];
@@ -37,18 +35,13 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  /* ---------- Load Setup ---------- */
-
   function loadSetup() {
     const api = window.Scrummer && window.Scrummer.setup;
     if (api && typeof api.loadSetup === "function") {
-      try { return api.loadSetup() || {}; }
-      catch {}
+      try { return api.loadSetup() || {}; } catch {}
     }
     return safeParse(localStorage.getItem(SETUP_KEY) || "{}", {});
   }
-
-  /* ---------- Fallback Compute ---------- */
 
   function computeFallback(setup) {
 
@@ -68,7 +61,6 @@
       : 0;
 
     let volatility = 0;
-
     if (velocities.length >= 2 && avgVel > 0) {
       const variance =
         velocities.reduce((acc,x)=>acc + Math.pow(x - avgVel,2),0)
@@ -85,7 +77,6 @@
       capacitySP > 0 ? committedSP / capacitySP : 0;
 
     let risk = 0;
-
     if (committedSP <= 0 || avgVel <= 0) risk += 30;
     if (overcommitRatio > 1)
       risk += Math.min(50, (overcommitRatio - 1) * 120);
@@ -116,8 +107,6 @@
     return computeFallback(setup);
   }
 
-  /* ---------- XP State ---------- */
-
   function loadXpState() {
     const s = safeParse(localStorage.getItem(XP_KEY) || "{}", {});
     return {
@@ -142,8 +131,6 @@
     return { level, inLevel, next: LEVEL_SIZE, title };
   }
 
-  /* ---------- Stability Logic ---------- */
-
   function isStable(metrics) {
     const risk = Number(metrics.riskScore);
     const conf = Number(metrics.confidence);
@@ -155,18 +142,39 @@
     return (
       risk < 40 &&
       conf >= 70 &&
-      ( !Number.isFinite(over) || over <= 1 )
+      (!Number.isFinite(over) || over <= 1)
     );
   }
 
-  /* ---------- XP Award ---------- */
+  // 🐆 Mood logic
+  function mood(metrics) {
+    const risk = Number(metrics.riskScore);
+    const conf = Number(metrics.confidence);
+    const over = Number(metrics.overcommitRatio);
+
+    // missing data
+    if (!Number.isFinite(risk) || !Number.isFinite(conf)) {
+      return { text: "🐆 Calm", bg: "rgba(0,0,0,.03)" };
+    }
+
+    // Sprinting (high risk)
+    if (risk >= 70 || (Number.isFinite(over) && over > 1.15) || conf < 55) {
+      return { text: "🐆💨 Sprinting", bg: "rgba(255, 0, 0, .08)" };
+    }
+
+    // Alert (watchlist)
+    if (risk >= 40 || (Number.isFinite(over) && over > 1.0) || conf < 70) {
+      return { text: "🐆⚡ Alert", bg: "rgba(255, 170, 0, .10)" };
+    }
+
+    // Calm (stable)
+    return { text: "🐆 Calm", bg: "rgba(0,0,0,.03)" };
+  }
 
   function awardXp(state, metrics) {
 
     const today = todayKey();
-
-    if (state.lastAwardDay === today)
-      return;
+    if (state.lastAwardDay === today) return;
 
     let gained = 0;
 
@@ -175,14 +183,9 @@
     const over = Number(metrics.overcommitRatio);
     const vol  = Number(metrics.volatility);
 
-    if (Number.isFinite(conf) && conf >= 75)
-      gained += 15;
-
-    if (Number.isFinite(over) && over > 0 && over <= 1)
-      gained += 25;
-
-    if (Number.isFinite(vol) && vol < 0.30)
-      gained += 10;
+    if (Number.isFinite(conf) && conf >= 75) gained += 15;
+    if (Number.isFinite(over) && over > 0 && over <= 1) gained += 25;
+    if (Number.isFinite(vol) && vol < 0.30) gained += 10;
 
     if (
       state.lastMetrics &&
@@ -195,8 +198,7 @@
 
     if (isStable(metrics)) {
       state.streak += 1;
-      state.bestStreak =
-        Math.max(state.bestStreak, state.streak);
+      state.bestStreak = Math.max(state.bestStreak, state.streak);
       gained += 10;
     } else {
       state.streak = 0;
@@ -213,25 +215,20 @@
     };
   }
 
-  /* ---------- Render ---------- */
-
-  function render(state) {
+  function render(state, metrics) {
 
     const info = levelInfo(state.totalXp);
 
-    if (el("xpLevel"))
-      el("xpLevel").textContent = `Level ${info.level}`;
+    if (el("xpLevel")) el("xpLevel").textContent = `Level ${info.level}`;
+    if (el("xpTitle")) el("xpTitle").textContent = info.title;
 
-    if (el("xpTitle"))
-      el("xpTitle").textContent = info.title;
-
-    if (el("xpFill"))
-      el("xpFill").style.width =
-        `${(info.inLevel / info.next) * 100}%`;
+    if (el("xpFill")) {
+      const pct = (info.inLevel / info.next) * 100;
+      el("xpFill").style.width = `${pct}%`;
+    }
 
     if (el("xpText"))
-      el("xpText").textContent =
-        `${info.inLevel} / ${info.next} XP`;
+      el("xpText").textContent = `${info.inLevel} / ${info.next} XP`;
 
     if (el("streakText")) {
       el("streakText").textContent =
@@ -239,23 +236,27 @@
           ? `🔥 ${state.streak} sprint-stable streak`
           : `🧊 streak reset`;
     }
+
+    // mood badge
+    const badge = el("moodBadge");
+    if (badge) {
+      const m = mood(metrics);
+      badge.textContent = m.text;
+      badge.style.background = m.bg;
+    }
   }
 
-  /* ---------- Init ---------- */
-
   function init() {
-
     if (!el("xpLevel")) return;
 
     const setup = loadSetup();
     const metrics = computeSignals(setup);
 
     const state = loadXpState();
-
     awardXp(state, metrics);
     saveXpState(state);
 
-    render(state);
+    render(state, metrics);
   }
 
   document.addEventListener("DOMContentLoaded", init);
