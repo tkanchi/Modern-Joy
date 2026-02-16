@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Scrummer — Forecast</title>
+  <link rel="stylesheet" href="css/style.css?v=3"/>
+</head>
+
+<body>
+  <div class="appShell">
+    <aside class="sideNav">
+      <div class="sideBrand">
+        <div class="brandMark">🐆</div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink active" href="forecast.html">📦 Forecast</a>
+      </nav>
+
+      <!-- XP widget -->
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div>
+            <div class="lvl" id="xpLevel">Level 1</div>
+            <div class="title" id="xpTitle">Rookie</div>
+          </div>
+          <div id="moodBadge">🐆 Calm</div>
+        </div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">Capacity Forecast</h1>
+        <p class="sectionSub">Pure math. Transparent formulas. No AI. No hidden assumptions.</p>
+
+        <div class="info-banner">
+          <strong>How to use:</strong> Enter inputs → see each calculation step → pick a safe commitment range for planning.
+        </div>
+
+        <!-- Inputs -->
+        <div style="margin-top:12px;">
+          <div class="kvKey">Inputs</div>
+
+          <div style="display:grid; gap:10px;">
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Sprint length (working days)</div>
+              <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10"/>
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Team members</div>
+              <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7"/>
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Leave days (total person-days)</div>
+              <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0"/>
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Interruptions (%)</div>
+              <input class="fun-input" id="interruptPct" type="number" min="0" max="60" step="1" placeholder="15"/>
+              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+                Includes support work, prod issues, ad-hoc meetings. Typical: 10–25%.
+              </div>
+            </div>
+
+            <div class="info-banner" style="margin-top:4px;">
+              <div style="font-weight:900;">Last 3 sprint velocities (completed SP)</div>
+              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+                Used only to compute average velocity (no forecasting “AI”).
+              </div>
+
+              <div style="display:grid; gap:10px; margin-top:12px;">
+                <input class="fun-input" id="v1" type="number" min="0" placeholder="N-1 velocity (e.g., 36)"/>
+                <input class="fun-input" id="v2" type="number" min="0" placeholder="N-2 velocity (e.g., 41)"/>
+                <input class="fun-input" id="v3" type="number" min="0" placeholder="N-3 velocity (e.g., 38)"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="btnRow" style="margin-top:12px;">
+            <button class="btnPrimary" id="calcBtn" type="button">Calculate 📦</button>
+            <button class="btnGhost" id="pullFromSetup" type="button">Use Setup inputs</button>
+            <button class="btnGhost" id="resetBtn" type="button">Reset</button>
+          </div>
+        </div>
+
+        <!-- Calculation steps -->
+        <div style="margin-top:14px;">
+          <div class="kvKey">Visible Calculations</div>
+
+          <div class="info-banner" id="step1">
+            <div style="font-weight:900;">Step 1 — Raw Capacity (team-days)</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Formula: <b>Raw Capacity = Sprint Days × Team Members</b>
+            </div>
+            <div style="font-weight:900; font-size:18px; margin-top:8px;" id="rawCap">—</div>
+          </div>
+
+          <div class="info-banner" style="margin-top:12px;" id="step2">
+            <div style="font-weight:900;">Step 2 — Effective Team Days</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Formula:
+              <b>Effective Days = (Raw Capacity − Leave Days) × (1 − Interruptions%)</b>
+            </div>
+            <div style="font-weight:900; font-size:18px; margin-top:8px;" id="effDays">—</div>
+          </div>
+
+          <div class="info-banner" style="margin-top:12px;" id="step3">
+            <div style="font-weight:900;">Step 3 — Velocity per team-day</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Formula:
+              <b>Velocity/Day = Avg Velocity ÷ Raw Capacity</b>
+            </div>
+            <div style="font-weight:900; font-size:18px; margin-top:8px;" id="velPerDay">—</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="avgVel">Avg velocity: —</div>
+          </div>
+
+          <div class="info-banner" style="margin-top:12px;" id="step4">
+            <div style="font-weight:900;">Step 4 — Forecast SP</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Formula:
+              <b>Forecast SP = Effective Days × Velocity/Day</b>
+            </div>
+            <div style="font-weight:900; font-size:18px; margin-top:8px;" id="forecastSp">—</div>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div style="margin-top:14px;">
+          <div class="kvKey">Commitment Range</div>
+
+          <div class="info-banner">
+            <div style="font-weight:900;">Recommended range (transparent)</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Conservative = Forecast − 10% • Likely = Forecast • Stretch = Forecast + 5%
+            </div>
+
+            <div style="display:grid; gap:10px; margin-top:10px;">
+              <div style="display:flex; justify-content:space-between; gap:10px;">
+                <div style="font-weight:900;">🟢 Conservative</div>
+                <div style="font-weight:900;" id="consRange">—</div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; gap:10px;">
+                <div style="font-weight:900;">⚖️ Likely</div>
+                <div style="font-weight:900;" id="likelyRange">—</div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; gap:10px;">
+                <div style="font-weight:900;">🚀 Stretch</div>
+                <div style="font-weight:900;" id="stretchRange">—</div>
+              </div>
+            </div>
+
+            <div style="color:var(--text-muted); font-weight:800; margin-top:10px;" id="note">
+              Tip: Use Conservative for unstable teams, Stretch only when volatility is low and risks are known.
+            </div>
+          </div>
+        </div>
+
+        <div class="btnRow" style="margin-top:12px;">
+          <a class="btnGhost" href="workspace.html">← Back to Copilot</a>
+          <a class="btnGhost" href="index.html">Go to Setup →</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script>
+
+  <script>
+    (function () {
+      const SETUP_KEY = "scrummer_setup_v1";
+      const FORECAST_KEY = "scrummer_forecast_v1";
+
+      const $ = (id) => document.getElementById(id);
+
+      function safeParse(str, fallback){
+        try { return JSON.parse(str); } catch { return fallback; }
+      }
+
+      function num(v){
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function readInputs(){
+        return {
+          sprintDays: num($("sprintDays")?.value),
+          teamMembers: num($("teamMembers")?.value),
+          leaveDays: num($("leaveDays")?.value) ?? 0,
+          interruptPct: num($("interruptPct")?.value) ?? 0,
+          v1: num($("v1")?.value),
+          v2: num($("v2")?.value),
+          v3: num($("v3")?.value),
+        };
+      }
+
+      function writeInputs(d){
+        d = d || {};
+        $("sprintDays").value = d.sprintDays ?? "";
+        $("teamMembers").value = d.teamMembers ?? "";
+        $("leaveDays").value = d.leaveDays ?? "";
+        $("interruptPct").value = d.interruptPct ?? "";
+        $("v1").value = d.v1 ?? "";
+        $("v2").value = d.v2 ?? "";
+        $("v3").value = d.v3 ?? "";
+      }
+
+      function loadForecastDraft(){
+        return safeParse(localStorage.getItem(FORECAST_KEY) || "{}", {});
+      }
+
+      function saveForecastDraft(d){
+        localStorage.setItem(FORECAST_KEY, JSON.stringify(d || {}));
+      }
+
+      function loadSetup(){
+        const api = window.Scrummer && window.Scrummer.setup;
+        if (api && typeof api.loadSetup === "function") {
+          try { return api.loadSetup() || {}; } catch {}
+        }
+        return safeParse(localStorage.getItem(SETUP_KEY) || "{}", {});
+      }
+
+      function setText(id, v){ const e = $(id); if (e) e.textContent = v; }
+
+      function round2(n){
+        return Math.round(n * 100) / 100;
+      }
+
+      function calc(){
+        const d = readInputs();
+
+        const sprintDays = d.sprintDays ?? 0;
+        const teamMembers = d.teamMembers ?? 0;
+        const leaveDays = d.leaveDays ?? 0;
+        const interruptPct = Math.max(0, Math.min(60, d.interruptPct ?? 0));
+
+        const velocities = [d.v1, d.v2, d.v3].filter(x => Number.isFinite(x) && x > 0);
+        const avgVel = velocities.length ? (velocities.reduce((a,b)=>a+b,0) / velocities.length) : 0;
+
+        // Step 1
+        const rawCap = sprintDays * teamMembers;
+
+        // Step 2
+        const effectiveBeforeInterrupt = Math.max(0, rawCap - leaveDays);
+        const effDays = effectiveBeforeInterrupt * (1 - (interruptPct / 100));
+
+        // Step 3
+        const velPerDay = rawCap > 0 ? (avgVel / rawCap) : 0;
+
+        // Step 4
+        const forecast = effDays * velPerDay;
+
+        // Render steps
+        setText("rawCap", rawCap > 0 ? `${rawCap} team-days` : "—");
+        setText("effDays", rawCap > 0 ? `${round2(effDays)} effective days` : "—");
+        setText("velPerDay", (rawCap > 0 && avgVel > 0) ? `${round2(velPerDay)} SP / team-day` : "—");
+        setText("avgVel", avgVel > 0 ? `Avg velocity: ${round2(avgVel)} SP` : "Avg velocity: —");
+        setText("forecastSp", (forecast > 0) ? `${round2(forecast)} SP` : "—");
+
+        // Range
+        if (forecast > 0) {
+          const cons = Math.max(0, Math.floor(forecast * 0.90));
+          const likely = Math.max(0, Math.round(forecast));
+          const stretch = Math.max(0, Math.ceil(forecast * 1.05));
+
+          setText("consRange", `${cons} SP`);
+          setText("likelyRange", `${likely} SP`);
+          setText("stretchRange", `${stretch} SP`);
+        } else {
+          setText("consRange", "—");
+          setText("likelyRange", "—");
+          setText("stretchRange", "—");
+        }
+
+        saveForecastDraft({ ...d, interruptPct });
+      }
+
+      // Load draft first (so user doesn't lose input)
+      const draft = loadForecastDraft();
+      if (draft && Object.keys(draft).length) writeInputs(draft);
+
+      // If no draft, optionally pull from Setup once
+      if (!draft || !Object.keys(draft).length) {
+        const s = loadSetup();
+        if (s && Object.keys(s).length) {
+          writeInputs({
+            sprintDays: s.sprintDays ?? "",
+            teamMembers: s.teamMembers ?? "",
+            leaveDays: s.leaveDays ?? "",
+            interruptPct: 15,
+            v1: s.v1 ?? "",
+            v2: s.v2 ?? "",
+            v3: s.v3 ?? ""
+          });
+        }
+      }
+
+      $("calcBtn")?.addEventListener("click", calc);
+
+      $("pullFromSetup")?.addEventListener("click", () => {
+        const s = loadSetup();
+        writeInputs({
+          sprintDays: s.sprintDays ?? "",
+          teamMembers: s.teamMembers ?? "",
+          leaveDays: s.leaveDays ?? "",
+          interruptPct: $("interruptPct").value || 15,
+          v1: s.v1 ?? "",
+          v2: s.v2 ?? "",
+          v3: s.v3 ?? ""
+        });
+        calc();
+      });
+
+      $("resetBtn")?.addEventListener("click", () => {
+        writeInputs({ sprintDays:"", teamMembers:"", leaveDays:"", interruptPct:"", v1:"", v2:"", v3:"" });
+        localStorage.removeItem(FORECAST_KEY);
+        calc();
+      });
+
+      // Auto-calc on input
+      ["sprintDays","teamMembers","leaveDays","interruptPct","v1","v2","v3"].forEach(id => {
+        const inp = $(id);
+        if (!inp) return;
+        inp.addEventListener("input", () => calc());
+      });
+
+      // Initial calc
+      calc();
+    })();
+  </script>
+</body>
+</html>
