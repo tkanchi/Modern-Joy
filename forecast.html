@@ -220,10 +220,19 @@
         <div style="margin-top:18px;">
           <div class="kvKey">Results</div>
 
+          <!-- Interrupt warning will appear here -->
+          <div class="info-banner" id="interruptWarn" style="display:none; margin-bottom:12px;">
+            <div style="font-weight:900;">⚠ High Interruptions Detected</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Interruptions above <b>40%</b> usually means the team is heavily loaded with support/meetings.
+              The forecast may be unreliable. Consider reducing scope or protecting focus time.
+            </div>
+          </div>
+
           <div class="info-banner" id="resultsBox">
             <div id="rawCap">Raw Capacity: —</div>
             <div id="effDays">Effective Days: —</div>
-            <div id="velPerDay">Velocity per Day: —</div>
+            <div id="velPerDay">Velocity per Team-Day: —</div>
             <div id="forecastSp">Forecast SP: —</div>
 
             <hr style="margin:10px 0; opacity:.2;">
@@ -250,11 +259,19 @@
 
     function round(n){ return Math.round(n*100)/100; }
 
+    function showWarn(show){
+      const w = $("interruptWarn");
+      if (!w) return;
+      w.style.display = show ? "block" : "none";
+    }
+
     function calculate(){
       const sprintDays = Number($("sprintDays").value) || 0;
       const teamMembers = Number($("teamMembers").value) || 0;
       const leaveDays = Number($("leaveDays").value) || 0;
-      const interruptPct = (Number($("interruptPct").value) || 0) / 100;
+
+      const interruptPctRaw = Number($("interruptPct").value) || 0;
+      const interruptPct = interruptPctRaw / 100;
 
       const velocities = [
         Number($("v1").value),
@@ -262,20 +279,44 @@
         Number($("v3").value)
       ].filter(v => v > 0);
 
-      const rawCap = sprintDays * teamMembers;
-      const effDays = (rawCap - leaveDays) * (1 - interruptPct);
-      const avgVel = avg(velocities);
-      const velPerDay = rawCap > 0 ? avgVel / rawCap : 0;
-      const forecast = effDays * velPerDay;
+      const rawCap = sprintDays * teamMembers;                // team-days
+      const effDays = (rawCap - leaveDays) * (1 - interruptPct); // effective team-days
+      const avgVel = avg(velocities);                         // SP per sprint
+      const velPerDay = rawCap > 0 ? avgVel / rawCap : 0;     // SP per team-day
+      const forecast = effDays * velPerDay;                   // SP
 
-      $("rawCap").textContent = `Raw Capacity: ${rawCap}`;
-      $("effDays").textContent = `Effective Days: ${round(effDays)}`;
-      $("velPerDay").textContent = `Velocity per Day: ${round(velPerDay)}`;
-      $("forecastSp").textContent = `Forecast SP: ${round(forecast)}`;
+      // Warn if interruptions > 40%
+      showWarn(interruptPctRaw > 40);
 
-      $("consRange").textContent = `Conservative: ${Math.floor(forecast*0.9)}`;
-      $("likelyRange").textContent = `Likely: ${Math.round(forecast)}`;
-      $("stretchRange").textContent = `Stretch: ${Math.ceil(forecast*1.05)}`;
+      // Units are now explicit
+      $("rawCap").textContent = rawCap > 0
+        ? `Raw Capacity: ${rawCap} team-days`
+        : `Raw Capacity: —`;
+
+      $("effDays").textContent = rawCap > 0
+        ? `Effective Days: ${round(effDays)} effective team-days`
+        : `Effective Days: —`;
+
+      $("velPerDay").textContent = (rawCap > 0 && avgVel > 0)
+        ? `Velocity per Team-Day: ${round(velPerDay)} SP / team-day`
+        : `Velocity per Team-Day: —`;
+
+      $("forecastSp").textContent = forecast > 0
+        ? `Forecast SP: ${round(forecast)} story points`
+        : `Forecast SP: —`;
+
+      // Commitment range (only if forecast > 0)
+      $("consRange").textContent = forecast > 0
+        ? `Conservative: ${Math.floor(forecast*0.9)} SP`
+        : `Conservative: —`;
+
+      $("likelyRange").textContent = forecast > 0
+        ? `Likely: ${Math.round(forecast)} SP`
+        : `Likely: —`;
+
+      $("stretchRange").textContent = forecast > 0
+        ? `Stretch: ${Math.ceil(forecast*1.05)} SP`
+        : `Stretch: —`;
     }
 
     $("calcBtn").addEventListener("click", calculate);
