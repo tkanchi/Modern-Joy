@@ -3,181 +3,79 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Scrummer — Launchpad</title>
-
-  <!-- IMPORTANT: this is what your current page is missing -->
-  <link rel="stylesheet" href="css/style.css?v=1" />
+  <title>Scrummer — Setup</title>
+  <link rel="stylesheet" href="css/style.css?v=2" />
 </head>
 
-<body data-page="upload">
+<body data-page="setup">
+  <div class="appShell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sideNav">
+      <div class="sideBrand">
+        <div class="brandMark">🐆</div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
+        </div>
+      </div>
 
-  <!-- TOP BAR -->
-  <div class="topbarWrap">
-  <div class="topbar">
-    <div class="brand">
-      <div class="brandMark">🐆</div>
-      <div class="brandName">SCRUMMER</div>
-    </div>
+      <nav class="nav">
+        <a class="navlink active" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+      </nav>
 
-    <div class="navTabs">
-      <a class="navlink active" href="index.html">🚀 Setup</a>
-      <a class="navlink" href="intelligence.html">📊 Insights</a>
-      <a class="navlink" href="suggestions.html">🎯 Actions</a>
-      <a class="navlink" href="workspace.html">🤖 Copilot</a>
-    </div>
-
-    <div class="topbarActions">
-      <button class="themeToggle" id="themeToggle" type="button">
-        Theme: <span id="themeMode">Light</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-      <div class="topbarActions">
-        <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false">
+      <div class="sideActions">
+        <button class="themeToggle" id="themeToggle" type="button">
           Theme: <span id="themeMode">Light</span>
         </button>
       </div>
-    </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">Launchpad</h1>
+        <p class="sectionSub">Initialize your sprint. These fields power Risk Score + Confidence %.</p>
+
+        <div class="info-banner">
+          <strong>SPRINT SETUP</strong><br />
+          These fields power Risk Score + Confidence %.
+        </div>
+
+        <div class="kv" style="margin-top:12px;">
+          <div>
+            <div class="kvKey">SPRINT LENGTH (WORKING DAYS)</div>
+            <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10" />
+          </div>
+
+          <div>
+            <div class="kvKey">TEAM MEMBERS</div>
+            <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7" />
+          </div>
+
+          <div>
+            <div class="kvKey">LEAVE DAYS (TOTAL PERSON-DAYS)</div>
+            <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0" />
+          </div>
+
+          <div>
+            <div class="kvKey">COMMITTED POINTS</div>
+            <input class="fun-input" id="committedSP" type="number" min="0" placeholder="40" />
+          </div>
+        </div>
+
+        <div class="btnRow" style="margin-top:16px;">
+          <a class="btnPrimary" href="intelligence.html" style="text-decoration:none; display:inline-block;">
+            Next: Insights ➜
+          </a>
+        </div>
+      </div>
+    </main>
   </div>
 
-  <!-- PAGE -->
-  <div class="pageWrap">
-    <div class="sectionCard">
-      <h1 class="sectionTitle">Launchpad</h1>
-      <p class="sectionSub">Initialize your sprint. These fields power Risk Score + Confidence %.</p>
-
-      <div class="info-banner">
-        <strong>SPRINT SETUP</strong><br />
-        These fields power Risk Score + Confidence %.
-      </div>
-
-      <div class="kv" style="margin-top:12px;">
-        <div>
-          <div class="kvKey">SPRINT LENGTH (WORKING DAYS)</div>
-          <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10" />
-        </div>
-
-        <div>
-          <div class="kvKey">TEAM MEMBERS</div>
-          <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7" />
-        </div>
-
-        <div>
-          <div class="kvKey">LEAVE DAYS (TOTAL PERSON-DAYS)</div>
-          <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0" />
-        </div>
-
-        <div>
-          <div class="kvKey">COMMITTED POINTS</div>
-          <input class="fun-input" id="committedSP" type="number" min="0" placeholder="40" />
-        </div>
-      </div>
-
-      <div style="margin-top:14px;">
-        <div class="kvKey">DEMO DATA</div>
-        <div class="btnRow">
-          <button class="btnGhost" id="demoExcellent" type="button">Excellent</button>
-          <button class="btnGhost" id="demoNormal" type="button">Normal</button>
-          <button class="btnGhost" id="demoRisky" type="button">Risky</button>
-        </div>
-      </div>
-
-      <div style="margin-top:16px;">
-        <div class="kvKey">LAST 3 SPRINT VELOCITIES (COMPLETED SP)</div>
-        <div class="sectionSub" style="margin-top:6px;">Used to compute average velocity + volatility.</div>
-
-        <div class="kv">
-          <div>
-            <div class="kvKey">N-1</div>
-            <input class="fun-input" id="v1" type="number" min="0" placeholder="36" />
-          </div>
-          <div>
-            <div class="kvKey">N-2</div>
-            <input class="fun-input" id="v2" type="number" min="0" placeholder="41" />
-          </div>
-          <div>
-            <div class="kvKey">N-3</div>
-            <input class="fun-input" id="v3" type="number" min="0" placeholder="38" />
-          </div>
-        </div>
-      </div>
-
-      <div class="btnRow" style="margin-top:16px;">
-        <button class="btnPrimary" id="saveContinue" type="button">Save & Continue ➜</button>
-        <a class="btnGhost" href="intelligence.html" style="text-decoration:none; display:inline-block;">Go to Insights</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- JS (order matters) -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
-
-  <script>
-    (function () {
-      const $ = (id) => document.getElementById(id);
-      const api = window.Scrummer && window.Scrummer.setup;
-
-      function load() {
-        if (!api) return {};
-        return api.loadSetup ? api.loadSetup() : {};
-      }
-
-      function save(data) {
-        if (!api || !api.saveSetup) return;
-        api.saveSetup(data);
-      }
-
-      function bind(id, key) {
-        const el = $(id);
-        if (!el) return;
-        const current = load();
-        if (current[key] !== undefined && current[key] !== null && current[key] !== "") {
-          el.value = current[key];
-        }
-        el.addEventListener("input", () => {
-          const next = Object.assign({}, load(), { [key]: el.value });
-          save(next);
-        });
-      }
-
-      // bind fields to storage keys expected by metrics.js
-      bind("sprintDays", "sprintDays");
-      bind("teamMembers", "teamMembers");
-      bind("leaveDays", "leaveDays");
-      bind("committedSP", "committedSP");
-      bind("v1", "v1");
-      bind("v2", "v2");
-      bind("v3", "v3");
-
-      function setDemo(type) {
-        const presets = {
-          excellent: { sprintDays: 10, teamMembers: 7, leaveDays: 0, committedSP: 38, v1: 40, v2: 39, v3: 41 },
-          normal:    { sprintDays: 10, teamMembers: 7, leaveDays: 3, committedSP: 42, v1: 40, v2: 36, v3: 41 },
-          risky:     { sprintDays: 10, teamMembers: 7, leaveDays: 6, committedSP: 52, v1: 38, v2: 30, v3: 44 }
-        };
-        const p = presets[type];
-        if (!p) return;
-
-        // update UI
-        ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"].forEach(k => {
-          if ($(k)) $(k).value = p[k];
-        });
-
-        // persist
-        save(Object.assign({}, load(), p));
-      }
-
-      const ex = $("demoExcellent"), no = $("demoNormal"), ri = $("demoRisky");
-      if (ex) ex.onclick = () => setDemo("excellent");
-      if (no) no.onclick = () => setDemo("normal");
-      if (ri) ri.onclick = () => setDemo("risky");
-
-      const btn = $("saveContinue");
-      if (btn) btn.onclick = () => location.href = "intelligence.html";
-    })();
-  </script>
 </body>
 </html>
