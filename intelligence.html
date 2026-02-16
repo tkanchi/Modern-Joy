@@ -38,7 +38,7 @@
         <p class="sectionSub">Risk, confidence, and health signals for this sprint.</p>
 
         <div class="info-banner">
-          <strong>How to use:</strong> Fill <b>Setup</b> first. Then refresh Insights.
+          <strong>Works offline:</strong> Insights will still compute even if <b>metrics.js</b> isn’t available.
         </div>
 
         <!-- KPI Cards -->
@@ -51,8 +51,10 @@
 
           <div class="info-banner">
             <div style="font-weight:900;">Confidence</div>
-            <div style="font-size:22px; font-weight:900; margin-top:4px;" id="confidence">—</div>
-            <div style="color:var(--text-muted); font-weight:800;">%</div>
+            <div style="font-size:22px; font-weight:900; margin-top:4px;">
+              <span id="confidence">—</span>%
+            </div>
+            <div style="color:var(--text-muted); font-weight:800;" id="confidenceLabel">—</div>
           </div>
 
           <div class="info-banner">
@@ -71,61 +73,155 @@
         <div class="info-banner" style="margin-top:16px;">
           <div style="font-weight:900;">Gamified Reading</div>
           <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-            🔴 High risk = sprint may slip. 🟡 Watchlist = be careful. 🟢 Stable = keep flow.
+            🔴 High risk = likely slip. 🟡 Watchlist = needs attention. 🟢 Stable = protect flow.
           </div>
+        </div>
+
+        <div class="info-banner" style="margin-top:12px;">
+          <div style="font-weight:900;">Inputs detected</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="inputsDetected">—</div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Optional: hook to your existing scripts if they exist -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
 
   <script>
     (function () {
+      const STORAGE_KEY = "scrummer_setup_v1";
       const $ = (id) => document.getElementById(id);
 
-      function bandFromRisk(score) {
+      function loadSetupUnified() {
+        // Prefer metrics.js api if available
+        const api = window.Scrummer && window.Scrummer.setup;
+        if (api && typeof api.loadSetup === "function") {
+          try { return api.loadSetup() || {}; } catch (e) {}
+        }
+        // Fallback to localStorage (same key as index.html)
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+        catch (e) { return {}; }
+      }
+
+      function num(v) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      // Fallback compute (works without computeSignals)
+      function computeFallback(setup) {
+        const sprintDays = num(setup.sprintDays) ?? 0;
+        const teamMembers = num(setup.teamMembers) ?? 0;
+        const leaveDays = num(setup.leaveDays) ?? 0;
+        const committedSP = num(setup.committedSP) ?? 0;
+
+        const v1 = num(setup.v1) ?? 0;
+        const v2 = num(setup.v2) ?? 0;
+        const v3 = num(setup.v3) ?? 0;
+
+        const velocities = [v1, v2, v3].filter(x => x > 0);
+        const avgVel = velocities.length ? velocities.reduce((a,b)=>a+b,0) / velocities.length : 0;
+
+        // Volatility as coefficient of variation (std/mean)
+        let vol = 0;
+        if (velocities.length >= 2 && avgVel > 0) {
+          const variance = velocities.reduce((acc,x)=>acc + Math.pow(x - avgVel, 2), 0) / velocities.length;
+          const std = Math.sqrt(variance);
+          vol = std / avgVel;
+        }
+
+        // Simple capacity model: avg velocity adjusted by leave
+        // (leaveDays is total person-days, scale down capacity a bit)
+        const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
+        const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays)); // cap effect
+        const capacitySP = avgVel * (1 - leaveRatio);
+
+        const overcommitRatio = capacitySP > 0 ? committedSP / capacitySP : 0;
+
+        // Risk score 0-100 heuristic: overcommit + volatility + missing data penalty
+        let risk = 0;
+        if (committedSP <= 0 || avgVel <= 0) risk += 30;
+        if (overcommitRatio > 1) risk += Math.min(50, (overcommitRatio - 1) * 120); // strong penalty
+        risk += Math.min(30, vol * 80); // volatility penalty
+        risk = Math.max(0, Math.min(100, Math.round(risk)));
+
+        const riskBand = risk >= 70 ? "High" : risk >= 40 ? "Medium" : "Low";
+
+        // Confidence roughly inverse of risk, but keep within 10-95
+        const confidence = Math.max(10, Math.min(95, Math.round(100 - risk)));
+
+        const capacityHealth =
+          overcommitRatio <= 0 ? "—" :
+          overcommitRatio <= 1 ? "🟢 Healthy" :
+          overcommitRatio <= 1.15 ? "🟡 Tight" :
+          "🔴 Overloaded";
+
+        return {
+          riskScore: risk,
+          riskBand,
+          confidence,
+          capacityHealth,
+          capacitySP,
+          overcommitRatio,
+          vol
+        };
+      }
+
+      function bandEmoji(score) {
         if (!Number.isFinite(score)) return "—";
         if (score >= 70) return "🔴 High Risk";
         if (score >= 40) return "🟡 Watchlist";
         return "🟢 Stable";
       }
 
+      function confidenceLabel(conf) {
+        if (!Number.isFinite(conf)) return "—";
+        if (conf >= 80) return "🔥 Strong Sprint";
+        if (conf >= 60) return "⚖️ Balanced";
+        return "⚠️ Fragile";
+      }
+
       function render() {
-        const api = window.Scrummer && window.Scrummer.setup;
+        const setup = loadSetupUnified();
+
+        const detected = [
+          ["sprintDays", setup.sprintDays],
+          ["teamMembers", setup.teamMembers],
+          ["leaveDays", setup.leaveDays],
+          ["committedSP", setup.committedSP],
+          ["v1", setup.v1],
+          ["v2", setup.v2],
+          ["v3", setup.v3],
+        ]
+        .filter(([k,v]) => v !== undefined && v !== null && v !== "")
+        .map(([k,v]) => `${k}: ${v}`)
+        .join(" • ");
+        $("inputsDetected").textContent = detected || "No setup found. Go to 🚀 Setup and Save.";
+
+        // Prefer computeSignals if present
         const compute = window.Scrummer && window.Scrummer.computeSignals;
-
-        // If your repo doesn't have computeSignals yet, show friendly message
-        if (!api || !compute) {
-          $("riskScore").textContent = "—";
-          $("riskBand").textContent = "Add setup first";
-          $("confidence").textContent = "—";
-          $("health").textContent = "—";
-          $("capacityNote").textContent = "metrics.js not ready";
-          return;
+        let s;
+        if (typeof compute === "function") {
+          try { s = compute(setup || {}); } catch (e) { s = null; }
         }
-
-        const setup = api.loadSetup ? (api.loadSetup() || {}) : {};
-        const s = compute(setup);
+        if (!s) s = computeFallback(setup || {});
 
         const risk = Number(s.riskScore);
         const conf = Number(s.confidence);
 
         $("riskScore").textContent = Number.isFinite(risk) ? risk : "—";
-        $("riskBand").textContent = bandFromRisk(risk);
+        $("riskBand").textContent = bandEmoji(risk);
 
         $("confidence").textContent = Number.isFinite(conf) ? conf : "—";
+        $("confidenceLabel").textContent = confidenceLabel(conf);
 
         $("health").textContent = s.capacityHealth ?? "—";
         $("capacityNote").textContent =
           Number.isFinite(s.capacitySP) ? `Capacity ≈ ${Math.round(s.capacitySP)} SP` : "Capacity unavailable";
       }
 
-      const btn = $("refreshBtn");
-      if (btn) btn.addEventListener("click", render);
-
+      $("refreshBtn")?.addEventListener("click", render);
       render();
     })();
   </script>
