@@ -1,122 +1,158 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Copilot</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css?v=1" />
+  <link rel="stylesheet" href="css/style.css?v=3"/>
 </head>
 
-<body data-page="workspace">
-  <!-- TOP BAR -->
-  <div class="topbarWrap">
-    <div class="topbar">
-      <div class="brand">
+<body>
+  <div class="appShell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sideNav">
+      <div class="sideBrand">
         <div class="brandMark">🐆</div>
-        <div class="brandName">SCRUMMER</div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
+        </div>
       </div>
 
-     <a class="navlink" href="index.html">🚀 Setup</a>
-<a class="navlink" href="intelligence.html">📊 Insights</a>
-<a class="navlink" href="suggestions.html">🎯 Actions</a>
-<a class="navlink active" href="workspace.html">🤖 Copilot</a>
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink active" href="workspace.html">🤖 Copilot</a>
+      </nav>
 
-      <div class="topbarActions">
-        <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false">
-          Theme: <span id="themeMode">Light</span>
-        </button>
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">AI Ceremony Copilot</h1>
+        <p class="sectionSub">Pick a ceremony → get guided prompts → capture outcomes.</p>
+
+        <div class="info-banner">
+          <strong>Pro move:</strong> Use Copilot in Daily Scrum to keep your sprint streak alive. 🏆
+        </div>
+
+        <!-- Ceremony Selector -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+          <button class="btnGhost" type="button" data-cer="planning">🗺️ Planning</button>
+          <button class="btnGhost" type="button" data-cer="daily">🧩 Daily</button>
+          <button class="btnGhost" type="button" data-cer="refine">🧠 Refinement</button>
+          <button class="btnGhost" type="button" data-cer="review">🎬 Review</button>
+          <button class="btnGhost" type="button" data-cer="retro">♻️ Retro</button>
+        </div>
+
+        <!-- Panel -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="panelBody">
+            Your prompts will appear here.
+          </div>
+        </div>
+
+        <!-- Decisions -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">Capture decisions</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+            Save key outcomes so your next sprint gets smarter.
+          </div>
+
+          <textarea class="fun-input" id="decisionNotes" rows="4" placeholder="Decisions / risks / owners..."></textarea>
+
+          <div class="btnRow">
+            <button class="btnPrimary" id="saveBtn" type="button">Save</button>
+            <button class="btnGhost" id="clearBtn" type="button">Reset</button>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <a class="btnGhost" href="suggestions.html">← Back to Actions</a>
+          <a class="btnGhost" href="index.html">Back to Setup</a>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 
-  <!-- PAGE -->
-  <div class="pageWrap">
-    <div class="sectionCard">
-      <h1 class="sectionTitle">AI Ceremony Copilot</h1>
-      <p class="sectionSub">
-        Pick a ceremony, see tailored prompts + capture decisions. Copilot uses your Setup signals.
-      </p>
-
-      <!-- Recommended badge + message -->
-      <div class="btnRow" style="margin-top:10px; align-items:center;">
-        <div id="copilotRecommended" class="btnGhost" style="cursor:default;">
-          AI Suggests: —
-        </div>
-        <div id="copilotMsg" style="display:none; font-weight:900;"></div>
-      </div>
-
-      <!-- Brief KPI strip -->
-      <div class="kv" style="margin-top:14px;">
-        <div class="kvRow">
-          <div class="kvKey">Scope Load</div>
-          <div class="kvVal"><span id="briefScope">—</span></div>
-        </div>
-        <div class="kvRow">
-          <div class="kvKey">Focus Factor</div>
-          <div class="kvVal"><span id="briefCapRatio">—</span></div>
-        </div>
-        <div class="kvRow">
-          <div class="kvKey">Confidence</div>
-          <div class="kvVal"><span id="briefConf">—</span></div>
-        </div>
-        <div class="kvRow">
-          <div class="kvKey">Risk</div>
-          <div class="kvVal"><span id="briefRisk">—</span></div>
-        </div>
-      </div>
-
-      <!-- Ceremony segmented controls -->
-      <div style="margin-top:16px;">
-        <div class="kvKey" style="margin-bottom:8px;">Choose a ceremony</div>
-
-        <div class="btnRow" style="gap:8px; flex-wrap:wrap;">
-          <button class="btnGhost segBtn is-active" data-tab="planning" type="button">Planning</button>
-          <button class="btnGhost segBtn" data-tab="daily" type="button">Daily</button>
-          <button class="btnGhost segBtn" data-tab="refine" type="button">Refinement</button>
-          <button class="btnGhost segBtn" data-tab="review" type="button">Review</button>
-          <button class="btnGhost segBtn" data-tab="retro" type="button">Retro</button>
-        </div>
-      </div>
-
-      <!-- Panel -->
-      <div class="info-banner" style="margin-top:14px;">
-        <div style="font-weight:900; font-size:16px;" id="panelTitle">—</div>
-        <div style="margin-top:6px; color: var(--text-muted); font-weight:700;" id="panelWhy">—</div>
-      </div>
-
-      <div class="sectionSub" style="margin-top:12px; margin-bottom:8px;">
-        Suggested talking points
-      </div>
-
-      <div class="card" style="padding:14px;">
-        <div id="panelList" style="white-space:pre-line; line-height:1.45; font-weight:800;"></div>
-      </div>
-
-      <!-- Decision capture -->
-      <div style="margin-top:14px;">
-        <div class="kvKey" style="margin-bottom:8px;">Capture decisions</div>
-
-        <!-- copilot.js will inject inputs here -->
-        <div id="decisionFields" class="kv"></div>
-
-        <div class="btnRow" style="margin-top:12px;">
-          <button class="btnPrimary" id="copilotSave" type="button">Save Decisions</button>
-          <button class="btnGhost" id="copilotClear" type="button">Reset</button>
-        </div>
-      </div>
-
-      <div class="btnRow" style="margin-top:16px;">
-        <a class="btnGhost" href="suggestions.html" style="text-decoration:none; display:inline-block;">← Back to Actions</a>
-        <a class="btnGhost" href="index.html" style="text-decoration:none; display:inline-block;">Setup</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- JS (order matters) -->
-  <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
-  <script src="js/copilot.js"></script>
+  <script>
+    (function () {
+      const title = document.getElementById("panelTitle");
+      const body = document.getElementById("panelBody");
+      const notes = document.getElementById("decisionNotes");
+
+      const prompts = {
+        planning: {
+          title: "🗺️ Sprint Planning",
+          body:
+            "1) What is the Sprint Goal?\n" +
+            "2) What are the top 3 risks?\n" +
+            "3) What can we move to Stretch?\n" +
+            "4) What dependencies exist?"
+        },
+        daily: {
+          title: "🧩 Daily Scrum",
+          body:
+            "1) Are we on track for Sprint Goal?\n" +
+            "2) Any blockers?\n" +
+            "3) Scope creep today?\n" +
+            "4) Who needs help?"
+        },
+        refine: {
+          title: "🧠 Refinement",
+          body:
+            "1) Are stories small enough?\n" +
+            "2) Are acceptance criteria clear?\n" +
+            "3) Dependencies identified?\n" +
+            "4) What’s the riskiest story?"
+        },
+        review: {
+          title: "🎬 Sprint Review",
+          body:
+            "1) What value shipped?\n" +
+            "2) Stakeholder feedback?\n" +
+            "3) What will we adjust next sprint?\n" +
+            "4) Any follow-ups?"
+        },
+        retro: {
+          title: "♻️ Retrospective",
+          body:
+            "1) What went well?\n" +
+            "2) What slowed us down?\n" +
+            "3) One improvement action (owner + date)\n" +
+            "4) How do we protect focus?"
+        }
+      };
+
+      document.querySelectorAll("[data-cer]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const key = btn.getAttribute("data-cer");
+          title.textContent = prompts[key].title;
+          body.textContent = prompts[key].body;
+        });
+      });
+
+      // Simple local save
+      document.getElementById("saveBtn").addEventListener("click", () => {
+        localStorage.setItem("scrummer_copilot_notes", notes.value || "");
+        alert("Saved ✅");
+      });
+
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        notes.value = "";
+        localStorage.removeItem("scrummer_copilot_notes");
+      });
+
+      // Load saved notes
+      notes.value = localStorage.getItem("scrummer_copilot_notes") || "";
+    })();
+  </script>
 </body>
 </html>
