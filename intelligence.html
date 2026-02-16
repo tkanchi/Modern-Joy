@@ -18,15 +18,19 @@
         </div>
       </div>
 
+      <!-- ✅ ONE nav, everything inside -->
       <nav class="nav">
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink active" href="intelligence.html">📊 Insights</a>
         <a class="navlink" href="suggestions.html">🎯 Actions</a>
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
-      </nav>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
-<a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-<a class="navlink" href="auth.html">🔐 Account</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+
+        <hr>
+
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
 
       <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
@@ -36,15 +40,8 @@
             <div class="title" id="xpTitle">Rookie</div>
           </div>
 
-          <!-- 🐆 Mood -->
-          <div id="moodBadge" style="
-            padding:6px 10px;
-            border-radius:999px;
-            border:1px solid var(--border);
-            font-weight:900;
-            font-size:12px;
-            background:rgba(0,0,0,.03);
-          ">🐆 Calm</div>
+          <!-- 🐆 Mood (no inline styles — css handles #moodBadge) -->
+          <div id="moodBadge">🐆 Calm</div>
         </div>
 
         <div class="xpBar">
@@ -94,9 +91,9 @@
         </div>
 
         <div class="btnRow">
-          <a class="btnGhost" href="index.html" style="display:inline-block; text-decoration:none;">← Back to Setup</a>
+          <a class="btnGhost" href="index.html">← Back to Setup</a>
           <button class="btnPrimary" id="refreshBtn" type="button">Refresh Insights</button>
-          <a class="btnGhost" href="suggestions.html" style="display:inline-block; text-decoration:none;">Next: Actions ➜</a>
+          <a class="btnGhost" href="suggestions.html">Next: Actions ➜</a>
         </div>
 
         <div class="info-banner" style="margin-top:12px;">
@@ -107,6 +104,7 @@
     </main>
   </div>
 
+  <!-- Scripts -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
@@ -220,7 +218,9 @@
       render();
     })();
   </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa.js"></script>
+
+  <!-- Supabase (cloud sync bridge) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supa.js"></script>
 </body>
 </html>
