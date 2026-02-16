@@ -169,13 +169,30 @@ body{
   font-weight:700;
 }
 
-/* Info banners */
+/* =========================================================
+   Step 2: Softer, Premium Info Banners
+   ========================================================= */
+
 .info-banner{
   border-radius:18px;
-  padding:12px 14px;
-  background: rgba(11,87,208,.06);
-  border: 1px solid rgba(11,87,208,.15);
+  padding:14px 16px;
+
+  background: var(--bg-card);         /* neutral */
+  border: 1px solid var(--border);    /* consistent system border */
+
   color: var(--text-main);
+  transition: background .18s ease, border-color .18s ease;
+}
+
+/* Subtle hover polish (desktop only) */
+.info-banner:hover{
+  border-color: rgba(11,87,208,.25);
+}
+
+/* Dark mode refinement */
+:root[data-theme="dark"] .info-banner,
+body.dark-mode .info-banner{
+  background: rgba(255,255,255,.02);
 }
 
 /* Inputs */
