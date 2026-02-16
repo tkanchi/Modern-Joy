@@ -371,3 +371,28 @@ body.dark-mode .xpWidget{
   background: rgba(11,87,208,.10);
 }
 
+
+/* =========================================================
+   Step 1: Premium card hover lift
+   ========================================================= */
+
+.sectionCard{
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.sectionCard:hover{
+  transform: translateY(-2px);
+  border-color: rgba(11,87,208,.18);
+  box-shadow: 0 26px 70px rgba(0,0,0,.08);
+}
+
+:root[data-theme="dark"] .sectionCard:hover,
+body.dark-mode .sectionCard:hover{
+  border-color: rgba(11,87,208,.28);
+  box-shadow: 0 26px 70px rgba(0,0,0,.35);
+}
+
+/* Mobile: disable hover lift (prevents odd tap feel) */
+@media (hover: none){
+  .sectionCard:hover{ transform:none; }
+}
