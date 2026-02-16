@@ -15,7 +15,7 @@
   const SETUP_KEY = "scrummer_setup_v1";
   const XP_KEY = "scrummer_xp_v1";
 
-  const LEVEL_SIZE = 300; // XP per level
+  const LEVEL_SIZE = 300;
   const LEVEL_TITLES = [
     "Rookie",
     "Sprint Scout",
@@ -52,7 +52,6 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  // Fallback computeSignals (simple but consistent)
   function computeFallback(setup) {
     const sprintDays = num(setup.sprintDays) ?? 0;
     const teamMembers = num(setup.teamMembers) ?? 0;
@@ -64,25 +63,21 @@
     const v3 = num(setup.v3) ?? 0;
 
     const velocities = [v1, v2, v3].filter(x => x > 0);
-    const avgVel = velocities.length
-      ? velocities.reduce((a,b)=>a+b,0) / velocities.length
-      : 0;
+    const avgVel = velocities.length ? velocities.reduce((a,b)=>a+b,0) / velocities.length : 0;
 
-    // volatility = std/mean
     let vol = 0;
     if (velocities.length >= 2 && avgVel > 0) {
       const variance = velocities.reduce((acc,x)=>acc + Math.pow(x - avgVel, 2), 0) / velocities.length;
-      vol = Math.sqrt(variance) / avgVel;
+      const std = Math.sqrt(variance);
+      vol = std / avgVel;
     }
 
-    // capacity estimate adjusted by leave ratio
     const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
     const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays));
     const capacitySP = avgVel * (1 - leaveRatio);
 
     const overcommitRatio = capacitySP > 0 ? committedSP / capacitySP : 0;
 
-    // Risk heuristic (0-100)
     let risk = 0;
     if (committedSP <= 0 || avgVel <= 0) risk += 30;
     if (overcommitRatio > 1) risk += Math.min(50, (overcommitRatio - 1) * 120);
@@ -91,13 +86,7 @@
 
     const confidence = Math.max(10, Math.min(95, Math.round(100 - risk)));
 
-    return {
-      riskScore: risk,
-      confidence,
-      capacitySP,
-      overcommitRatio,
-      vol
-    };
+    return { riskScore: risk, confidence, capacitySP, overcommitRatio, vol };
   }
 
   function computeSignalsUnified(setup) {
@@ -133,11 +122,11 @@
     return { lvl, inLevel, next: LEVEL_SIZE, title };
   }
 
-  // Stable condition for streak
   function isStable(metrics) {
     const risk = Number(metrics.riskScore);
     const conf = Number(metrics.confidence);
     const over = Number(metrics.overcommitRatio);
+
     if (!Number.isFinite(risk) || !Number.isFinite(conf)) return false;
 
     const okRisk = risk < 40;
@@ -149,12 +138,8 @@
 
   function awardXpOncePerDay(state, metrics) {
     const day = todayKey();
-    if (state.lastAwardDay === day) {
-      // No XP farming today.
-      return { gained: 0, reasons: [] };
-    }
+    if (state.lastAwardDay === day) return;
 
-    const reasons = [];
     let gained = 0;
 
     const risk = Number(metrics.riskScore);
@@ -162,33 +147,24 @@
     const over = Number(metrics.overcommitRatio);
     const vol = Number(metrics.vol);
 
-    // Base daily check-in XP if setup exists
     const hasSomeData = Number.isFinite(risk) || Number.isFinite(conf);
-    if (hasSomeData) {
-      gained += 5;
-      reasons.push("+5 Daily check-in");
-    }
+    if (hasSomeData) gained += 5;
 
-    // Reward “good state”
-    if (Number.isFinite(conf) && conf >= 75) { gained += 15; reasons.push("+15 Confidence ≥ 75"); }
-    if (Number.isFinite(over) && over > 0 && over <= 1) { gained += 25; reasons.push("+25 No overcommit"); }
-    if (Number.isFinite(vol) && vol > 0 && vol < 0.30) { gained += 10; reasons.push("+10 Low volatility"); }
+    if (Number.isFinite(conf) && conf >= 75) gained += 15;
+    if (Number.isFinite(over) && over > 0 && over <= 1) gained += 25;
+    if (Number.isFinite(vol) && vol > 0 && vol < 0.30) gained += 10;
 
-    // Reward improvement vs last snapshot (if we have one)
     if (state.lastMetrics && Number.isFinite(Number(state.lastMetrics.riskScore)) && Number.isFinite(risk)) {
       const prevRisk = Number(state.lastMetrics.riskScore);
-      if (prevRisk - risk >= 5) { gained += 20; reasons.push("+20 Risk improved"); }
+      if (prevRisk - risk >= 5) gained += 20;
     }
 
-    // Streak logic
     if (isStable(metrics)) {
       state.streak += 1;
       state.bestStreak = Math.max(state.bestStreak, state.streak);
       gained += 10;
-      reasons.push("+10 Stable streak day");
     } else {
       state.streak = 0;
-      reasons.push("Streak reset (not stable)");
     }
 
     state.totalXp += gained;
@@ -199,8 +175,6 @@
       overcommitRatio: Number.isFinite(over) ? over : null,
       vol: Number.isFinite(vol) ? vol : null
     };
-
-    return { gained, reasons };
   }
 
   function renderWidget(state) {
@@ -220,14 +194,12 @@
     if (textEl) textEl.textContent = `${info.inLevel} / ${info.next} XP`;
 
     if (streakEl) {
-      streakEl.textContent = state.streak > 0
-        ? `🔥 ${state.streak} sprint-stable streak`
-        : `🧊 streak reset`;
+      streakEl.textContent =
+        state.streak > 0 ? `🔥 ${state.streak} sprint-stable streak` : `🧊 streak reset`;
     }
   }
 
   function init() {
-    // If widget not present on page, do nothing.
     if (!el("xpLevel") && !el("xpFill") && !el("xpText")) return;
 
     const setup = loadSetupUnified();
@@ -239,9 +211,5 @@
     renderWidget(state);
   }
 
-  // Expose for debugging if needed
-  window.ScrummerXP = { init };
-
-  // Auto-init
   document.addEventListener("DOMContentLoaded", init);
 })();
