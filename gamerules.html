@@ -9,6 +9,8 @@
 
 <body>
   <div class="appShell">
+
+    <!-- SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark">🐆</div>
@@ -19,6 +21,7 @@
       </div>
 
       <nav class="nav">
+        <a class="navlink" href="auth.html">🔐 Login</a>
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
         <a class="navlink" href="suggestions.html">🎯 Actions</a>
@@ -27,11 +30,161 @@
         <a class="navlink active" href="gamerules.html">🎮 Game Rules</a>
       </nav>
 
-      <!-- XP widget -->
+      <!-- XP WIDGET -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
             <div class="lvl" id="xpLevel">Level 1</div>
             <div class="title" id="xpTitle">Rookie</div>
           </div>
-          <div
+          <div id="moodBadge">🐆 Calm</div>
+        </div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">🎮 How Scrummer Works</h1>
+        <p class="sectionSub">
+          Scrummer is not just a dashboard.  
+          It’s a performance system for Scrum Masters.
+        </p>
+
+        <!-- SECTION 1 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">1️⃣ Start with Setup</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            Enter sprint basics:
+            <br/>• Sprint length
+            <br/>• Team members
+            <br/>• Leave days
+            <br/>• Committed story points
+            <br/>• Last 3 sprint velocities
+            <br/><br/>
+            This powers Forecast, Insights, and Actions.
+          </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">📦 Forecast = Pure Math</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            Forecast calculates realistic commitment before Sprint Planning.
+            <br/><br/>
+            It uses:
+            <br/>
+            Raw Capacity = Sprint Days × Team Members
+            <br/>
+            Effective Days = (Raw Capacity − Leave Days) × (1 − Interruptions%)
+            <br/>
+            Velocity per Team-Day = Avg Velocity ÷ Raw Capacity
+            <br/>
+            Forecast SP = Effective Days × Velocity per Team-Day
+            <br/><br/>
+            No AI. No guesswork. Only transparent math.
+          </div>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">📊 Insights = Risk Intelligence</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            Scrummer calculates:
+            <br/>• Risk Score
+            <br/>• Confidence %
+            <br/>• Capacity Health
+            <br/>• Volatility
+            <br/><br/>
+            These signals show how stable your sprint is likely to be.
+          </div>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">🎯 Actions = Tactical Advice</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            Based on risk signals, Scrummer suggests:
+            <br/>• De-scoping
+            <br/>• Mid-sprint checkpoints
+            <br/>• Slice strategy
+            <br/>• Flow improvements
+            <br/><br/>
+            These are practical moves — not generic Agile quotes.
+          </div>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">🤖 Copilot = Ceremony Prompts</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            Copilot gives structured prompts for:
+            <br/>• Planning
+            <br/>• Daily Scrum
+            <br/>• Refinement
+            <br/>• Review
+            <br/>• Retro
+            <br/><br/>
+            Capture decisions. Build memory. Improve every sprint.
+          </div>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">🏆 XP System</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            You earn XP for:
+            <br/>• Stable sprints
+            <br/>• Reduced risk
+            <br/>• Healthy commitments
+            <br/><br/>
+            Keep your streak alive.
+            <br/>
+            Calm cheetah = stable sprint.
+            <br/>
+            Sprinting cheetah = chaos incoming.
+          </div>
+        </div>
+
+        <!-- SECTION 7 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">🔐 Cloud Sync</div>
+          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+            When logged in, your sprint data syncs to the cloud automatically.
+            <br/>
+            If not logged in, it runs locally in your browser.
+          </div>
+        </div>
+
+        <div class="btnRow" style="margin-top:16px;">
+          <a class="btnGhost" href="index.html">Back to Setup</a>
+          <a class="btnPrimary" href="forecast.html">Go to Forecast 📦</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script>
+
+  <!-- Supabase (Minimal SaaS Bridge) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supa.js"></script>
+
+</body>
+</html>
