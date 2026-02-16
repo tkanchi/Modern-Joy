@@ -13,8 +13,8 @@
    ========================================================= */
 
 (function () {
-  const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY";
+  const SUPABASE_URL = "https://yenljhilvtnijsmuybph.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_Xp0YXEWEmJDugzoBZHI8Qw_SGDbJktD";
 
   const LOCAL_SETUP_KEY = "scrummer_setup_v1";
 
@@ -209,7 +209,8 @@
     await pullCloudToLocal();
     await pushLocalToCloud();
 
-    // Whenever setup changes in localStorage, push to cloud (debounced)
+    // NOTE: "storage" only fires across tabs, not same tab.
+    // Your existing pages already save localStorage, so this still helps for multi-tab.
     let t = null;
     window.addEventListener("storage", (e) => {
       if (e.key !== LOCAL_SETUP_KEY) return;
