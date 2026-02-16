@@ -89,7 +89,6 @@
               </div>
             </div>
 
-            <!-- ✅ Improved: interruptions explanation + example -->
             <div style="margin-bottom:12px;">
               <div style="font-weight:900; color:var(--text-main);">2) Effective Team Days</div>
               Effective Days = (Raw Capacity − Leave Days) × (1 − Interruptions%)
@@ -121,7 +120,6 @@
               </div>
             </div>
 
-            <!-- ✅ Improved: why divide by Raw Capacity -->
             <div style="margin-bottom:12px;">
               <div style="font-weight:900; color:var(--text-main);">3) Velocity per Team Day</div>
               Velocity/Day = Average Velocity ÷ Raw Capacity
@@ -254,7 +252,6 @@
         <div style="margin-top:18px;">
           <div class="kvKey">Results</div>
 
-          <!-- Warnings -->
           <div class="info-banner" id="interruptWarn" style="display:none; margin-bottom:12px;">
             <div style="font-weight:900;">⚠ High Interruptions Detected</div>
             <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
@@ -309,6 +306,10 @@
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
 
+  <!-- ✅ Supabase BEFORE your page logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supa.js"></script>
+
   <script>
     const $ = id => document.getElementById(id);
 
@@ -338,14 +339,13 @@
         Number($("v3").value)
       ].filter(v => v > 0);
 
-      const rawCap = sprintDays * teamMembers;                     // team-days
-      const effectiveBase = (rawCap - leaveDays);                  // team-days
-      const effDays = effectiveBase * (1 - interruptPct);          // effective team-days
-      const avgVel = avg(velocities);                              // SP per sprint
-      const velPerDay = rawCap > 0 ? avgVel / rawCap : 0;          // SP per team-day
-      const forecast = (effDays > 0 && velPerDay > 0) ? effDays * velPerDay : 0; // SP
+      const rawCap = sprintDays * teamMembers;
+      const effectiveBase = (rawCap - leaveDays);
+      const effDays = effectiveBase * (1 - interruptPct);
+      const avgVel = avg(velocities);
+      const velPerDay = rawCap > 0 ? avgVel / rawCap : 0;
+      const forecast = (effDays > 0 && velPerDay > 0) ? effDays * velPerDay : 0;
 
-      // Warnings
       show("interruptWarn", interruptPctRaw > 40);
       show("leaveWarn", rawCap > 0 && leaveDays > rawCap);
       show("velocityWarn", velocities.length < 2);
@@ -400,9 +400,6 @@
 
     calculate();
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supa.js"></script>
 
 </body>
 </html>
