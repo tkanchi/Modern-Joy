@@ -9,7 +9,6 @@
 
 <body>
   <div class="appShell">
-    <!-- LEFT SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark">🐆</div>
@@ -26,19 +25,31 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
       </nav>
 
+      <!-- ✅ XP WIDGET -->
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div class="lvl" id="xpLevel">Level 1</div>
+          <div class="title" id="xpTitle">Rookie</div>
+        </div>
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+
       <button class="themeToggle" id="themeToggle" type="button">
         Theme: <span id="themeMode">Light</span>
       </button>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
         <h1 class="sectionTitle">Recommended Actions</h1>
         <p class="sectionSub">Battle plan to reduce risk and boost confidence.</p>
 
         <div class="info-banner">
-          <strong>Works offline:</strong> Actions will still generate even if <b>metrics.js</b> isn’t available.
+          <strong>Works offline:</strong> Actions generate even if <b>metrics.js</b> isn’t available.
         </div>
 
         <div id="actionsWrap" style="display:grid; gap:12px; margin-top:10px;"></div>
@@ -54,6 +65,7 @@
 
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script> <!-- ✅ Step 4 -->
 
   <script>
     (function () {
@@ -63,16 +75,13 @@
       function loadSetupUnified() {
         const api = window.Scrummer && window.Scrummer.setup;
         if (api && typeof api.loadSetup === "function") {
-          try { return api.loadSetup() || {}; } catch (e) {}
+          try { return api.loadSetup() || {}; } catch {}
         }
         try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
-        catch (e) { return {}; }
+        catch { return {}; }
       }
 
-      function num(v) {
-        const n = Number(v);
-        return Number.isFinite(n) ? n : null;
-      }
+      function num(v) { const n = Number(v); return Number.isFinite(n) ? n : null; }
 
       function computeFallback(setup) {
         const sprintDays = num(setup.sprintDays) ?? 0;
@@ -80,16 +89,13 @@
         const leaveDays = num(setup.leaveDays) ?? 0;
         const committedSP = num(setup.committedSP) ?? 0;
 
-        const v1 = num(setup.v1) ?? 0;
-        const v2 = num(setup.v2) ?? 0;
-        const v3 = num(setup.v3) ?? 0;
-
+        const v1 = num(setup.v1) ?? 0, v2 = num(setup.v2) ?? 0, v3 = num(setup.v3) ?? 0;
         const velocities = [v1, v2, v3].filter(x => x > 0);
         const avgVel = velocities.length ? velocities.reduce((a,b)=>a+b,0) / velocities.length : 0;
 
         let vol = 0;
         if (velocities.length >= 2 && avgVel > 0) {
-          const variance = velocities.reduce((acc,x)=>acc + Math.pow(x - avgVel, 2), 0) / velocities.length;
+          const variance = velocities.reduce((acc,x)=>acc + (x-avgVel)*(x-avgVel), 0) / velocities.length;
           vol = Math.sqrt(variance) / avgVel;
         }
 
@@ -110,6 +116,11 @@
         return { riskScore:risk, confidence, capacitySP, overcommitRatio, vol };
       }
 
+      function hasMinimumSetup(setup) {
+        const needed = ["sprintDays","teamMembers","committedSP","v1","v2","v3"];
+        return needed.every(k => setup[k] !== undefined && setup[k] !== null && setup[k] !== "");
+      }
+
       function card(title, why, how, tier) {
         const el = document.createElement("div");
         el.className = "info-banner";
@@ -123,20 +134,14 @@
         return el;
       }
 
-      function hasMinimumSetup(setup) {
-        const needed = ["sprintDays","teamMembers","committedSP","v1","v2","v3"];
-        return needed.every(k => setup[k] !== undefined && setup[k] !== null && setup[k] !== "");
-      }
-
       function render() {
         wrap.innerHTML = "";
         const setup = loadSetupUnified();
 
-        // Prefer computeSignals if present
         const compute = window.Scrummer && window.Scrummer.computeSignals;
         let s = null;
         if (typeof compute === "function") {
-          try { s = compute(setup || {}); } catch (e) { s = null; }
+          try { s = compute(setup || {}); } catch { s = null; }
         }
         if (!s) s = computeFallback(setup || {});
 
@@ -154,11 +159,9 @@
         const conf = Number(s.confidence ?? 0);
         const over = Number(s.overcommitRatio ?? 0);
         const vol = Number(s.vol ?? 0);
-
         const cap = Number(s.capacitySP ?? 0);
         const committed = Number(num(setup.committedSP) ?? 0);
 
-        // P0: Overcommit
         if (over > 1.05) {
           const pct = Math.round((over - 1) * 100);
           wrap.appendChild(card(
@@ -169,7 +172,6 @@
           ));
         }
 
-        // P0: Capacity mismatch
         if (cap && committed && committed > cap) {
           wrap.appendChild(card(
             "Fix capacity mismatch",
@@ -179,7 +181,6 @@
           ));
         }
 
-        // P1: High volatility
         if (vol >= 0.30) {
           wrap.appendChild(card(
             "Reduce volatility (slice smaller)",
@@ -189,7 +190,6 @@
           ));
         }
 
-        // P1: Low confidence
         if (conf < 60) {
           wrap.appendChild(card(
             "Add a mid-sprint checkpoint",
@@ -199,7 +199,6 @@
           ));
         }
 
-        // Default: if no actions
         if (!wrap.children.length) {
           const tier = risk >= 70 ? "🔴" : risk >= 40 ? "🟡" : "🟢";
           wrap.appendChild(card(
