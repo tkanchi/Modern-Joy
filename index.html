@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Setup</title>
-  <link rel="stylesheet" href="css/style.css?v=2" />
+  <link rel="stylesheet" href="css/style.css?v=3"/>
 </head>
 
-<body data-page="setup">
+<body>
   <div class="appShell">
     <!-- LEFT SIDEBAR -->
     <aside class="sideNav">
@@ -26,56 +26,203 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
       </nav>
 
-      <div class="sideActions">
-        <button class="themeToggle" id="themeToggle" type="button">
-          Theme: <span id="themeMode">Light</span>
-        </button>
-      </div>
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
     </aside>
 
     <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
         <h1 class="sectionTitle">Launchpad</h1>
-        <p class="sectionSub">Initialize your sprint. These fields power Risk Score + Confidence %.</p>
+        <p class="sectionSub">Enter your sprint basics. This powers Insights + Actions.</p>
 
         <div class="info-banner">
-          <strong>SPRINT SETUP</strong><br />
-          These fields power Risk Score + Confidence %.
+          <strong>XP Tip:</strong> Accuracy here = better forecasts + fewer surprises. 🏆
         </div>
 
-        <div class="kv" style="margin-top:12px;">
-          <div>
-            <div class="kvKey">SPRINT LENGTH (WORKING DAYS)</div>
-            <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10" />
+        <!-- Setup Inputs -->
+        <div style="margin-top:10px;">
+          <div style="font-weight:900; margin-bottom:6px;">Sprint length (working days)</div>
+          <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10"/>
+
+          <div style="font-weight:900; margin:12px 0 6px;">Team members</div>
+          <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7"/>
+
+          <div style="font-weight:900; margin:12px 0 6px;">Leave days (total person-days)</div>
+          <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0"/>
+
+          <div style="font-weight:900; margin:12px 0 6px;">Committed story points</div>
+          <input class="fun-input" id="committedSP" type="number" min="0" placeholder="40"/>
+
+          <div class="info-banner" style="margin-top:14px;">
+            <div style="font-weight:900;">Last 3 sprint velocities (completed SP)</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Used for average + volatility.
+            </div>
+
+            <div style="display:grid; gap:10px; margin-top:12px;">
+              <input class="fun-input" id="v1" type="number" min="0" placeholder="N-1 velocity (e.g., 36)"/>
+              <input class="fun-input" id="v2" type="number" min="0" placeholder="N-2 velocity (e.g., 41)"/>
+              <input class="fun-input" id="v3" type="number" min="0" placeholder="N-3 velocity (e.g., 38)"/>
+            </div>
           </div>
 
-          <div>
-            <div class="kvKey">TEAM MEMBERS</div>
-            <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7" />
+          <!-- Quick Presets -->
+          <div style="margin-top:14px;">
+            <div style="font-weight:900; margin-bottom:6px;">Quick presets</div>
+            <div class="btnRow" style="margin-top:8px;">
+              <button class="btnGhost" id="presetExcellent" type="button">🟢 Excellent</button>
+              <button class="btnGhost" id="presetNormal" type="button">🟡 Normal</button>
+              <button class="btnGhost" id="presetRisky" type="button">🔴 Risky</button>
+            </div>
           </div>
 
-          <div>
-            <div class="kvKey">LEAVE DAYS (TOTAL PERSON-DAYS)</div>
-            <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0" />
+          <!-- Actions -->
+          <div class="btnRow">
+            <button class="btnPrimary" id="saveBtn" type="button">Save ✅</button>
+            <a class="btnGhost" href="intelligence.html">Next: Insights ➜</a>
+            <button class="btnGhost" id="resetBtn" type="button">Reset</button>
           </div>
 
-          <div>
-            <div class="kvKey">COMMITTED POINTS</div>
-            <input class="fun-input" id="committedSP" type="number" min="0" placeholder="40" />
+          <div class="info-banner" style="margin-top:16px;">
+            <div style="font-weight:900;">Save status</div>
+            <div id="saveStatus" style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Not saved yet.
+            </div>
           </div>
-        </div>
-
-        <div class="btnRow" style="margin-top:16px;">
-          <a class="btnPrimary" href="intelligence.html" style="text-decoration:none; display:inline-block;">
-            Next: Insights ➜
-          </a>
         </div>
       </div>
     </main>
   </div>
 
+  <!-- Scripts -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
+
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const status = $("saveStatus");
+
+      const STORAGE_KEY = "scrummer_setup_v1";
+
+      function getApi() {
+        return (window.Scrummer && window.Scrummer.setup) ? window.Scrummer.setup : null;
+      }
+
+      function safeNumber(v) {
+        if (v === "" || v === null || v === undefined) return "";
+        const n = Number(v);
+        return Number.isFinite(n) ? n : "";
+      }
+
+      function readForm() {
+        return {
+          sprintDays: safeNumber($("sprintDays")?.value),
+          teamMembers: safeNumber($("teamMembers")?.value),
+          leaveDays: safeNumber($("leaveDays")?.value),
+          committedSP: safeNumber($("committedSP")?.value),
+          v1: safeNumber($("v1")?.value),
+          v2: safeNumber($("v2")?.value),
+          v3: safeNumber($("v3")?.value),
+        };
+      }
+
+      function writeForm(data) {
+        const d = data || {};
+        if ($("sprintDays")) $("sprintDays").value = d.sprintDays ?? "";
+        if ($("teamMembers")) $("teamMembers").value = d.teamMembers ?? "";
+        if ($("leaveDays")) $("leaveDays").value = d.leaveDays ?? "";
+        if ($("committedSP")) $("committedSP").value = d.committedSP ?? "";
+        if ($("v1")) $("v1").value = d.v1 ?? "";
+        if ($("v2")) $("v2").value = d.v2 ?? "";
+        if ($("v3")) $("v3").value = d.v3 ?? "";
+      }
+
+      function loadSetup() {
+        const api = getApi();
+        if (api && typeof api.loadSetup === "function") {
+          return api.loadSetup() || {};
+        }
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function saveSetup(data) {
+        const api = getApi();
+        if (api && typeof api.saveSetup === "function") {
+          api.saveSetup(data);
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
+        }
+      }
+
+      function setStatus(msg) {
+        status.textContent = msg;
+      }
+
+      function onSave() {
+        const data = readForm();
+        saveSetup(data);
+        setStatus("Saved ✅ Your sprint setup is ready for Insights + Actions.");
+      }
+
+      function onReset() {
+        writeForm({
+          sprintDays: "",
+          teamMembers: "",
+          leaveDays: "",
+          committedSP: "",
+          v1: "",
+          v2: "",
+          v3: ""
+        });
+        saveSetup({});
+        setStatus("Reset done. Fill again to earn XP. 🎮");
+      }
+
+      function applyPreset(type) {
+        const presets = {
+          excellent: { sprintDays: 10, teamMembers: 7, leaveDays: 0, committedSP: 38, v1: 40, v2: 39, v3: 41 },
+          normal:    { sprintDays: 10, teamMembers: 7, leaveDays: 3, committedSP: 42, v1: 40, v2: 36, v3: 41 },
+          risky:     { sprintDays: 10, teamMembers: 7, leaveDays: 6, committedSP: 52, v1: 38, v2: 30, v3: 44 }
+        };
+        const p = presets[type];
+        if (!p) return;
+        writeForm(p);
+        saveSetup(p);
+        setStatus(`Preset applied: ${type.toUpperCase()} ✅`);
+      }
+
+      // Initial load
+      const existing = loadSetup();
+      if (existing && Object.keys(existing).length) {
+        writeForm(existing);
+        setStatus("Loaded saved setup ✅");
+      }
+
+      // Buttons
+      $("saveBtn")?.addEventListener("click", onSave);
+      $("resetBtn")?.addEventListener("click", onReset);
+
+      $("presetExcellent")?.addEventListener("click", () => applyPreset("excellent"));
+      $("presetNormal")?.addEventListener("click", () => applyPreset("normal"));
+      $("presetRisky")?.addEventListener("click", () => applyPreset("risky"));
+
+      // Auto-save on input (optional but nice)
+      ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"].forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        el.addEventListener("input", () => {
+          saveSetup(readForm());
+          setStatus("Auto-saved… ✅");
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
