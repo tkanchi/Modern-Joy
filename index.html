@@ -26,6 +26,23 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
       </nav>
 
+      <!-- ✅ XP WIDGET (Step 3 applied) -->
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div class="lvl" id="xpLevel">Level 1</div>
+          <div class="title" id="xpTitle">Rookie</div>
+        </div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+
       <button class="themeToggle" id="themeToggle" type="button">
         Theme: <span id="themeMode">Light</span>
       </button>
@@ -41,7 +58,6 @@
           <strong>XP Tip:</strong> Accuracy here = better forecasts + fewer surprises. 🏆
         </div>
 
-        <!-- Setup Inputs -->
         <div style="margin-top:10px;">
           <div style="font-weight:900; margin-bottom:6px;">Sprint length (working days)</div>
           <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10"/>
@@ -68,7 +84,6 @@
             </div>
           </div>
 
-          <!-- Quick Presets -->
           <div style="margin-top:14px;">
             <div style="font-weight:900; margin-bottom:6px;">Quick presets</div>
             <div class="btnRow" style="margin-top:8px;">
@@ -78,7 +93,6 @@
             </div>
           </div>
 
-          <!-- Actions -->
           <div class="btnRow">
             <button class="btnPrimary" id="saveBtn" type="button">Save ✅</button>
             <a class="btnGhost" href="intelligence.html">Next: Insights ➜</a>
@@ -99,24 +113,22 @@
   <!-- Scripts -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script> <!-- ✅ Step 4 applied -->
 
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
       const status = $("saveStatus");
-
       const STORAGE_KEY = "scrummer_setup_v1";
 
       function getApi() {
         return (window.Scrummer && window.Scrummer.setup) ? window.Scrummer.setup : null;
       }
-
       function safeNumber(v) {
         if (v === "" || v === null || v === undefined) return "";
         const n = Number(v);
         return Number.isFinite(n) ? n : "";
       }
-
       function readForm() {
         return {
           sprintDays: safeNumber($("sprintDays")?.value),
@@ -128,68 +140,45 @@
           v3: safeNumber($("v3")?.value),
         };
       }
-
-      function writeForm(data) {
-        const d = data || {};
-        if ($("sprintDays")) $("sprintDays").value = d.sprintDays ?? "";
-        if ($("teamMembers")) $("teamMembers").value = d.teamMembers ?? "";
-        if ($("leaveDays")) $("leaveDays").value = d.leaveDays ?? "";
-        if ($("committedSP")) $("committedSP").value = d.committedSP ?? "";
-        if ($("v1")) $("v1").value = d.v1 ?? "";
-        if ($("v2")) $("v2").value = d.v2 ?? "";
-        if ($("v3")) $("v3").value = d.v3 ?? "";
+      function writeForm(d) {
+        d = d || {};
+        $("sprintDays").value = d.sprintDays ?? "";
+        $("teamMembers").value = d.teamMembers ?? "";
+        $("leaveDays").value = d.leaveDays ?? "";
+        $("committedSP").value = d.committedSP ?? "";
+        $("v1").value = d.v1 ?? "";
+        $("v2").value = d.v2 ?? "";
+        $("v3").value = d.v3 ?? "";
       }
-
       function loadSetup() {
         const api = getApi();
         if (api && typeof api.loadSetup === "function") {
-          return api.loadSetup() || {};
+          try { return api.loadSetup() || {}; } catch {}
         }
-        try {
-          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-        } catch (e) {
-          return {};
-        }
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; }
       }
-
       function saveSetup(data) {
         const api = getApi();
-        if (api && typeof api.saveSetup === "function") {
-          api.saveSetup(data);
-        } else {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
-        }
+        if (api && typeof api.saveSetup === "function") api.saveSetup(data);
+        else localStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
       }
-
-      function setStatus(msg) {
-        status.textContent = msg;
-      }
+      function setStatus(msg) { status.textContent = msg; }
 
       function onSave() {
         const data = readForm();
         saveSetup(data);
         setStatus("Saved ✅ Your sprint setup is ready for Insights + Actions.");
       }
-
       function onReset() {
-        writeForm({
-          sprintDays: "",
-          teamMembers: "",
-          leaveDays: "",
-          committedSP: "",
-          v1: "",
-          v2: "",
-          v3: ""
-        });
+        writeForm({ sprintDays:"", teamMembers:"", leaveDays:"", committedSP:"", v1:"", v2:"", v3:"" });
         saveSetup({});
         setStatus("Reset done. Fill again to earn XP. 🎮");
       }
-
       function applyPreset(type) {
         const presets = {
-          excellent: { sprintDays: 10, teamMembers: 7, leaveDays: 0, committedSP: 38, v1: 40, v2: 39, v3: 41 },
-          normal:    { sprintDays: 10, teamMembers: 7, leaveDays: 3, committedSP: 42, v1: 40, v2: 36, v3: 41 },
-          risky:     { sprintDays: 10, teamMembers: 7, leaveDays: 6, committedSP: 52, v1: 38, v2: 30, v3: 44 }
+          excellent: { sprintDays:10, teamMembers:7, leaveDays:0, committedSP:38, v1:40, v2:39, v3:41 },
+          normal:    { sprintDays:10, teamMembers:7, leaveDays:3, committedSP:42, v1:40, v2:36, v3:41 },
+          risky:     { sprintDays:10, teamMembers:7, leaveDays:6, committedSP:52, v1:38, v2:30, v3:44 }
         };
         const p = presets[type];
         if (!p) return;
@@ -198,22 +187,18 @@
         setStatus(`Preset applied: ${type.toUpperCase()} ✅`);
       }
 
-      // Initial load
       const existing = loadSetup();
       if (existing && Object.keys(existing).length) {
         writeForm(existing);
         setStatus("Loaded saved setup ✅");
       }
 
-      // Buttons
       $("saveBtn")?.addEventListener("click", onSave);
       $("resetBtn")?.addEventListener("click", onReset);
-
       $("presetExcellent")?.addEventListener("click", () => applyPreset("excellent"));
       $("presetNormal")?.addEventListener("click", () => applyPreset("normal"));
       $("presetRisky")?.addEventListener("click", () => applyPreset("risky"));
 
-      // Auto-save on input (optional but nice)
       ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"].forEach(id => {
         const el = $(id);
         if (!el) return;
