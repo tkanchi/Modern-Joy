@@ -413,3 +413,52 @@ body.dark-mode .sectionCard:hover{
 @media (hover: none){
   .sectionCard:hover{ transform:none; }
 }
+
+/* =========================================================
+   Step 3: Mood badge styling (Calm / Alert / Sprinting)
+   ========================================================= */
+
+#moodBadge{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-weight:900;
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+}
+
+/* Calm = green tint */
+#moodBadge.mood-calm{
+  background: rgba(16,185,129,.10);
+  border-color: rgba(16,185,129,.28);
+  color: rgba(16,185,129,1);
+}
+
+/* Alert = amber tint */
+#moodBadge.mood-alert{
+  background: rgba(245,158,11,.12);
+  border-color: rgba(245,158,11,.30);
+  color: rgba(245,158,11,1);
+}
+
+/* Sprinting = red tint */
+#moodBadge.mood-sprinting{
+  background: rgba(239,68,68,.12);
+  border-color: rgba(239,68,68,.32);
+  color: rgba(239,68,68,1);
+}
+
+/* Dark mode: slightly stronger fill */
+:root[data-theme="dark"] #moodBadge.mood-calm,
+body.dark-mode #moodBadge.mood-calm{
+  background: rgba(16,185,129,.16);
+}
+:root[data-theme="dark"] #moodBadge.mood-alert,
+body.dark-mode #moodBadge.mood-alert{
+  background: rgba(245,158,11,.18);
+}
+:root[data-theme="dark"] #moodBadge.mood-sprinting,
+body.dark-mode #moodBadge.mood-sprinting{
+  background: rgba(239,68,68,.18);
+}
