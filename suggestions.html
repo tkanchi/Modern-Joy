@@ -1,258 +1,155 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Actions</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css?v=1" />
+  <link rel="stylesheet" href="css/style.css?v=3"/>
 </head>
 
-<body data-page="suggestions">
-  <!-- TOP BAR -->
-  <div class="topbarWrap">
-    <div class="topbar">
-      <div class="brand">
+<body>
+  <div class="appShell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sideNav">
+      <div class="sideBrand">
         <div class="brandMark">🐆</div>
-        <div class="brandName">SCRUMMER</div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
+        </div>
       </div>
 
-    <a class="navlink" href="index.html">🚀 Setup</a>
-<a class="navlink" href="intelligence.html">📊 Insights</a>
-<a class="navlink active" href="suggestions.html">🎯 Actions</a>
-<a class="navlink" href="workspace.html">🤖 Copilot</a>
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink active" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+      </nav>
 
-      <div class="topbarActions">
-        <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false">
-          Theme: <span id="themeMode">Light</span>
-        </button>
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">Recommended Actions</h1>
+        <p class="sectionSub">Battle plan to reduce risk and boost confidence.</p>
+
+        <div class="info-banner">
+          <strong>Rule:</strong> Do the top 3 actions first. That’s your fastest XP gain.
+        </div>
+
+        <div id="actionsWrap" style="display:grid; gap:12px; margin-top:10px;"></div>
+
+        <div class="btnRow">
+          <a class="btnGhost" href="intelligence.html">← Back to Insights</a>
+          <button class="btnPrimary" id="refreshBtn" type="button">Refresh Actions</button>
+          <a class="btnGhost" href="workspace.html">Next: Copilot ➜</a>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 
-  <!-- PAGE -->
-  <div class="pageWrap">
-    <div class="sectionCard">
-      <h1 class="sectionTitle">Actions</h1>
-      <p class="sectionSub">Concrete next steps to reduce risk and increase confidence.</p>
-
-      <div class="btnRow" style="margin-top:10px;">
-        <a class="btnGhost" href="workspace.html" style="text-decoration:none; display:inline-block;">
-          Next: Copilot ➜
-        </a>
-      </div>
-
-      <div class="info-banner" style="margin-top:12px;">
-        <strong>How this works:</strong> Actions are generated from your Setup + Sprint Intelligence signals.
-      </div>
-
-      <!-- Summary -->
-      <div class="kv" style="margin-top:14px;">
-        <div class="kvRow">
-          <div class="kvKey">Risk</div>
-          <div class="kvVal"><span id="riskScore">—</span> <span id="riskBand" style="opacity:.75;"></span></div>
-        </div>
-        <div class="kvRow">
-          <div class="kvKey">Confidence</div>
-          <div class="kvVal"><span id="confidence">—</span>%</div>
-        </div>
-        <div class="kvRow">
-          <div class="kvKey">Capacity Health</div>
-          <div class="kvVal"><span id="health">—</span></div>
-        </div>
-      </div>
-
-      <!-- Action list -->
-      <div style="margin-top:16px;">
-        <div class="kvKey" style="margin-bottom:8px;">Recommended actions</div>
-        <div class="sectionSub" style="margin-top:0;">Do the top 3 first. It’ll move the needle fastest.</div>
-
-        <div id="actionList" class="kv" style="margin-top:10px;"></div>
-
-        <div id="emptyState" class="info-banner" style="display:none; margin-top:10px;">
-          <strong>No actions yet.</strong> Fill Setup first (Sprint days, team members, committed points, last 3 velocities).
-        </div>
-      </div>
-
-      <div class="btnRow" style="margin-top:16px;">
-        <a class="btnGhost" href="intelligence.html" style="text-decoration:none; display:inline-block;">← Back to Insights</a>
-        <button class="btnPrimary" id="refreshBtn" type="button">Refresh Actions</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JS -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
 
   <script>
     (function () {
-      const $ = (id) => document.getElementById(id);
-      const list = $("actionList");
-      const empty = $("emptyState");
+      const wrap = document.getElementById("actionsWrap");
 
-      function addAction(title, why, how, priority) {
-        const row = document.createElement("div");
-        row.className = "kvRow";
-        row.innerHTML = `
-          <div style="min-width:0; flex: 1;">
-            <div class="kvKey" style="margin-bottom:6px;">
-              ${priority ? "⭐ " + priority + " — " : ""}${title}
-            </div>
-            <div style="font-weight:900; margin-bottom:6px;">Why</div>
-            <div style="color: var(--text-muted); font-weight:700; line-height:1.35;">${why}</div>
-            <div style="height:10px;"></div>
-            <div style="font-weight:900; margin-bottom:6px;">How</div>
-            <div style="color: var(--text-muted); font-weight:700; line-height:1.35;">${how}</div>
-          </div>
+      function card(title, why, how, tier) {
+        const el = document.createElement("div");
+        el.className = "info-banner";
+        el.innerHTML = `
+          <div style="font-weight:900; font-size:16px;">${tier} ${title}</div>
+          <div style="margin-top:8px; font-weight:900;">Why</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:4px; white-space:pre-line;">${why}</div>
+          <div style="margin-top:10px; font-weight:900;">How</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:4px; white-space:pre-line;">${how}</div>
         `;
-        list.appendChild(row);
-      }
-
-      function clearActions() {
-        list.innerHTML = "";
-      }
-
-      function isSetupMissing(setup) {
-        // minimum set needed to compute something meaningful
-        const needed = ["sprintDays", "teamMembers", "committedSP", "v1", "v2", "v3"];
-        return needed.some(k => setup[k] === undefined || setup[k] === null || setup[k] === "" || Number.isNaN(Number(setup[k])));
+        return el;
       }
 
       function render() {
+        wrap.innerHTML = "";
+
         const api = window.Scrummer && window.Scrummer.setup;
         const compute = window.Scrummer && window.Scrummer.computeSignals;
 
-        clearActions();
-
         if (!api || !compute) {
-          empty.style.display = "block";
+          wrap.appendChild(card(
+            "Setup first",
+            "I can’t generate actions without your sprint inputs.",
+            "Go to 🚀 Setup → enter sprint days, team members, committed SP, and last 3 velocities.",
+            "⚠️"
+          ));
           return;
         }
 
         const setup = api.loadSetup ? (api.loadSetup() || {}) : {};
-        if (isSetupMissing(setup)) {
-          empty.style.display = "block";
-          $("riskScore").textContent = "—";
-          $("riskBand").textContent = "";
-          $("confidence").textContent = "—";
-          $("health").textContent = "—";
-          return;
-        }
-
-        empty.style.display = "none";
-
         const s = compute(setup);
-        const c = s.components || {};
 
-        $("riskScore").textContent = (s.riskScore ?? "—");
-        $("riskBand").textContent = s.riskBand ? `(${s.riskBand})` : "";
-        $("confidence").textContent = (s.confidence ?? "—");
-        $("health").textContent = (s.capacityHealth ?? "—");
-
-        // Heuristics (safe even if some fields are missing)
         const risk = Number(s.riskScore ?? 0);
         const conf = Number(s.confidence ?? 0);
-        const overcommitRatio = Number(s.overcommitRatio ?? 0);
+        const over = Number(s.overcommitRatio ?? 0);
         const vol = Number(s.vol ?? 0);
-        const capSP = Number(s.capacitySP ?? 0);
+        const cap = Number(s.capacitySP ?? 0);
         const committed = Number(setup.committedSP ?? 0);
 
-        // Priority logic
-        const highRisk = (s.riskBand || "").toLowerCase().includes("high") || risk >= 70;
-        const mediumRisk = (s.riskBand || "").toLowerCase().includes("medium") || (risk >= 40 && risk < 70);
-
-        // Action 1: Overcommit / scope trim
-        if (overcommitRatio && overcommitRatio > 1.05) {
-          const pct = Math.round((overcommitRatio - 1) * 100);
-          addAction(
-            "Trim scope or re-negotiate commitment",
-            `You’re overcommitted by ~${pct}%. This is the #1 predictor of spillover.`,
-            `Option A: De-scope ${Math.max(1, Math.round((committed - capSP) || 0))} points into a Stretch bucket.\n` +
-            `Option B: Split the largest stories into “must-have” vs “nice-to-have”.\n` +
-            `Option C: Add explicit buffer (10–20%) and communicate it.`,
-            "P0"
-          );
+        // P0 actions
+        if (over > 1.05) {
+          const pct = Math.round((over - 1) * 100);
+          wrap.appendChild(card(
+            "De-scope or re-negotiate commitment",
+            `You’re overcommitted by ~${pct}%. This is the biggest predictor of spillover.`,
+            `Move 10–20% scope into a Stretch bucket.\nSplit largest story into must-have vs nice-to-have.\nLock sprint scope in Daily Scrum.`,
+            "⭐ P0"
+          ));
         }
 
-        // Action 2: Capacity shortfall
-        if (capSP && committed && committed > capSP) {
-          addAction(
-            "Rebalance capacity (leave / focus factor)",
-            `Committed points (${committed}) are higher than available capacity (${Math.round(capSP)}).`,
-            `Re-check leave days and context-switching.\n` +
-            `If leave is real: adjust commitment.\n` +
-            `If interruptions are real: reserve a “support buffer” lane.`,
-            "P0"
-          );
+        if (cap && committed && committed > cap) {
+          wrap.appendChild(card(
+            "Fix capacity mismatch",
+            `Committed (${committed}) is above capacity (~${Math.round(cap)}).`,
+            `Confirm leave days + interrupts.\nReserve buffer lane for support.\nAdjust scope until committed <= capacity.`,
+            "⭐ P0"
+          ));
         }
 
-        // Action 3: High volatility
-        if (vol && vol >= 0.30) {
-          addAction(
+        // P1 actions
+        if (vol >= 0.30) {
+          wrap.appendChild(card(
             "Reduce volatility with smaller slices",
-            `Your recent velocity volatility is high (${(Math.round(vol * 100) / 100)}). That makes forecasting unreliable.`,
-            `Keep stories thin: 1–2 day slices.\n` +
-            `Add acceptance criteria early.\n` +
-            `Limit WIP and finish before starting new items.`,
-            "P1"
-          );
+            `Velocity volatility is high (${Math.round(vol * 100) / 100}). Forecasting becomes unreliable.`,
+            `Split stories into 1–2 day items.\nLimit WIP.\nFinish-first rule: complete before starting new.`,
+            "🏅 P1"
+          ));
         }
 
-        // Action 4: Low confidence
         if (conf && conf < 60) {
-          addAction(
-            "Increase confidence with a mid-sprint checkpoint",
+          wrap.appendChild(card(
+            "Add a mid-sprint checkpoint",
             `Confidence is below 60%. You need an early reality check.`,
-            `Set a Day-3 (or Day-4) checkpoint:\n` +
-            `- If behind: de-scope fast.\n` +
-            `- If on track: move Stretch items into commit carefully.`,
-            "P1"
-          );
+            `Day-3 checkpoint:\n- If behind → de-scope fast\n- If on track → pull stretch carefully`,
+            "🏅 P1"
+          ));
         }
 
-        // Action 5: General health-based tips
-        if (highRisk) {
-          addAction(
-            "Protect delivery with a ‘Definition of Ready’ gate",
-            "High risk usually comes from uncertain work entering the sprint late.",
-            "Gate new items: clear AC, dependencies identified, test approach known.\n" +
-            "Anything not ready goes to Stretch or next sprint.",
-            "P2"
-          );
-        } else if (mediumRisk) {
-          addAction(
-            "Use a ‘Stretch bucket’ to keep the sprint calm",
-            "Medium risk benefits from separating must-do from nice-to-do.",
-            "Commit only the must-do scope.\n" +
-            "Keep Stretch items visible but not promised.",
-            "P2"
-          );
-        } else {
-          addAction(
-            "Maintain momentum with a simple WIP rule",
-            "Low risk doesn’t mean no risk — protect flow.",
-            "WIP rule: each person works on max 1 item at a time.\n" +
-            "Finish-first helps keep confidence high.",
-            "P3"
-          );
-        }
-
-        // If no actions got added (edge case), show default
-        if (!list.children.length) {
-          addAction(
-            "You’re in a good spot — keep the sprint predictable",
-            "Signals look stable.",
-            "Keep stories small, review scope changes daily, and protect focus time.",
-            "P3"
-          );
+        // Default / good state
+        if (!wrap.children.length) {
+          const tier = risk >= 70 ? "🔴" : risk >= 40 ? "🟡" : "🟢";
+          wrap.appendChild(card(
+            "Maintain flow (keep the streak alive)",
+            `Signals look stable. Keep momentum.\nCurrent risk tier: ${tier}`,
+            `Keep WIP low.\nReview scope changes daily.\nProtect focus time (no random work mid-sprint).`,
+            "🎮 P2"
+          ));
         }
       }
 
-      const btn = $("refreshBtn");
-      if (btn) btn.addEventListener("click", render);
-
+      document.getElementById("refreshBtn")?.addEventListener("click", render);
       render();
     })();
   </script>
