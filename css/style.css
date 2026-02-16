@@ -298,3 +298,80 @@ body.dark-mode .btnGhost:hover{ background: rgba(255,255,255,.06); }
 body.dark-mode .xpWidget{
   background: rgba(11,87,208,.10);
 }
+
+
+
+
+/* =========================================================
+   BUTTON CONSISTENCY PATCH (buttons + anchor buttons)
+   Paste at end of css/style.css
+   ========================================================= */
+
+/* Base button style for both <button> and <a> */
+.btnPrimary,
+.btnGhost{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  min-height:44px;
+  padding:12px 16px;
+
+  border-radius:16px;
+  font-weight:900;
+  font-size:14px;
+  line-height:1;
+
+  text-decoration:none;       /* important for <a> */
+  -webkit-tap-highlight-color: transparent;
+
+  user-select:none;
+  cursor:pointer;
+}
+
+/* Ensure anchors don't show underline even on mobile */
+a.btnPrimary,
+a.btnGhost{
+  text-decoration:none !important;
+}
+
+/* Normalize button defaults across browsers */
+button.btnPrimary,
+button.btnGhost{
+  appearance:none;
+  -webkit-appearance:none;
+  background-clip:padding-box;
+}
+
+/* Hover / active feel consistent */
+.btnPrimary:hover,
+.btnGhost:hover{
+  transform: translateY(-1px);
+}
+
+.btnPrimary:active,
+.btnGhost:active{
+  transform: translateY(0px);
+}
+
+/* Visible focus (keyboard accessibility) */
+.btnPrimary:focus-visible,
+.btnGhost:focus-visible{
+  outline:3px solid rgba(11,87,208,.25);
+  outline-offset:2px;
+}
+
+/* Prevent weird stretching inside btnRow */
+.btnRow .btnPrimary,
+.btnRow .btnGhost{
+  white-space:nowrap;
+}
+
+/* Optional: make all rows feel same width on mobile */
+@media (max-width: 520px){
+  .btnRow .btnPrimary,
+  .btnRow .btnGhost{
+    width:100%;
+  }
+}
