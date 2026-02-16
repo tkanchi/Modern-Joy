@@ -25,13 +25,29 @@
         <a class="navlink active" href="workspace.html">🤖 Copilot</a>
       </nav>
 
-      <!-- ✅ XP WIDGET -->
+      <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
         <div class="xpTop">
-          <div class="lvl" id="xpLevel">Level 1</div>
-          <div class="title" id="xpTitle">Rookie</div>
+          <div>
+            <div class="lvl" id="xpLevel">Level 1</div>
+            <div class="title" id="xpTitle">Rookie</div>
+          </div>
+
+          <!-- 🐆 Mood -->
+          <div id="moodBadge" style="
+            padding:6px 10px;
+            border-radius:999px;
+            border:1px solid var(--border);
+            font-weight:900;
+            font-size:12px;
+            background:rgba(0,0,0,.03);
+          ">🐆 Calm</div>
         </div>
-        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
         <div class="xpMeta">
           <span id="xpText">0 / 300 XP</span>
           <span id="streakText">🧊 streak reset</span>
@@ -82,15 +98,15 @@
         </div>
 
         <div class="btnRow">
-          <a class="btnGhost" href="suggestions.html">← Back to Actions</a>
-          <a class="btnGhost" href="index.html">Back to Setup</a>
+          <a class="btnGhost" href="suggestions.html" style="display:inline-block; text-decoration:none;">← Back to Actions</a>
+          <a class="btnGhost" href="index.html" style="display:inline-block; text-decoration:none;">Back to Setup</a>
         </div>
       </div>
     </main>
   </div>
 
   <script src="js/theme.js"></script>
-  <script src="js/xp.js"></script> <!-- ✅ Step 4 -->
+  <script src="js/xp.js"></script>
 
   <script>
     (function () {
