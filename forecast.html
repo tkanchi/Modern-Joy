@@ -85,19 +85,49 @@
               </div>
             </div>
 
+            <!-- ✅ Improved: interruptions explanation + example -->
             <div style="margin-bottom:12px;">
               <div style="font-weight:900; color:var(--text-main);">2) Effective Team Days</div>
               Effective Days = (Raw Capacity − Leave Days) × (1 − Interruptions%)
+
               <div style="margin-top:6px;">
-                Subtract time-off, then reduce remaining capacity by expected overhead.
+                First subtract time-off, then reduce remaining capacity by expected overhead (support work, meetings, production issues).
+              </div>
+
+              <div style="margin-top:8px;">
+                <b>Why (1 − Interruptions%)?</b>
+              </div>
+
+              <div style="margin-top:6px;">
+                If interruptions are 20%, it means <b>20% of remaining time is NOT usable</b> for sprint work.
+                So usable time = 100% − 20% = 80% → multiply by 0.80.
+              </div>
+
+              <div style="margin-top:8px;">
+                <b>Mini example:</b>
+                <div style="margin-top:6px;">
+                  Raw Capacity = 10 days × 7 people = 70 team-days<br/>
+                  Leave Days = 5 → remaining = 65 team-days<br/>
+                  Interruptions = 20% → usable = 65 × 0.80 = <b>52 effective team-days</b>
+                </div>
+              </div>
+
+              <div style="margin-top:8px;">
+                Percentages always reduce proportionally — that’s why we multiply by (1 − Interruptions%), not subtract “days” directly.
               </div>
             </div>
 
+            <!-- ✅ Improved: why divide by Raw Capacity -->
             <div style="margin-bottom:12px;">
               <div style="font-weight:900; color:var(--text-main);">3) Velocity per Team Day</div>
               Velocity/Day = Average Velocity ÷ Raw Capacity
               <div style="margin-top:6px;">
                 Converts historical output into delivery rate per team-day.
+              </div>
+              <div style="margin-top:6px;">
+                <b>Why divide by Raw Capacity (not Effective Days)?</b><br/>
+                Because historical velocity was achieved under full sprint context.
+                We use Raw Capacity as the stable denominator, then apply your leave/interruptions via Effective Days.
               </div>
             </div>
 
@@ -220,12 +250,37 @@
         <div style="margin-top:18px;">
           <div class="kvKey">Results</div>
 
-          <!-- Interrupt warning will appear here -->
+          <!-- Warnings -->
           <div class="info-banner" id="interruptWarn" style="display:none; margin-bottom:12px;">
             <div style="font-weight:900;">⚠ High Interruptions Detected</div>
             <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
               Interruptions above <b>40%</b> usually means the team is heavily loaded with support/meetings.
               The forecast may be unreliable. Consider reducing scope or protecting focus time.
+            </div>
+          </div>
+
+          <div class="info-banner" id="leaveWarn" style="display:none; margin-bottom:12px;">
+            <div style="font-weight:900;">⚠ Leave Days Look Too High</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Your <b>leave days</b> exceed your <b>raw capacity</b>. This makes effective capacity negative.
+              Check sprint days, team members, and leave days (person-days).
+            </div>
+          </div>
+
+          <div class="info-banner" id="velocityWarn" style="display:none; margin-bottom:12px;">
+            <div style="font-weight:900;">⚠ Not Enough Velocity History</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Forecasting is much weaker without past velocities.
+              Add at least <b>2</b> completed sprint velocities (N-1, N-2) for a more reliable result.
+            </div>
+          </div>
+
+          <div class="info-banner" id="spikeWarn" style="display:none; margin-bottom:12px;">
+            <div style="font-weight:900;">⚠ Forecast Is Much Higher Than Average Velocity</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Your forecast is significantly higher than what the team typically delivers.
+              This often indicates optimistic inputs (low interruptions/leave) or unusual sprint conditions.
+              Consider using <b>Conservative</b> as your safe commitment.
             </div>
           </div>
 
@@ -259,10 +314,10 @@
 
     function round(n){ return Math.round(n*100)/100; }
 
-    function showWarn(show){
-      const w = $("interruptWarn");
-      if (!w) return;
-      w.style.display = show ? "block" : "none";
+    function show(id, yes){
+      const el = $(id);
+      if (!el) return;
+      el.style.display = yes ? "block" : "none";
     }
 
     function calculate(){
@@ -279,19 +334,20 @@
         Number($("v3").value)
       ].filter(v => v > 0);
 
-      const rawCap = sprintDays * teamMembers;                // team-days
-      const effDays = (rawCap - leaveDays) * (1 - interruptPct); // effective team-days
-      const avgVel = avg(velocities);                         // SP per sprint
-      const velPerDay = rawCap > 0 ? avgVel / rawCap : 0;     // SP per team-day
-      const forecast = effDays * velPerDay;                   // SP
+      const rawCap = sprintDays * teamMembers;                     // team-days
+      const effectiveBase = (rawCap - leaveDays);                  // team-days
+      const effDays = effectiveBase * (1 - interruptPct);          // effective team-days
+      const avgVel = avg(velocities);                              // SP per sprint
+      const velPerDay = rawCap > 0 ? avgVel / rawCap : 0;          // SP per team-day
+      const forecast = (effDays > 0 && velPerDay > 0) ? effDays * velPerDay : 0; // SP
 
-      // Warn if interruptions > 40%
-      showWarn(interruptPctRaw > 40);
+      // Warnings
+      show("interruptWarn", interruptPctRaw > 40);
+      show("leaveWarn", rawCap > 0 && leaveDays > rawCap);
+      show("velocityWarn", velocities.length < 2);
+      show("spikeWarn", avgVel > 0 && forecast > (avgVel * 1.15));
 
-      // Units are now explicit
-      $("rawCap").textContent = rawCap > 0
-        ? `Raw Capacity: ${rawCap} team-days`
-        : `Raw Capacity: —`;
+      $("rawCap").textContent = rawCap > 0 ? `Raw Capacity: ${rawCap} team-days` : `Raw Capacity: —`;
 
       $("effDays").textContent = rawCap > 0
         ? `Effective Days: ${round(effDays)} effective team-days`
@@ -305,18 +361,9 @@
         ? `Forecast SP: ${round(forecast)} story points`
         : `Forecast SP: —`;
 
-      // Commitment range (only if forecast > 0)
-      $("consRange").textContent = forecast > 0
-        ? `Conservative: ${Math.floor(forecast*0.9)} SP`
-        : `Conservative: —`;
-
-      $("likelyRange").textContent = forecast > 0
-        ? `Likely: ${Math.round(forecast)} SP`
-        : `Likely: —`;
-
-      $("stretchRange").textContent = forecast > 0
-        ? `Stretch: ${Math.ceil(forecast*1.05)} SP`
-        : `Stretch: —`;
+      $("consRange").textContent = forecast > 0 ? `Conservative: ${Math.floor(forecast*0.9)} SP` : `Conservative: —`;
+      $("likelyRange").textContent = forecast > 0 ? `Likely: ${Math.round(forecast)} SP` : `Likely: —`;
+      $("stretchRange").textContent = forecast > 0 ? `Stretch: ${Math.ceil(forecast*1.05)} SP` : `Stretch: —`;
     }
 
     $("calcBtn").addEventListener("click", calculate);
@@ -339,7 +386,6 @@
       calculate();
     });
 
-    // Explanation toggle
     $("toggleExplain").addEventListener("click", () => {
       const box = $("explainBox");
       const btn = $("toggleExplain");
