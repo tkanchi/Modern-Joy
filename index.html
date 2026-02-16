@@ -19,15 +19,19 @@
         </div>
       </div>
 
+      <!-- ✅ ONE nav, everything inside -->
       <nav class="nav">
         <a class="navlink active" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
         <a class="navlink" href="suggestions.html">🎯 Actions</a>
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+
+        <hr>
+
+        <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
-<a class="navlink" href="forecast.html">📦 Forecast</a>
-<a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-<a class="navlink" href="auth.html">🔐 Account</a>
 
       <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
@@ -37,15 +41,8 @@
             <div class="title" id="xpTitle">Rookie</div>
           </div>
 
-          <!-- 🐆 Mood -->
-          <div id="moodBadge" style="
-            padding:6px 10px;
-            border-radius:999px;
-            border:1px solid var(--border);
-            font-weight:900;
-            font-size:12px;
-            background:rgba(0,0,0,.03);
-          ">🐆 Calm</div>
+          <!-- 🐆 Mood (no inline styles — css handles #moodBadge) -->
+          <div id="moodBadge">🐆 Calm</div>
         </div>
 
         <div class="xpBar">
@@ -110,12 +107,7 @@
 
           <div class="btnRow">
             <button class="btnPrimary" id="saveBtn" type="button">Save ✅</button>
-
-            <!-- make anchor behave like a button consistently -->
-            <a class="btnGhost" href="intelligence.html" style="display:inline-block; text-decoration:none;">
-              Next: Insights ➜
-            </a>
-
+            <a class="btnGhost" href="intelligence.html">Next: Insights ➜</a>
             <button class="btnGhost" id="resetBtn" type="button">Reset</button>
           </div>
 
@@ -134,6 +126,10 @@
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
+
+  <!-- Supabase (cloud sync bridge) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supa.js"></script>
 
   <script>
     (function () {
@@ -239,8 +235,5 @@
       });
     })();
   </script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supa.js"></script>
 </body>
 </html>
