@@ -1,125 +1,84 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Insights</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/style.css?v=1" />
+  <link rel="stylesheet" href="css/style.css?v=3"/>
 </head>
 
-<body data-page="intelligence">
-  <!-- TOP BAR -->
-  <div class="topbarWrap">
-    <div class="topbar">
-      <div class="brand">
+<body>
+  <div class="appShell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sideNav">
+      <div class="sideBrand">
         <div class="brandMark">🐆</div>
-        <div class="brandName">SCRUMMER</div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
+        </div>
       </div>
 
-     <a class="navlink" href="index.html">🚀 Setup</a>
-<a class="navlink active" href="intelligence.html">📊 Insights</a>
-<a class="navlink" href="suggestions.html">🎯 Actions</a>
-<a class="navlink" href="workspace.html">🤖 Copilot</a>
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink active" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+      </nav>
 
-      <div class="topbarActions">
-        <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false">
-          Theme: <span id="themeMode">Light</span>
-        </button>
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">Sprint Intelligence</h1>
+        <p class="sectionSub">Risk, confidence, and health signals for this sprint.</p>
+
+        <div class="info-banner">
+          <strong>How to use:</strong> Fill <b>Setup</b> first. Then refresh Insights.
+        </div>
+
+        <!-- KPI Cards -->
+        <div style="display:grid; gap:12px; margin-top:10px;">
+          <div class="info-banner">
+            <div style="font-weight:900;">Risk Score</div>
+            <div style="font-size:22px; font-weight:900; margin-top:4px;" id="riskScore">—</div>
+            <div style="color:var(--text-muted); font-weight:800;" id="riskBand">—</div>
+          </div>
+
+          <div class="info-banner">
+            <div style="font-weight:900;">Confidence</div>
+            <div style="font-size:22px; font-weight:900; margin-top:4px;" id="confidence">—</div>
+            <div style="color:var(--text-muted); font-weight:800;">%</div>
+          </div>
+
+          <div class="info-banner">
+            <div style="font-weight:900;">Capacity Health</div>
+            <div style="font-size:18px; font-weight:900; margin-top:4px;" id="health">—</div>
+            <div style="color:var(--text-muted); font-weight:800;" id="capacityNote">—</div>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <a class="btnGhost" href="index.html">← Back to Setup</a>
+          <button class="btnPrimary" id="refreshBtn" type="button">Refresh Insights</button>
+          <a class="btnGhost" href="suggestions.html">Next: Actions ➜</a>
+        </div>
+
+        <div class="info-banner" style="margin-top:16px;">
+          <div style="font-weight:900;">Gamified Reading</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+            🔴 High risk = sprint may slip. 🟡 Watchlist = be careful. 🟢 Stable = keep flow.
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 
-  <!-- PAGE -->
-  <div class="pageWrap">
-    <div class="sectionCard">
-      <h1 class="sectionTitle">Sprint Intelligence</h1>
-      <p class="sectionSub">Risk, confidence, and health signals based on your sprint setup.</p>
-
-      <div class="btnRow" style="margin-top:10px;">
-        <a class="btnGhost" href="suggestions.html" style="text-decoration:none; display:inline-block;">
-          Next: Actions ➜
-        </a>
-      </div>
-
-      <div class="info-banner" style="margin-top:12px;">
-        <strong>Tip:</strong> Fill Setup first. Insights update automatically from your saved inputs.
-      </div>
-
-      <!-- KPIs -->
-      <div class="kv" style="margin-top:14px;">
-        <div class="kvRow">
-          <div class="kvKey">Risk Score</div>
-          <div class="kvVal"><span id="riskScore">—</span> <span id="riskBand" style="opacity:.75;"></span></div>
-        </div>
-
-        <div class="kvRow">
-          <div class="kvKey">Confidence</div>
-          <div class="kvVal"><span id="confidence">—</span>%</div>
-        </div>
-
-        <div class="kvRow">
-          <div class="kvKey">Focus Factor</div>
-          <div class="kvVal"><span id="focusFactor">—</span></div>
-        </div>
-
-        <div class="kvRow">
-          <div class="kvKey">Health</div>
-          <div class="kvVal"><span id="health">—</span></div>
-        </div>
-      </div>
-
-      <!-- Drivers -->
-      <div style="margin-top:16px;">
-        <div class="kvKey" style="margin-bottom:8px;">Risk Drivers</div>
-        <div class="sectionSub" style="margin-top:0;">What’s contributing to the risk score.</div>
-
-        <div class="kv">
-          <div class="kvRow">
-            <div class="kvKey">Overcommit</div>
-            <div class="kvVal"><span id="drvOver">—</span></div>
-          </div>
-          <div class="kvRow">
-            <div class="kvKey">Capacity Shortfall</div>
-            <div class="kvVal"><span id="drvCap">—</span></div>
-          </div>
-          <div class="kvRow">
-            <div class="kvKey">Volatility</div>
-            <div class="kvVal"><span id="drvVol">—</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Signals -->
-      <div style="margin-top:16px;">
-        <div class="kvKey" style="margin-bottom:8px;">Signals</div>
-
-        <div class="kv">
-          <div class="kvRow">
-            <div class="kvKey">Scope</div>
-            <div class="kvVal"><span id="sigScope">—</span></div>
-          </div>
-          <div class="kvRow">
-            <div class="kvKey">Volatility</div>
-            <div class="kvVal"><span id="sigVol">—</span></div>
-          </div>
-          <div class="kvRow">
-            <div class="kvKey">Capacity (SP)</div>
-            <div class="kvVal"><span id="sigCap">—</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="btnRow" style="margin-top:16px;">
-        <a class="btnGhost" href="index.html" style="text-decoration:none; display:inline-block;">← Back to Setup</a>
-        <button class="btnPrimary" id="refreshBtn" type="button">Refresh Insights</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JS -->
-  <!-- metrics.js exposes window.Scrummer.setup + window.Scrummer.computeSignals -->
+  <!-- Optional: hook to your existing scripts if they exist -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
 
@@ -127,53 +86,46 @@
     (function () {
       const $ = (id) => document.getElementById(id);
 
-      function fmtPct(x) {
-        if (!Number.isFinite(x)) return "—";
-        return (Math.round(x * 100) / 100).toString();
+      function bandFromRisk(score) {
+        if (!Number.isFinite(score)) return "—";
+        if (score >= 70) return "🔴 High Risk";
+        if (score >= 40) return "🟡 Watchlist";
+        return "🟢 Stable";
       }
 
       function render() {
         const api = window.Scrummer && window.Scrummer.setup;
         const compute = window.Scrummer && window.Scrummer.computeSignals;
-        if (!api || !compute) return;
 
-        const setup = api.loadSetup ? api.loadSetup() : {};
-        const s = compute(setup || {});
+        // If your repo doesn't have computeSignals yet, show friendly message
+        if (!api || !compute) {
+          $("riskScore").textContent = "—";
+          $("riskBand").textContent = "Add setup first";
+          $("confidence").textContent = "—";
+          $("health").textContent = "—";
+          $("capacityNote").textContent = "metrics.js not ready";
+          return;
+        }
 
-        // KPIs
-        $("riskScore").textContent = (s.riskScore ?? "—");
-        $("riskBand").textContent = s.riskBand ? `(${s.riskBand})` : "";
-        $("confidence").textContent = (s.confidence ?? "—");
-        $("focusFactor").textContent = fmtPct(s.focusFactor);
-        $("health").textContent = (s.capacityHealth ?? "—");
+        const setup = api.loadSetup ? (api.loadSetup() || {}) : {};
+        const s = compute(setup);
 
-        // Drivers
-        const c = s.components || {};
-        $("drvOver").textContent = (c.over ?? "—");
-        $("drvCap").textContent = (c.cap ?? "—");
-        $("drvVol").textContent = (c.vola ?? "—");
+        const risk = Number(s.riskScore);
+        const conf = Number(s.confidence);
 
-        // Signals (simple readable summaries)
-        const overRatio = s.overcommitRatio ?? null;
-        $("sigScope").textContent =
-          overRatio && Number.isFinite(overRatio)
-            ? (overRatio > 1 ? `Over by ${Math.round((overRatio - 1) * 100)}%` : "Within historical range")
-            : "—";
+        $("riskScore").textContent = Number.isFinite(risk) ? risk : "—";
+        $("riskBand").textContent = bandFromRisk(risk);
 
-        const v = s.vol ?? null;
-        $("sigVol").textContent =
-          v && Number.isFinite(v)
-            ? (v >= 0.30 ? `High (${fmtPct(v)})` : `Normal (${fmtPct(v)})`)
-            : "—";
+        $("confidence").textContent = Number.isFinite(conf) ? conf : "—";
 
-        $("sigCap").textContent =
-          Number.isFinite(s.capacitySP) ? fmtPct(s.capacitySP) : "—";
+        $("health").textContent = s.capacityHealth ?? "—";
+        $("capacityNote").textContent =
+          Number.isFinite(s.capacitySP) ? `Capacity ≈ ${Math.round(s.capacitySP)} SP` : "Capacity unavailable";
       }
 
       const btn = $("refreshBtn");
       if (btn) btn.addEventListener("click", render);
 
-      // initial render
       render();
     })();
   </script>
