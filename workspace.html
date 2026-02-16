@@ -1,69 +1,124 @@
-/**
- * SCRUMMER — Copilot Logic
- */
-(() => {
-    const $ = (id) => document.getElementById(id);
-    const compute = window.Scrummer?.computeSignals;
-    const setupApi = window.Scrummer?.setup;
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scrummer — Copilot</title>
 
-    const ceremonyData = {
-        planning: {
-            title: "Sprint Planning Guide",
-            why: "Focus on balancing commitment against the historical average to protect delivery confidence.",
-            points: (s) => [
-                `Current load is ${Math.round(s.overcommitRatio * 100)}% of capacity. Discuss if this is sustainable.`,
-                `Velocity volatility is ${Math.round(s.vol * 100)}%. Recommend a 10% buffer for unknown technical debt.`,
-                `Capacity health is ${s.capacityHealth}. Prioritize 'Must-Have' items first.`
-            ]
-        },
-        daily: {
-            title: "Daily Standup Guide",
-            why: "Use these signals to identify hidden blockers before they become delays.",
-            points: (s) => [
-                `Focus Factor is ${Math.round(s.focusFactor * 100)}%. Are meetings distracting from development?`,
-                `Risk is ${s.riskScore}%. Identify the single biggest ticket blocking the Sprint Goal.`,
-                `Ask: 'If we could only finish ONE thing today, what would it be?'`
-            ]
-        },
-        refine: {
-            title: "Backlog Refinement",
-            why: "Aim to reduce volatility by improving story slicing.",
-            points: (s) => [
-                `Volatility is high. Look for stories > 5SP and split them into smaller units.`,
-                `Ensure 'Definition of Ready' is met for the next ${Math.round(s.avgVelocity)} points of work.`,
-                `Validate acceptance criteria for the top 3 items.`
-            ]
-        }
-    };
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css?v=1" />
+</head>
 
-    function updateCopilot(tab) {
-        const s = compute(setupApi.loadSetup());
-        const data = ceremonyData[tab] || ceremonyData.planning;
+<body data-page="workspace">
+  <!-- TOP BAR -->
+  <div class="topbarWrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brandMark">▦</div>
+        <div class="brandName">SCRUMMER</div>
+      </div>
 
-        $("panelTitle").innerText = data.title;
-        $("panelWhy").innerText = data.why;
-        
-        const listHtml = data.points(s).map(p => `<li>${p}</li>`).join('');
-        $("panelList").innerHTML = listHtml;
+      <div class="navTabs">
+        <a class="navlink" href="index.html">Setup</a>
+        <a class="navlink" href="intelligence.html">Insights</a>
+        <a class="navlink" href="suggestions.html">Actions</a>
+        <a class="navlink active" href="workspace.html">⚡ Copilot</a>
+      </div>
 
-        // Update Brief KPIs
-        $("briefScope").innerText = `${Math.round(s.overcommitRatio * 100)}%`;
-        $("briefCapRatio").innerText = `${Math.round(s.focusFactor * 100)}%`;
-        $("briefConf").innerText = `${s.confidence}%`;
-        $("briefRisk").innerText = `${s.riskScore}%`;
-    }
+      <div class="topbarActions">
+        <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false">
+          Theme: <span id="themeMode">Light</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
-    // Tab Switching
-    document.querySelectorAll('.segBtn').forEach(btn => {
-        btn.onclick = () => {
-            document.querySelectorAll('.segBtn').forEach(b => b.classList.remove('active', 'is-active'));
-            btn.classList.add('is-active');
-            updateCopilot(btn.getAttribute('data-tab'));
-        };
-    });
+  <!-- PAGE -->
+  <div class="pageWrap">
+    <div class="sectionCard">
+      <h1 class="sectionTitle">AI Ceremony Copilot</h1>
+      <p class="sectionSub">
+        Pick a ceremony, see tailored prompts + capture decisions. Copilot uses your Setup signals.
+      </p>
 
-    // Initialize
-    if (compute && setupApi) {
-        updateCopilot('planning');
-    }
-})();
+      <!-- Recommended badge + message -->
+      <div class="btnRow" style="margin-top:10px; align-items:center;">
+        <div id="copilotRecommended" class="btnGhost" style="cursor:default;">
+          AI Suggests: —
+        </div>
+        <div id="copilotMsg" style="display:none; font-weight:900;"></div>
+      </div>
+
+      <!-- Brief KPI strip -->
+      <div class="kv" style="margin-top:14px;">
+        <div class="kvRow">
+          <div class="kvKey">Scope Load</div>
+          <div class="kvVal"><span id="briefScope">—</span></div>
+        </div>
+        <div class="kvRow">
+          <div class="kvKey">Focus Factor</div>
+          <div class="kvVal"><span id="briefCapRatio">—</span></div>
+        </div>
+        <div class="kvRow">
+          <div class="kvKey">Confidence</div>
+          <div class="kvVal"><span id="briefConf">—</span></div>
+        </div>
+        <div class="kvRow">
+          <div class="kvKey">Risk</div>
+          <div class="kvVal"><span id="briefRisk">—</span></div>
+        </div>
+      </div>
+
+      <!-- Ceremony segmented controls -->
+      <div style="margin-top:16px;">
+        <div class="kvKey" style="margin-bottom:8px;">Choose a ceremony</div>
+
+        <div class="btnRow" style="gap:8px; flex-wrap:wrap;">
+          <button class="btnGhost segBtn is-active" data-tab="planning" type="button">Planning</button>
+          <button class="btnGhost segBtn" data-tab="daily" type="button">Daily</button>
+          <button class="btnGhost segBtn" data-tab="refine" type="button">Refinement</button>
+          <button class="btnGhost segBtn" data-tab="review" type="button">Review</button>
+          <button class="btnGhost segBtn" data-tab="retro" type="button">Retro</button>
+        </div>
+      </div>
+
+      <!-- Panel -->
+      <div class="info-banner" style="margin-top:14px;">
+        <div style="font-weight:900; font-size:16px;" id="panelTitle">—</div>
+        <div style="margin-top:6px; color: var(--text-muted); font-weight:700;" id="panelWhy">—</div>
+      </div>
+
+      <div class="sectionSub" style="margin-top:12px; margin-bottom:8px;">
+        Suggested talking points
+      </div>
+
+      <div class="card" style="padding:14px;">
+        <div id="panelList" style="white-space:pre-line; line-height:1.45; font-weight:800;"></div>
+      </div>
+
+      <!-- Decision capture -->
+      <div style="margin-top:14px;">
+        <div class="kvKey" style="margin-bottom:8px;">Capture decisions</div>
+
+        <!-- copilot.js will inject inputs here -->
+        <div id="decisionFields" class="kv"></div>
+
+        <div class="btnRow" style="margin-top:12px;">
+          <button class="btnPrimary" id="copilotSave" type="button">Save Decisions</button>
+          <button class="btnGhost" id="copilotClear" type="button">Reset</button>
+        </div>
+      </div>
+
+      <div class="btnRow" style="margin-top:16px;">
+        <a class="btnGhost" href="suggestions.html" style="text-decoration:none; display:inline-block;">← Back to Actions</a>
+        <a class="btnGhost" href="index.html" style="text-decoration:none; display:inline-block;">Setup</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS (order matters) -->
+  <script src="js/metrics.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/copilot.js"></script>
+</body>
+</html>
