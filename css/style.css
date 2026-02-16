@@ -371,24 +371,3 @@ body.dark-mode .xpWidget{
   background: rgba(11,87,208,.10);
 }
 
-/* =========================================================
-   BACK/NEXT ARROW VISIBILITY (CSS-only, no HTML changes)
-   ========================================================= */
-
-/* Make the first character (←) bigger + bolder when used as Back arrow */
-.btnGhost::first-letter,
-.btnPrimary::first-letter{
-  font-weight:900;
-  font-size:16px;
-}
-
-/* But don't affect normal labels like "Save" or "Reset" */
-.btnPrimary::first-letter{
-  font-size:14px; /* keep primary buttons normal */
-}
-
-/* Only boost arrows when the button text starts with an arrow */
-.btnGhost[href^="#"]::first-letter,
-.btnGhost[href*="javascript"]::first-letter{
-  font-size:14px; /* safety: don't style weird links */
-}
