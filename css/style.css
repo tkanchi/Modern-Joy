@@ -99,6 +99,15 @@ body{
   margin-top:6px;
 }
 
+/* ✅ Divider inside sidebar nav (for separating Account/Auth) */
+.nav hr{
+  width:100%;
+  border:none;
+  border-top:1px solid var(--border);
+  margin:12px 0;
+  opacity:.65;
+}
+
 .navlink{
   display:flex;
   align-items:center;
@@ -387,7 +396,6 @@ body.dark-mode .btnGhost:hover{
 body.dark-mode .xpWidget{
   background: rgba(11,87,208,.10);
 }
-
 
 /* =========================================================
    Step 1: Premium card hover lift
