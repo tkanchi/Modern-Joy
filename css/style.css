@@ -462,3 +462,55 @@ body.dark-mode #moodBadge.mood-alert{
 body.dark-mode #moodBadge.mood-sprinting{
   background: rgba(239,68,68,.18);
 }
+
+/* =========================================================
+   Step 4: XP bar animation + pulse
+   ========================================================= */
+
+.xpFill{
+  position: relative;
+  will-change: width;
+}
+
+/* soft shine */
+.xpFill::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  transform: translateX(-30%);
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.25) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  opacity:0;
+  pointer-events:none;
+}
+
+/* pulse when XP changes */
+.xpWidget.xp-bump{
+  animation: xpBump .35s ease;
+}
+
+.xpWidget.xp-bump .xpFill::after{
+  animation: xpShine .6s ease;
+  opacity:1;
+}
+
+@keyframes xpBump{
+  0%{ transform: translateY(0); }
+  50%{ transform: translateY(-1px); }
+  100%{ transform: translateY(0); }
+}
+
+@keyframes xpShine{
+  0%{ transform: translateX(-40%); opacity:0; }
+  30%{ opacity:1; }
+  100%{ transform: translateX(140%); opacity:0; }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .xpWidget.xp-bump{ animation:none; }
+  .xpWidget.xp-bump .xpFill::after{ animation:none; }
+}
