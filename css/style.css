@@ -514,3 +514,25 @@ body.dark-mode #moodBadge.mood-sprinting{
   .xpWidget.xp-bump{ animation:none; }
   .xpWidget.xp-bump .xpFill::after{ animation:none; }
 }
+
+/* =========================================================
+   Remove mobile tap highlight + ugly focus rectangles
+   ========================================================= */
+
+/* Kill the Android/Chrome tap highlight */
+a, button, .navlink, .btnGhost, .btnPrimary, .themeToggle{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove default focus outline (we'll keep a nicer focus-visible) */
+.navlink:focus,
+.navlink:active{
+  outline: none;
+}
+
+/* Optional: better keyboard focus (desktop accessibility) */
+.navlink:focus-visible{
+  outline: 3px solid rgba(11,87,208,.25);
+  outline-offset: 2px;
+  border-radius: 16px;
+}
