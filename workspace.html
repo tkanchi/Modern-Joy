@@ -9,7 +9,6 @@
 
 <body>
   <div class="appShell">
-    <!-- LEFT SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark">🐆</div>
@@ -26,22 +25,33 @@
         <a class="navlink active" href="workspace.html">🤖 Copilot</a>
       </nav>
 
+      <!-- ✅ XP WIDGET -->
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div class="lvl" id="xpLevel">Level 1</div>
+          <div class="title" id="xpTitle">Rookie</div>
+        </div>
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+
       <button class="themeToggle" id="themeToggle" type="button">
         Theme: <span id="themeMode">Light</span>
       </button>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
         <h1 class="sectionTitle">AI Ceremony Copilot</h1>
         <p class="sectionSub">Pick a ceremony → get guided prompts → capture outcomes.</p>
 
         <div class="info-banner">
-          <strong>Pro move:</strong> Use Copilot in Daily Scrum to keep your sprint streak alive. 🏆
+          <strong>Pro move:</strong> Use Copilot in Daily Scrum to keep your streak alive. 🏆
         </div>
 
-        <!-- Ceremony Selector -->
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
           <button class="btnGhost" type="button" data-cer="planning">🗺️ Planning</button>
           <button class="btnGhost" type="button" data-cer="daily">🧩 Daily</button>
@@ -50,7 +60,6 @@
           <button class="btnGhost" type="button" data-cer="retro">♻️ Retro</button>
         </div>
 
-        <!-- Panel -->
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
           <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="panelBody">
@@ -58,7 +67,6 @@
           </div>
         </div>
 
-        <!-- Decisions -->
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900;">Capture decisions</div>
           <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
@@ -82,6 +90,8 @@
   </div>
 
   <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script> <!-- ✅ Step 4 -->
+
   <script>
     (function () {
       const title = document.getElementById("panelTitle");
@@ -89,46 +99,11 @@
       const notes = document.getElementById("decisionNotes");
 
       const prompts = {
-        planning: {
-          title: "🗺️ Sprint Planning",
-          body:
-            "1) What is the Sprint Goal?\n" +
-            "2) What are the top 3 risks?\n" +
-            "3) What can we move to Stretch?\n" +
-            "4) What dependencies exist?"
-        },
-        daily: {
-          title: "🧩 Daily Scrum",
-          body:
-            "1) Are we on track for Sprint Goal?\n" +
-            "2) Any blockers?\n" +
-            "3) Scope creep today?\n" +
-            "4) Who needs help?"
-        },
-        refine: {
-          title: "🧠 Refinement",
-          body:
-            "1) Are stories small enough?\n" +
-            "2) Are acceptance criteria clear?\n" +
-            "3) Dependencies identified?\n" +
-            "4) What’s the riskiest story?"
-        },
-        review: {
-          title: "🎬 Sprint Review",
-          body:
-            "1) What value shipped?\n" +
-            "2) Stakeholder feedback?\n" +
-            "3) What will we adjust next sprint?\n" +
-            "4) Any follow-ups?"
-        },
-        retro: {
-          title: "♻️ Retrospective",
-          body:
-            "1) What went well?\n" +
-            "2) What slowed us down?\n" +
-            "3) One improvement action (owner + date)\n" +
-            "4) How do we protect focus?"
-        }
+        planning: { title:"🗺️ Sprint Planning", body:"1) Sprint Goal?\n2) Top 3 risks?\n3) What goes to Stretch?\n4) Dependencies?" },
+        daily:    { title:"🧩 Daily Scrum",      body:"1) On track?\n2) Blockers?\n3) Scope creep?\n4) Who needs help?" },
+        refine:   { title:"🧠 Refinement",       body:"1) Stories small?\n2) AC clear?\n3) Dependencies?\n4) Riskiest story?" },
+        review:   { title:"🎬 Sprint Review",    body:"1) Value shipped?\n2) Feedback?\n3) Next adjustments?\n4) Follow-ups?" },
+        retro:    { title:"♻️ Retro",            body:"1) Went well?\n2) Slowed us?\n3) 1 improvement (owner+date)\n4) Protect focus?" }
       };
 
       document.querySelectorAll("[data-cer]").forEach(btn => {
@@ -139,7 +114,6 @@
         });
       });
 
-      // Simple local save
       document.getElementById("saveBtn").addEventListener("click", () => {
         localStorage.setItem("scrummer_copilot_notes", notes.value || "");
         alert("Saved ✅");
@@ -150,7 +124,6 @@
         localStorage.removeItem("scrummer_copilot_notes");
       });
 
-      // Load saved notes
       notes.value = localStorage.getItem("scrummer_copilot_notes") || "";
     })();
   </script>
