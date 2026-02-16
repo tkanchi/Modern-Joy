@@ -239,3 +239,62 @@ body.dark-mode .btnGhost:hover{ background: rgba(255,255,255,.06); }
     border-bottom:1px solid var(--border);
   }
 }
+
+/* ---------- XP Widget (Gamified) ---------- */
+.xpWidget{
+  margin-top:14px;
+  padding:12px 12px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background: rgba(11,87,208,.06);
+}
+
+.xpTop{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.xpTop .lvl{
+  font-weight:900;
+}
+
+.xpTop .title{
+  color:var(--text-muted);
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.06em;
+}
+
+.xpBar{
+  margin-top:10px;
+  height:10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: rgba(0,0,0,.04);
+  overflow:hidden;
+}
+
+.xpFill{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background: var(--accent);
+  transition: width .35s ease;
+}
+
+.xpMeta{
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  color:var(--text-muted);
+  font-weight:900;
+  font-size:12px;
+}
+
+:root[data-theme="dark"] .xpWidget,
+body.dark-mode .xpWidget{
+  background: rgba(11,87,208,.10);
+}
