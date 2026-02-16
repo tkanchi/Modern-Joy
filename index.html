@@ -1,130 +1,174 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrummer — Launchpad</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scrummer — Launchpad</title>
+
+  <!-- IMPORTANT: this is what your current page is missing -->
+  <link rel="stylesheet" href="css/style.css?v=1" />
 </head>
-<body data-page="launchpad">
 
-<div class="app-container">
-    <aside class="sidebar">
-        <div class="logo-text">SCRUMMER</div>
-        <nav class="nav-menu">
-            <a href="index.html" class="nav-item active" data-page="launchpad"><span class="nav-icon">🚀</span> Setup</a>
-            <a href="intelligence.html" class="nav-item" data-page="intelligence"><span class="nav-icon">📊</span> Insights</a>
-            <a href="suggestions.html" class="nav-item" data-page="suggestions"><span class="nav-icon">💡</span> Actions</a>
-            <a href="workspace.html" class="nav-item" data-page="workspace"><span class="nav-icon">⚡</span> Copilot</a>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <button id="themeToggle" class="btn-fun secondary" style="width:100%;">Theme: Light</button>
-            <div class="pro-card">
-                <div class="pro-title">Scrummer Gold</div>
-                <div class="pro-sub">Unlock AI Analysis</div>
-                <button class="pro-btn">Upgrade ✨</button>
-            </div>
+<body data-page="upload">
+  <!-- TOP BAR -->
+  <div class="topbarWrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brandMark">▦</div>
+        <div class="brandName">SCRUMMER</div>
+      </div>
+
+      <div class="navTabs">
+        <a class="navlink active" href="index.html">Setup</a>
+        <a class="navlink" href="intelligence.html">Insights</a>
+        <a class="navlink" href="suggestions.html">Actions</a>
+        <a class="navlink" href="workspace.html">⚡ Copilot</a>
+      </div>
+
+      <div class="topbarActions">
+        <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false">
+          Theme: <span id="themeMode">Light</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE -->
+  <div class="pageWrap">
+    <div class="sectionCard">
+      <h1 class="sectionTitle">Launchpad</h1>
+      <p class="sectionSub">Initialize your sprint. These fields power Risk Score + Confidence %.</p>
+
+      <div class="info-banner">
+        <strong>SPRINT SETUP</strong><br />
+        These fields power Risk Score + Confidence %.
+      </div>
+
+      <div class="kv" style="margin-top:12px;">
+        <div>
+          <div class="kvKey">SPRINT LENGTH (WORKING DAYS)</div>
+          <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10" />
         </div>
-    </aside>
 
-    <main class="main">
-        <header class="top-header">
-            <div class="tagline-group">
-                <div class="tagline-main">Know what's happening. Know what to do next.</div>
-                <div class="tagline-sub">AI-powered delivery intelligence for teams.</div>
-            </div>
-        </header>
-
-        <div class="content-scroll">
-            <h1 class="page-title">Launchpad</h1>
-            
-            <div class="steps-row">
-                <div class="steps-list">Step 1: Setup &nbsp; Step 2: Insights &nbsp; Step 3: Actions</div>
-                <button id="headerNext" class="btn-fun primary">Next Insights ➔</button>
-            </div>
-
-            <div class="info-banner">
-                <div class="banner-title">SPRINT SETUP</div>
-                <div class="banner-sub">These fields power Risk Score + Confidence %.</div>
-            </div>
-
-            <div class="grid-main">
-                <div class="card main-card">
-                    <h2 class="card-title">Sprint Setup</h2>
-                    <div class="input-group">
-                        <label class="kpi-label">SPRINT LENGTH (WORKING DAYS)</label>
-                        <input id="sprintDays" type="number" class="fun-input" value="10">
-                    </div>
-                    <div class="input-group">
-                        <label class="kpi-label">TEAM MEMBERS</label>
-                        <input id="teamMembers" type="number" class="fun-input" value="7">
-                    </div>
-                    <div class="input-group">
-                        <label class="kpi-label">COMMITTED POINTS</label>
-                        <input id="committedSP" type="number" class="fun-input" value="40">
-                    </div>
-                </div>
-
-                <div class="side-col">
-                    <div class="card side-card">
-                        <div class="card-title-small">Demo Data</div>
-                        <p class="card-desc">Load sample inputs to test Excellent, Normal, and Risky scenarios.</p>
-                        <div class="demo-btn-group">
-                            <button id="demoExcellent" class="btn-demo dark">Excellent</button>
-                            <button id="demoNormal" class="btn-demo gray">Normal</button>
-                            <button id="demoRisky" class="btn-demo red">Risky</button>
-                        </div>
-                    </div>
-
-                    <div class="card side-card">
-                        <div class="card-title-small">Last 3 Sprint Velocities (completed SP)</div>
-                        <p class="card-desc">Used to compute average velocity + volatility.</p>
-                        <div class="velocity-grid">
-                            <div class="vel-item"><label>N-1</label><input id="v1" type="number" class="fun-input"></div>
-                            <div class="vel-item"><label>N-2</label><input id="v2" type="number" class="fun-input"></div>
-                            <div class="vel-item"><label>N-3</label><input id="v3" type="number" class="fun-input"></div>
-                        </div>
-                        <button id="saveSetup" class="btn-fun primary full-width">Save & Continue ➔</button>
-                    </div>
-                </div>
-            </div>
+        <div>
+          <div class="kvKey">TEAM MEMBERS</div>
+          <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7" />
         </div>
-    </main>
-</div>
 
-<script src="js/shell.js"></script>
-<script>
-    (function(){
-        const $ = (id) => document.getElementById(id);
-        const setupApi = window.Scrummer?.setup;
-        if (!setupApi) return;
+        <div>
+          <div class="kvKey">LEAVE DAYS (TOTAL PERSON-DAYS)</div>
+          <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0" />
+        </div>
 
-        $("saveSetup").onclick = () => {
-            setupApi.saveSetup({
-                sprintDays: $("sprintDays").value,
-                teamMembers: $("teamMembers").value,
-                committedSP: $("committedSP").value,
-                v1: $("v1").value, v2: $("v2").value, v3: $("v3").value
-            });
-            window.location.href = 'intelligence.html';
-        };
+        <div>
+          <div class="kvKey">COMMITTED POINTS</div>
+          <input class="fun-input" id="committedSP" type="number" min="0" placeholder="40" />
+        </div>
+      </div>
 
-        $("headerNext").onclick = () => $("saveSetup").click();
+      <div style="margin-top:14px;">
+        <div class="kvKey">DEMO DATA</div>
+        <div class="btnRow">
+          <button class="btnGhost" id="demoExcellent" type="button">Excellent</button>
+          <button class="btnGhost" id="demoNormal" type="button">Normal</button>
+          <button class="btnGhost" id="demoRisky" type="button">Risky</button>
+        </div>
+      </div>
 
-        $("demoExcellent").onclick = () => {
-            $("sprintDays").value = 10; $("teamMembers").value = 8; $("committedSP").value = 60;
-            $("v1").value = 62; $("v2").value = 60; $("v3").value = 64;
+      <div style="margin-top:16px;">
+        <div class="kvKey">LAST 3 SPRINT VELOCITIES (COMPLETED SP)</div>
+        <div class="sectionSub" style="margin-top:6px;">Used to compute average velocity + volatility.</div>
+
+        <div class="kv">
+          <div>
+            <div class="kvKey">N-1</div>
+            <input class="fun-input" id="v1" type="number" min="0" placeholder="36" />
+          </div>
+          <div>
+            <div class="kvKey">N-2</div>
+            <input class="fun-input" id="v2" type="number" min="0" placeholder="41" />
+          </div>
+          <div>
+            <div class="kvKey">N-3</div>
+            <input class="fun-input" id="v3" type="number" min="0" placeholder="38" />
+          </div>
+        </div>
+      </div>
+
+      <div class="btnRow" style="margin-top:16px;">
+        <button class="btnPrimary" id="saveContinue" type="button">Save & Continue ➜</button>
+        <a class="btnGhost" href="intelligence.html" style="text-decoration:none; display:inline-block;">Go to Insights</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS (order matters) -->
+  <script src="js/metrics.js"></script>
+  <script src="js/theme.js"></script>
+
+  <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const api = window.Scrummer && window.Scrummer.setup;
+
+      function load() {
+        if (!api) return {};
+        return api.loadSetup ? api.loadSetup() : {};
+      }
+
+      function save(data) {
+        if (!api || !api.saveSetup) return;
+        api.saveSetup(data);
+      }
+
+      function bind(id, key) {
+        const el = $(id);
+        if (!el) return;
+        const current = load();
+        if (current[key] !== undefined && current[key] !== null && current[key] !== "") {
+          el.value = current[key];
+        }
+        el.addEventListener("input", () => {
+          const next = Object.assign({}, load(), { [key]: el.value });
+          save(next);
+        });
+      }
+
+      // bind fields to storage keys expected by metrics.js
+      bind("sprintDays", "sprintDays");
+      bind("teamMembers", "teamMembers");
+      bind("leaveDays", "leaveDays");
+      bind("committedSP", "committedSP");
+      bind("v1", "v1");
+      bind("v2", "v2");
+      bind("v3", "v3");
+
+      function setDemo(type) {
+        const presets = {
+          excellent: { sprintDays: 10, teamMembers: 7, leaveDays: 0, committedSP: 38, v1: 40, v2: 39, v3: 41 },
+          normal:    { sprintDays: 10, teamMembers: 7, leaveDays: 3, committedSP: 42, v1: 40, v2: 36, v3: 41 },
+          risky:     { sprintDays: 10, teamMembers: 7, leaveDays: 6, committedSP: 52, v1: 38, v2: 30, v3: 44 }
         };
-        $("demoNormal").onclick = () => {
-            $("sprintDays").value = 10; $("teamMembers").value = 7; $("committedSP").value = 45;
-            $("v1").value = 42; $("v2").value = 45; $("v3").value = 44;
-        };
-        $("demoRisky").onclick = () => {
-            $("sprintDays").value = 10; $("teamMembers").value = 6; $("committedSP").value = 90;
-            $("v1").value = 55; $("v2").value = 50; $("v3").value = 48;
-        };
+        const p = presets[type];
+        if (!p) return;
+
+        // update UI
+        ["sprintDays","teamMembers","leaveDays","committedSP","v1","v2","v3"].forEach(k => {
+          if ($(k)) $(k).value = p[k];
+        });
+
+        // persist
+        save(Object.assign({}, load(), p));
+      }
+
+      const ex = $("demoExcellent"), no = $("demoNormal"), ri = $("demoRisky");
+      if (ex) ex.onclick = () => setDemo("excellent");
+      if (no) no.onclick = () => setDemo("normal");
+      if (ri) ri.onclick = () => setDemo("risky");
+
+      const btn = $("saveContinue");
+      if (btn) btn.onclick = () => location.href = "intelligence.html";
     })();
-</script>
+  </script>
 </body>
 </html>
