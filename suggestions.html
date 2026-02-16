@@ -25,13 +25,29 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
       </nav>
 
-      <!-- ✅ XP WIDGET -->
+      <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
         <div class="xpTop">
-          <div class="lvl" id="xpLevel">Level 1</div>
-          <div class="title" id="xpTitle">Rookie</div>
+          <div>
+            <div class="lvl" id="xpLevel">Level 1</div>
+            <div class="title" id="xpTitle">Rookie</div>
+          </div>
+
+          <!-- 🐆 Mood -->
+          <div id="moodBadge" style="
+            padding:6px 10px;
+            border-radius:999px;
+            border:1px solid var(--border);
+            font-weight:900;
+            font-size:12px;
+            background:rgba(0,0,0,.03);
+          ">🐆 Calm</div>
         </div>
-        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
         <div class="xpMeta">
           <span id="xpText">0 / 300 XP</span>
           <span id="streakText">🧊 streak reset</span>
@@ -55,9 +71,9 @@
         <div id="actionsWrap" style="display:grid; gap:12px; margin-top:10px;"></div>
 
         <div class="btnRow">
-          <a class="btnGhost" href="intelligence.html">← Back to Insights</a>
+          <a class="btnGhost" href="intelligence.html" style="display:inline-block; text-decoration:none;">← Back to Insights</a>
           <button class="btnPrimary" id="refreshBtn" type="button">Refresh Actions</button>
-          <a class="btnGhost" href="workspace.html">Next: Copilot ➜</a>
+          <a class="btnGhost" href="workspace.html" style="display:inline-block; text-decoration:none;">Next: Copilot ➜</a>
         </div>
       </div>
     </main>
@@ -65,7 +81,7 @@
 
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
-  <script src="js/xp.js"></script> <!-- ✅ Step 4 -->
+  <script src="js/xp.js"></script>
 
   <script>
     (function () {
