@@ -146,29 +146,29 @@
     );
   }
 
-  // 🐆 Mood logic
+  // 🐆 Mood logic (class-based: calm / alert / sprinting)
   function mood(metrics) {
     const risk = Number(metrics.riskScore);
     const conf = Number(metrics.confidence);
     const over = Number(metrics.overcommitRatio);
 
-    // missing data
+    // missing data -> calm
     if (!Number.isFinite(risk) || !Number.isFinite(conf)) {
-      return { text: "🐆 Calm", bg: "rgba(0,0,0,.03)" };
+      return { kind: "calm", text: "🐆 Calm" };
     }
 
     // Sprinting (high risk)
     if (risk >= 70 || (Number.isFinite(over) && over > 1.15) || conf < 55) {
-      return { text: "🐆💨 Sprinting", bg: "rgba(255, 0, 0, .08)" };
+      return { kind: "sprinting", text: "🐆💨 Sprinting" };
     }
 
     // Alert (watchlist)
     if (risk >= 40 || (Number.isFinite(over) && over > 1.0) || conf < 70) {
-      return { text: "🐆⚡ Alert", bg: "rgba(255, 170, 0, .10)" };
+      return { kind: "alert", text: "🐆⚡ Alert" };
     }
 
     // Calm (stable)
-    return { text: "🐆 Calm", bg: "rgba(0,0,0,.03)" };
+    return { kind: "calm", text: "🐆 Calm" };
   }
 
   function awardXp(state, metrics) {
@@ -237,12 +237,17 @@
           : `🧊 streak reset`;
     }
 
-    // mood badge
+    // mood badge (CSS classes)
     const badge = el("moodBadge");
     if (badge) {
       const m = mood(metrics);
+
       badge.textContent = m.text;
-      badge.style.background = m.bg;
+
+      badge.classList.remove("mood-calm", "mood-alert", "mood-sprinting");
+      if (m.kind === "calm") badge.classList.add("mood-calm");
+      if (m.kind === "alert") badge.classList.add("mood-alert");
+      if (m.kind === "sprinting") badge.classList.add("mood-sprinting");
     }
   }
 
