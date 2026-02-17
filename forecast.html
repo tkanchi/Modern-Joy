@@ -62,7 +62,7 @@
     <main class="main">
       <div class="sectionCard">
         <h1 class="sectionTitle">Sprint Forecast</h1>
-        <p class="sectionSub">Only 2 modes: Velocity Average or Capacity (Focus + Leaves Weight).</p>
+        <p class="sectionSub">Two modes: Velocity Average or Capacity (Focus + Leaves Weight).</p>
 
         <div class="info-banner">
           <strong>Goal:</strong> Get a clean, explainable forecast in Story Points.
@@ -108,10 +108,10 @@
         <div id="capacityBox" class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900;">🟢 Capacity-Based Forecast (Your Exact Logic)</div>
           <div style="color:var(--text-muted); font-weight:800; margin-top:6px; line-height:1.6;">
-            Ideal Capacity (Days per person) = Sprint Days × Focus Factor<br>
-            Total Ideal Capacity (Days) = Team Members × Ideal Capacity (Days per person)<br>
-            Total Actual Capacity (Days) = Total Ideal Capacity (Days) − (Leaves × Weight)<br>
-            Forecast SP = Total Actual Capacity (Days) × SP/day
+            Ideal (Days/person) = Sprint Days × Focus Factor<br>
+            Total Ideal Days = Team Members × Ideal (Days/person)<br>
+            Total Actual Days = Total Ideal Days − (Leaves × Weight)<br>
+            Forecast SP = Total Actual Days × SP/day
           </div>
 
           <div style="display:grid; gap:10px; margin-top:12px;">
@@ -155,21 +155,23 @@
             </div>
           </div>
 
-          <!-- ✅ Roles Extension (Optional) -->
-          <div class="info-banner" style="margin-top:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-              <div style="font-weight:900;">Roles (optional)</div>
-              <button class="btnGhost" id="addRoleBtn" type="button">+ Add Role</button>
-            </div>
-
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px; line-height:1.6;">
-              If you add roles, Scrummer will calculate:
-              <b>capacity per role</b> + totals, and auto-fill Team Count + Leaves above.
-            </div>
-
-            <div id="rolesContainer" style="display:grid; gap:10px; margin-top:12px;"></div>
+          <!-- Roles (optional) -->
+          <div class="rolesHeader">
+            <div style="font-weight:900;">Roles (optional)</div>
+            <button class="btnGhost" id="addRoleBtn" type="button">+ Add Role</button>
           </div>
 
+          <div class="rolesMeta">
+            <span class="miniTag" id="rolesCountTag">Roles: 0</span>
+            <span class="miniTag" id="rolesMembersTag">Members: 0</span>
+            <span class="miniTag" id="rolesLeavesTag">Leaves: 0</span>
+          </div>
+
+          <div style="color:var(--text-muted); font-weight:800; margin-top:8px; line-height:1.6;">
+            If roles exist, Team Count + Leaves are auto-filled from roles, and you get per-role capacity output.
+          </div>
+
+          <div id="rolesContainer" class="rolesContainer"></div>
         </div>
 
         <!-- BUTTONS -->
@@ -191,6 +193,25 @@
             <div id="resultTitle" style="font-weight:900;">—</div>
             <div id="resultMain" style="margin-top:8px;">—</div>
 
+            <!-- ✅ Side-by-side summaries -->
+            <div class="summaryGrid" id="summaryGrid" style="display:none;">
+              <div class="summaryCard">
+                <div class="summaryTitle">
+                  <span>Team Summary</span>
+                  <span class="miniTag">Totals</span>
+                </div>
+                <div id="teamSummary"></div>
+              </div>
+
+              <div class="summaryCard">
+                <div class="summaryTitle">
+                  <span>Role Summary</span>
+                  <span class="miniTag">Breakdown</span>
+                </div>
+                <div id="roleSummary"></div>
+              </div>
+            </div>
+
             <hr style="margin:12px 0; opacity:.2;">
 
             <div id="formulaBox" style="color:var(--text-muted); font-weight:800; line-height:1.7;"></div>
@@ -203,8 +224,6 @@
 
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
-
-  <!-- ✅ Forecast logic -->
   <script src="js/forecast.js"></script>
 </body>
 </html>
