@@ -8,385 +8,116 @@
 </head>
 
 <body>
-  <div class="appShell">
+<div class="appShell">
 
-    <!-- SIDEBAR -->
-    <aside class="sideNav">
-      <div class="sideBrand">
-        <div class="brandMark">🐆</div>
-        <div>
-          <div class="brandName">SCRUMMER</div>
-          <div class="brandTag">Gamified Scrum OS</div>
-        </div>
+  <!-- SIDEBAR (unchanged) -->
+  <aside class="sideNav">
+    <div class="sideBrand">
+      <div class="brandMark">🐆</div>
+      <div>
+        <div class="brandName">SCRUMMER</div>
+        <div class="brandTag">Gamified Scrum OS</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a class="navlink" href="index.html">🚀 Setup</a>
+      <a class="navlink" href="intelligence.html">📊 Insights</a>
+      <a class="navlink" href="suggestions.html">🎯 Actions</a>
+      <a class="navlink" href="workspace.html">🤖 Copilot</a>
+      <a class="navlink active" href="forecast.html">📦 Forecast</a>
+      <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+      <hr>
+      <a class="navlink" href="auth.html">🔐 Account</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+  <div class="sectionCard">
+    <h1 class="sectionTitle">Capacity Forecast</h1>
+    <p class="sectionSub">Pure math. Transparent formulas.</p>
+
+    <!-- MODE -->
+    <div style="margin-bottom:20px;">
+      <div style="font-weight:900;">Forecast Mode</div>
+      <select class="fun-input" id="forecastMode">
+        <option value="existing">Existing (Velocity-based)</option>
+        <option value="roleModel">Role-Based Weighted Capacity (New)</option>
+      </select>
+    </div>
+
+    <!-- ================= EXISTING MODE ================= -->
+    <div id="existingBox">
+      <div style="display:grid; gap:12px;">
+        <input class="fun-input" id="sprintDays" type="number" placeholder="Sprint Days">
+        <input class="fun-input" id="teamMembers" type="number" placeholder="Team Members">
+        <input class="fun-input" id="leaveDays" type="number" placeholder="Leave Days (person-days)">
+        <input class="fun-input" id="interruptPct" type="number" placeholder="Interruptions %">
+
+        <input class="fun-input" id="v1" type="number" placeholder="Velocity N-1">
+        <input class="fun-input" id="v2" type="number" placeholder="Velocity N-2">
+        <input class="fun-input" id="v3" type="number" placeholder="Velocity N-3">
+      </div>
+    </div>
+
+    <!-- ================= NEW ROLE MODEL ================= -->
+    <div id="roleModelBox" style="display:none; margin-top:20px;" class="info-banner">
+
+      <div style="display:grid; gap:10px;">
+        <input class="fun-input" id="totalDays" type="number" placeholder="Total Sprint Days">
+        <input class="fun-input" id="spPerDay" type="number" value="4" placeholder="SP per Person per Day">
+
+        <input class="fun-input" id="unavailableWeight" type="number" step="0.05" min="0" max="1" value="0.5"
+               placeholder="Unavailability Weight (0–1)">
       </div>
 
-      <nav class="nav">
-        <a class="navlink" href="index.html">🚀 Setup</a>
-        <a class="navlink" href="intelligence.html">📊 Insights</a>
-        <a class="navlink" href="suggestions.html">🎯 Actions</a>
-        <a class="navlink" href="workspace.html">🤖 Copilot</a>
-        <a class="navlink active" href="forecast.html">📦 Forecast</a>
-        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+      <hr style="margin:16px 0; opacity:.2;">
 
-        <hr>
+      <div style="font-weight:900;">Roles</div>
 
-        <a class="navlink" href="auth.html">🔐 Account</a>
-      </nav>
+      <table style="width:100%; margin-top:10px;">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Members</th>
+            <th>Unavailable Days</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rolesTbody"></tbody>
+      </table>
 
-      <!-- XP WIDGET -->
-      <div class="xpWidget">
-        <div class="xpTop">
-          <div>
-            <div class="lvl" id="xpLevel">Level 1</div>
-            <div class="title" id="xpTitle">Rookie</div>
-          </div>
-          <div id="moodBadge">🐆 Calm</div>
-        </div>
+      <button class="btnGhost" id="addRoleBtn" type="button">+ Add Role</button>
 
-        <div class="xpBar">
-          <div class="xpFill" id="xpFill"></div>
-        </div>
+      <template id="roleRowTpl">
+        <tr class="roleRow">
+          <td><input class="fun-input roleName" type="text"></td>
+          <td><input class="fun-input roleMembers" type="number"></td>
+          <td><input class="fun-input roleUnavailable" type="number" step="0.5"></td>
+          <td><button class="btnGhost roleRemove" type="button">✕</button></td>
+        </tr>
+      </template>
 
-        <div class="xpMeta">
-          <span id="xpText">0 / 300 XP</span>
-          <span id="streakText">🧊 streak reset</span>
-        </div>
-      </div>
+    </div>
 
-      <button class="themeToggle" id="themeToggle" type="button">
-        Theme: <span id="themeMode">Light</span>
-      </button>
-    </aside>
+    <div style="margin-top:20px;">
+      <button class="btnPrimary" id="calcBtn">Calculate</button>
+    </div>
 
-    <!-- MAIN -->
-    <main class="main">
-      <div class="sectionCard">
-        <h1 class="sectionTitle">Capacity Forecast</h1>
-        <p class="sectionSub">Pure math. Transparent formulas. No AI. No hidden assumptions.</p>
+    <!-- RESULTS -->
+    <div style="margin-top:20px;" class="info-banner">
+      <div id="rawCap">—</div>
+      <div id="effDays">—</div>
+      <div id="forecastSp">—</div>
+      <div id="roleBreakdown" style="margin-top:10px;"></div>
+    </div>
 
-        <div class="info-banner">
-          <strong>Purpose:</strong> Estimate realistic Sprint commitment before planning begins.
-        </div>
-
-        <!-- ===================================================== -->
-        <!-- FORECAST MATH EXPLANATION -->
-        <!-- ===================================================== -->
-        <div class="info-banner" style="margin-top:14px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-weight:900;">📖 How Forecast Is Calculated</div>
-            <button class="btnGhost" type="button" id="toggleExplain" style="padding:6px 10px; font-size:12px;">
-              Show Details
-            </button>
-          </div>
-
-          <div id="explainBox" style="display:none; margin-top:14px; color:var(--text-muted); font-weight:800; line-height:1.6;">
-
-            <div style="margin-bottom:12px;">
-              <div style="font-weight:900; color:var(--text-main);">1) Raw Capacity</div>
-              Raw Capacity = Sprint Days × Team Members
-              <div style="margin-top:6px;">
-                Total theoretical working days before accounting for leave or interruptions.
-              </div>
-            </div>
-
-            <div style="margin-bottom:12px;">
-              <div style="font-weight:900; color:var(--text-main);">2) Effective Team Days</div>
-              Effective Days = (Raw Capacity − Leave Days) × (1 − Interruptions%)
-
-              <div style="margin-top:6px;">
-                First subtract time-off, then reduce remaining capacity by expected overhead (support work, meetings, production issues).
-              </div>
-
-              <div style="margin-top:8px;">
-                <b>Why (1 − Interruptions%)?</b>
-              </div>
-
-              <div style="margin-top:6px;">
-                If interruptions are 20%, it means <b>20% of remaining time is NOT usable</b> for sprint work.
-                So usable time = 100% − 20% = 80% → multiply by 0.80.
-              </div>
-
-              <div style="margin-top:8px;">
-                <b>Mini example:</b>
-                <div style="margin-top:6px;">
-                  Raw Capacity = 10 days × 7 people = 70 team-days<br/>
-                  Leave Days = 5 → remaining = 65 team-days<br/>
-                  Interruptions = 20% → usable = 65 × 0.80 = <b>52 effective team-days</b>
-                </div>
-              </div>
-
-              <div style="margin-top:8px;">
-                Percentages always reduce proportionally — that’s why we multiply by (1 − Interruptions%), not subtract “days” directly.
-              </div>
-            </div>
-
-            <div style="margin-bottom:12px;">
-              <div style="font-weight:900; color:var(--text-main);">3) Velocity per Team Day</div>
-              Velocity/Day = Average Velocity ÷ Raw Capacity
-              <div style="margin-top:6px;">
-                Converts historical output into delivery rate per team-day.
-              </div>
-              <div style="margin-top:6px;">
-                <b>Why divide by Raw Capacity (not Effective Days)?</b><br/>
-                Because historical velocity was achieved under full sprint context.
-                We use Raw Capacity as the stable denominator, then apply your leave/interruptions via Effective Days.
-              </div>
-            </div>
-
-            <div style="margin-bottom:12px;">
-              <div style="font-weight:900; color:var(--text-main);">4) Forecast Story Points</div>
-              Forecast SP = Effective Days × Velocity/Day
-              <div style="margin-top:6px;">
-                Realistic estimate based on usable time and past throughput.
-              </div>
-            </div>
-
-            <div style="margin-top:10px;">
-              <div style="font-weight:900; color:var(--text-main);">Commitment Range</div>
-              Conservative = Forecast − 10% <br/>
-              Likely = Forecast <br/>
-              Stretch = Forecast + 5%
-              <div style="margin-top:6px;">
-                Forecasting is probabilistic, so we show a safe band instead of a single number.
-              </div>
-            </div>
-
-            <div style="margin-top:14px; font-size:12px;">
-              Based on standard Scrum capacity planning concepts, Sprint Planning guidance,
-              and industry practices around velocity and focus factor.
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ===================================================== -->
-        <!-- ESTIMATION SCALE COMPATIBILITY -->
-        <!-- ===================================================== -->
-        <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">📏 Estimation Scale Compatibility</div>
-
-          <div style="margin-top:8px; color:var(--text-muted); font-weight:800; line-height:1.6;">
-            Scrummer Forecast works with any consistent estimation scale, as long as your historical velocity uses the same scale.
-          </div>
-
-          <div style="margin-top:8px; color:var(--text-muted); font-weight:800; line-height:1.6; white-space:pre-line;">
-• Fibonacci (1, 2, 3, 5, 8, 13…)
-• Modified scales (1, 2, 4, 6, 8, 16, 32…) ✅
-• Linear scales (1, 2, 3, 4…)
-• T-shirt sizing (only if converted to numbers)
-          </div>
-
-          <div style="margin-top:10px; color:var(--text-muted); font-weight:800; line-height:1.6;">
-            The forecast does NOT depend on what “1 story point” means. It depends on velocity consistency over time.
-          </div>
-
-          <div style="margin-top:10px; color:var(--text-muted); font-weight:800; line-height:1.6;">
-            ⚠ Large jumps in scale (e.g., 16 → 32) can increase volatility. If possible, slice large stories to make forecasts more reliable.
-          </div>
-        </div>
-
-        <!-- INPUTS -->
-        <div style="margin-top:16px;">
-          <div class="kvKey">Inputs</div>
-
-          <div style="display:grid; gap:12px;">
-
-            <!-- MODE SELECT -->
-            <div>
-              <div style="font-weight:900; margin-bottom:6px;">Forecast Mode</div>
-              <select class="fun-input" id="forecastMode">
-                <option value="existing">Existing (Velocity-based)</option>
-                <option value="capacityDays">Capacity Days × SP/day (New)</option>
-              </select>
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                Switch between your current model and the new "Ideal − Holidays − Leaves" model.
-              </div>
-            </div>
-
-            <div>
-              <div style="font-weight:900; margin-bottom:6px;">Sprint Days (working days)</div>
-              <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="e.g., 10">
-            </div>
-
-            <div>
-              <div style="font-weight:900; margin-bottom:6px;">Team Members</div>
-              <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="e.g., 7">
-            </div>
-
-            <!-- NEW MODEL INPUTS BOX -->
-            <div id="capacityDaysBox" class="info-banner" style="display:none; margin-top:0;">
-              <div style="font-weight:900;">New Model Inputs</div>
-
-              <div style="display:grid; gap:10px; margin-top:12px;">
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Ideal Capacity per Member (days)</div>
-                  <input class="fun-input" id="idealPerMember" type="number" min="0" step="0.5" placeholder="e.g., 6">
-                  <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                    Example: 6 working days per person in the sprint.
-                  </div>
-                </div>
-
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Public Holidays (team person-days)</div>
-                  <input class="fun-input" id="holidayDays" type="number" min="0" step="0.5" placeholder="e.g., 2">
-                </div>
-
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Story Points per Productive Day</div>
-                  <input class="fun-input" id="spPerDay" type="number" min="0" step="0.1" value="4">
-                </div>
-
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Use Predictability?</div>
-                  <select class="fun-input" id="usePredictability">
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
-                  </select>
-                </div>
-
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Predictability (0–1)</div>
-                  <input class="fun-input" id="predictability" type="number" min="0" max="1" step="0.001" value="0.695">
-                  <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                    Committable SP = Forecast SP × Predictability
-                  </div>
-                </div>
-              </div>
-
-              <hr style="margin:12px 0; opacity:.2;">
-
-              <div style="font-weight:900;">Per-member leaves import (optional)</div>
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px; line-height:1.6;">
-                Paste leaves (days) per person, one per line. Total will be summed into Planned Leaves (person-days).
-              </div>
-              <textarea class="fun-input" id="leavesList" rows="4" placeholder="Example:
-0
-1
-0.5
-2
-..."></textarea>
-
-              <div style="display:flex; gap:10px; margin-top:10px;">
-                <button class="btnGhost" id="sumLeavesBtn" type="button">Sum Leaves</button>
-                <div style="align-self:center; font-weight:900;" id="leavesSumText">Planned Leaves Total: —</div>
-              </div>
-            </div>
-
-            <div>
-              <div style="font-weight:900; margin-bottom:6px;">Leave Days (person-days)</div>
-              <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="e.g., 3">
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                Example: 2 people taking 1 day off each = 2 leave days.
-              </div>
-            </div>
-
-            <div>
-              <div style="font-weight:900; margin-bottom:6px;">Interruptions (%)</div>
-              <input class="fun-input" id="interruptPct" type="number" min="0" max="60" step="1" placeholder="e.g., 15">
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                Support work, prod issues, ad-hoc meetings. Typical: 10–25%.
-              </div>
-            </div>
-
-            <div class="info-banner" style="margin-top:0;">
-              <div style="font-weight:900;">Last 3 Sprint Velocities (Completed SP)</div>
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                Use <b>completed</b> story points (Definition of Done met), not committed.
-              </div>
-
-              <div style="display:grid; gap:10px; margin-top:12px;">
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Velocity N-1</div>
-                  <input class="fun-input" id="v1" type="number" min="0" placeholder="e.g., 36">
-                </div>
-
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Velocity N-2</div>
-                  <input class="fun-input" id="v2" type="number" min="0" placeholder="e.g., 41">
-                </div>
-
-                <div>
-                  <div style="font-weight:900; margin-bottom:6px;">Velocity N-3</div>
-                  <input class="fun-input" id="v3" type="number" min="0" placeholder="e.g., 38">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="btnRow" style="margin-top:12px;">
-            <button class="btnPrimary" id="calcBtn" type="button">Calculate 📦</button>
-            <button class="btnGhost" id="pullFromSetup" type="button">Use Setup Inputs</button>
-            <button class="btnGhost" id="resetBtn" type="button">Reset</button>
-          </div>
-        </div>
-
-        <!-- OUTPUT -->
-        <div style="margin-top:18px;">
-          <div class="kvKey">Results</div>
-
-          <div class="info-banner" id="interruptWarn" style="display:none; margin-bottom:12px;">
-            <div style="font-weight:900;">⚠ High Interruptions Detected</div>
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-              Interruptions above <b>40%</b> usually means the team is heavily loaded with support/meetings.
-              The forecast may be unreliable. Consider reducing scope or protecting focus time.
-            </div>
-          </div>
-
-          <div class="info-banner" id="leaveWarn" style="display:none; margin-bottom:12px;">
-            <div style="font-weight:900;">⚠ Leave Days Look Too High</div>
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-              Your <b>leave days</b> exceed your <b>raw capacity</b>. This makes effective capacity negative.
-              Check sprint days, team members, and leave days (person-days).
-            </div>
-          </div>
-
-          <div class="info-banner" id="velocityWarn" style="display:none; margin-bottom:12px;">
-            <div style="font-weight:900;">⚠ Not Enough Velocity History</div>
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-              Forecasting is much weaker without past velocities.
-              Add at least <b>2</b> completed sprint velocities (N-1, N-2) for a more reliable result.
-            </div>
-          </div>
-
-          <div class="info-banner" id="spikeWarn" style="display:none; margin-bottom:12px;">
-            <div style="font-weight:900;">⚠ Forecast Is Much Higher Than Average Velocity</div>
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-              Your forecast is significantly higher than what the team typically delivers.
-              This often indicates optimistic inputs (low interruptions/leave) or unusual sprint conditions.
-              Consider using <b>Conservative</b> as your safe commitment.
-            </div>
-          </div>
-
-          <div class="info-banner" id="resultsBox">
-            <div id="rawCap">Raw Capacity: —</div>
-            <div id="effDays">Effective Days: —</div>
-            <div id="velPerDay">Velocity per Team-Day: —</div>
-            <div id="forecastSp">Forecast SP: —</div>
-
-            <div id="commitSp" style="display:none;">Committable SP (Predictability): —</div>
-            <div id="formulaBox" style="margin-top:10px; color:var(--text-muted); font-weight:800; line-height:1.6;"></div>
-
-            <hr style="margin:10px 0; opacity:.2;">
-
-            <div id="consRange">Conservative: —</div>
-            <div id="likelyRange">Likely: —</div>
-            <div id="stretchRange">Stretch: —</div>
-          </div>
-        </div>
-
-      </div>
-    </main>
   </div>
+  </main>
 
-  <script src="js/theme.js"></script>
-  <script src="js/xp.js"></script>
+</div>
 
-  <!-- ✅ Supabase BEFORE your page logic -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supa.js"></script>
-
-  <!-- ✅ Forecast logic moved to its own file -->
-  <script src="js/forecast.js"></script>
-
+<script src="js/forecast.js"></script>
 </body>
 </html>
