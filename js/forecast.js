@@ -284,7 +284,6 @@
     calculate();
   }
 
-  // Run when DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", wire);
   } else {
