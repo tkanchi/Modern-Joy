@@ -635,3 +635,155 @@ table, th, td{
   font-weight:800;
   line-height:1.6;
 }
+
+/* ================================
+   Forecast — Roles + Summary Polish
+   ================================ */
+
+.summaryGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+
+@media (max-width: 900px){
+  .summaryGrid{ grid-template-columns: 1fr; }
+}
+
+.summaryCard{
+  border:1px solid var(--border);
+  background: var(--bg-card);
+  border-radius:18px;
+  padding:12px;
+}
+
+.summaryTitle{
+  font-weight:900;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.miniTag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-weight:900;
+  font-size:12px;
+  background: rgba(11,87,208,.06);
+  color: var(--text-main);
+}
+
+.kvRow{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 0;
+  border-top:1px dashed rgba(0,0,0,.10);
+}
+:root[data-theme="dark"] .kvRow,
+body.dark-mode .kvRow{
+  border-top:1px dashed rgba(255,255,255,.14);
+}
+.kvRow:first-of-type{ border-top:none; }
+.kvLabel{ color:var(--text-muted); font-weight:900; }
+.kvVal{ font-weight:900; }
+
+.rolesHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+}
+
+.rolesMeta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.rolesContainer{
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+}
+
+.roleRow{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:12px;
+  background: var(--bg-card);
+}
+
+.roleRowTop{
+  display:grid;
+  grid-template-columns: 1fr 140px 140px auto;
+  gap:10px;
+  align-items:end;
+}
+
+@media (max-width: 900px){
+  .roleRowTop{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.iconBtn{
+  min-height:44px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background: var(--bg-card);
+  cursor:pointer;
+  font-weight:900;
+  transition: transform .15s ease, background .18s ease, border-color .18s ease;
+}
+.iconBtn:hover{
+  transform: translateY(-1px);
+  background: rgba(239,68,68,.06);
+  border-color: rgba(239,68,68,.30);
+}
+
+.tableMini{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:16px;
+  margin-top:10px;
+}
+
+.tableMini th,
+.tableMini td{
+  padding:10px 10px;
+  text-align:left;
+  font-weight:900;
+  font-size:13px;
+}
+
+.tableMini th{
+  color: var(--text-muted);
+  background: rgba(11,87,208,.06);
+  border-bottom:1px solid var(--border);
+}
+
+.tableMini td{
+  border-top:1px solid rgba(0,0,0,.06);
+}
+
+:root[data-theme="dark"] .tableMini td,
+body.dark-mode .tableMini td{
+  border-top:1px solid rgba(255,255,255,.10);
+}
+
+.tableRight{ text-align:right; }
+.mono{ font-variant-numeric: tabular-nums; }
