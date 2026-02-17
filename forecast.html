@@ -1,189 +1,156 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Scrummer — Role Based Forecast</title>
-<link rel="stylesheet" href="css/style.css"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Scrummer — Forecast</title>
+  <link rel="stylesheet" href="css/style.css?v=3"/>
 </head>
 
 <body>
-<div class="appShell">
+  <div class="appShell">
 
-  <!-- SIDEBAR -->
-  <aside class="sideNav">
-    <div class="sideBrand">
-      <div class="brandMark">🐆</div>
-      <div>
-        <div class="brandName">SCRUMMER</div>
-        <div class="brandTag">Gamified Scrum OS</div>
-      </div>
-    </div>
-
-    <nav class="nav">
-      <a class="navlink" href="index.html">🚀 Setup</a>
-      <a class="navlink active" href="forecast.html">📦 Forecast</a>
-    </nav>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-    <div class="sectionCard">
-
-      <h1 class="sectionTitle">Role-Based Capacity Forecast</h1>
-      <p class="sectionSub">
-        Focus Factor × Role Capacity × Weighted Leaves
-      </p>
-
-      <!-- Sprint Inputs -->
-      <div class="info-banner">
-        <div style="font-weight:900; margin-bottom:12px;">Sprint Setup</div>
-
-        <div style="display:grid; gap:10px;">
-          <input class="fun-input" id="sprintDays" type="number" placeholder="Total Sprint Days (e.g. 10)">
-          <input class="fun-input" id="focusFactor" type="number" step="0.01" placeholder="Focus Factor (e.g. 0.6)">
-          <input class="fun-input" id="spPerDay" type="number" step="0.1" value="4" placeholder="SP per Day">
-          <input class="fun-input" id="unavailabilityWeight" type="number" step="0.1" value="0.5" placeholder="Unavailability Weight (0-1)">
+    <!-- SIDEBAR -->
+    <aside class="sideNav">
+      <div class="sideBrand">
+        <div class="brandMark">🐆</div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
         </div>
       </div>
 
-      <!-- Roles Section -->
-      <div class="sectionCard" style="margin-top:18px;">
-        <div style="font-weight:900; margin-bottom:10px;">Team Roles</div>
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink active" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
-        <div id="rolesContainer"></div>
+        <hr>
 
-        <button class="btnPrimary" id="addRoleBtn" style="margin-top:12px;">
-          + Add Role
-        </button>
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
+
+      <!-- XP WIDGET -->
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div>
+            <div class="lvl" id="xpLevel">Level 1</div>
+            <div class="title" id="xpTitle">Rookie</div>
+          </div>
+          <div id="moodBadge">🐆 Calm</div>
+        </div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
       </div>
 
-      <!-- Results -->
-      <div class="info-banner" style="margin-top:18px;">
-        <div id="idealPerMemberResult"></div>
-        <div id="totalActualDays"></div>
-        <div id="totalActualSP"></div>
+      <button class="themeToggle" id="themeToggle" type="button">
+        Theme: <span id="themeMode">Light</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">Capacity Forecast (Role-Based)</h1>
+        <p class="sectionSub">Focus Factor × Team Roles × Weighted Leaves → Forecast Story Points</p>
+
+        <div class="info-banner">
+          <strong>Logic:</strong>
+          Ideal per member = Sprint Days × Focus Factor →
+          Role Ideal Days = Members × Ideal →
+          Role Actual Days = Role Ideal Days − (Leaves × Weight) →
+          Forecast SP = Actual Days × SP/day
+        </div>
+
+        <!-- INPUTS -->
+        <div style="margin-top:16px;">
+          <div class="kvKey">Sprint Inputs</div>
+
+          <div style="display:grid; gap:12px;">
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Total No. of Days in Sprint</div>
+              <input class="fun-input" id="sprintDays" type="number" min="0" step="0.5" placeholder="e.g., 10">
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Focus Factor (0–1)</div>
+              <input class="fun-input" id="focusFactor" type="number" min="0" max="1" step="0.01" value="0.60">
+              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+                Example: 0.60 means 60% of sprint time is productive for planned work.
+              </div>
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Story Points per Day (per member)</div>
+              <input class="fun-input" id="spPerDay" type="number" min="0" step="0.1" value="4">
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Unavailability Weight (0–1)</div>
+              <input class="fun-input" id="unavailabilityWeight" type="number" min="0" max="1" step="0.01" value="0.50">
+              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+                1 = 100% productivity loss • 0.5 = 50% loss • 0.6 = 60% loss
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROLES -->
+        <div style="margin-top:16px;">
+          <div class="kvKey">Team Roles</div>
+
+          <div class="info-banner">
+            <div style="font-weight:900;">Add roles + member count + leaves</div>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              Leaves are entered as <b>person-days</b> for that role.
+            </div>
+
+            <div id="rolesContainer" style="display:grid; gap:12px; margin-top:12px;"></div>
+
+            <div class="btnRow">
+              <button class="btnPrimary" id="addRoleBtn" type="button">+ Add Role</button>
+              <button class="btnGhost" id="resetBtn" type="button">Reset</button>
+              <button class="btnGhost" id="calcBtn" type="button">Calculate 📦</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT -->
+        <div style="margin-top:18px;">
+          <div class="kvKey">Results</div>
+
+          <div class="info-banner" id="warnBox" style="display:none; margin-bottom:12px;">
+            <div style="font-weight:900;">⚠ Check Inputs</div>
+            <div id="warnText" style="color:var(--text-muted); font-weight:800; margin-top:6px;"></div>
+          </div>
+
+          <div class="info-banner">
+            <div id="idealPerMemberResult">Ideal Capacity per Member: —</div>
+            <div id="totalActualDays">Total Actual Capacity (Days): —</div>
+            <div id="totalActualSP">Total Actual Capacity (Story Points): —</div>
+
+            <div id="formulaBox" style="margin-top:12px; color:var(--text-muted); font-weight:800; line-height:1.7;"></div>
+          </div>
+        </div>
+
       </div>
+    </main>
+  </div>
 
-    </div>
-  </main>
+  <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script>
 
-</div>
-
-<script>
-(() => {
-
-  const $ = (id) => document.getElementById(id);
-
-  function num(val, fallback = 0) {
-    const n = Number(val);
-    return Number.isFinite(n) ? n : fallback;
-  }
-
-  function round(n) {
-    return Math.round(n * 100) / 100;
-  }
-
-  let roleIndex = 0;
-
-  function addRoleRow(name = "", members = "", leaves = "") {
-
-    const container = $("rolesContainer");
-
-    const row = document.createElement("div");
-    row.className = "roleRow";
-    row.style.marginBottom = "14px";
-    row.style.padding = "12px";
-    row.style.border = "1px solid var(--border)";
-    row.style.borderRadius = "16px";
-
-    row.innerHTML = `
-      <div style="display:grid; gap:8px;">
-        <input class="fun-input roleName" placeholder="Role Name (e.g. Dev, QA)" value="${name}">
-        <input class="fun-input roleMembers" type="number" min="0" placeholder="Members" value="${members}">
-        <input class="fun-input roleLeaves" type="number" min="0" placeholder="Leaves (person-days)" value="${leaves}">
-        <button class="btnGhost removeRole">Remove Role</button>
-        <div class="roleResult" style="margin-top:8px; font-weight:800;"></div>
-      </div>
-    `;
-
-    container.appendChild(row);
-
-    row.querySelector(".removeRole").addEventListener("click", () => {
-      row.remove();
-      calculate();
-    });
-
-    row.querySelectorAll("input").forEach(input =>
-      input.addEventListener("input", calculate)
-    );
-  }
-
-  function calculate() {
-
-    const sprintDays = num($("sprintDays").value);
-    const focusFactor = num($("focusFactor").value);
-    const spPerDay = num($("spPerDay").value);
-    const weight = num($("unavailabilityWeight").value);
-
-    const idealPerMember = sprintDays * focusFactor;
-
-    let totalActualDays = 0;
-    let totalActualSP = 0;
-
-    const rows = document.querySelectorAll(".roleRow");
-
-    rows.forEach(row => {
-
-      const roleName = row.querySelector(".roleName").value || "Role";
-      const members = num(row.querySelector(".roleMembers").value);
-      const leaves = num(row.querySelector(".roleLeaves").value);
-
-      const totalIdealDays = members * idealPerMember;
-      const actualDays = totalIdealDays - (leaves * weight);
-      const actualSP = actualDays * spPerDay;
-
-      totalActualDays += actualDays;
-      totalActualSP += actualSP;
-
-      row.querySelector(".roleResult").innerHTML = `
-        <div><b>${roleName}</b></div>
-        Ideal Days: ${round(totalIdealDays)}<br>
-        Actual Days: ${round(actualDays)}<br>
-        Actual SP: ${round(actualSP)}
-      `;
-    });
-
-    $("idealPerMemberResult").textContent =
-      "Ideal Capacity per Member: " + round(idealPerMember) + " days";
-
-    $("totalActualDays").textContent =
-      "Total Actual Capacity (Days): " + round(totalActualDays);
-
-    $("totalActualSP").textContent =
-      "Total Actual Capacity (Story Points): " + round(totalActualSP);
-  }
-
-  function wire() {
-
-    $("addRoleBtn").addEventListener("click", () => addRoleRow());
-
-    ["sprintDays", "focusFactor", "spPerDay", "unavailabilityWeight"]
-      .forEach(id => {
-        $(id).addEventListener("input", calculate);
-      });
-
-    calculate();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", wire);
-  } else {
-    wire();
-  }
-
-})();
-</script>
-
+  <!-- ✅ Role-based forecast logic -->
+  <script src="js/forecast.js"></script>
 </body>
 </html>
