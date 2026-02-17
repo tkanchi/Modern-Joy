@@ -1,23 +1,23 @@
 /* =========================================================
-   Scrummer — forecast.js (FINAL + ROLES SAFE)
-   ONLY:
-   1) Velocity Forecast: avg of N, N-1, N-2
-   2) Capacity Forecast (your exact logic):
-      idealPerPersonDays = sprintDays * focusFactor
-      totalIdealDays = teamCount * idealPerPersonDays
-      totalActualDays = totalIdealDays - (leaves * weight)
-      forecastSP = totalActualDays * spPerDay
+   Scrummer — forecast.js (FINAL + ROLES + STORAGE + SUMMARY)
+   - Velocity mode: avg(N, N-1, N-2)
+   - Capacity mode (your exact logic):
+     idealPerPersonDays = sprintDays * focusFactor
+     totalIdealDays     = teamCount * idealPerPersonDays
+     totalActualDays    = totalIdealDays - (leaves * weight)
+     forecastSP         = totalActualDays * spPerDay
 
-   + Optional Roles:
-      - If roles exist, auto-calc:
-        teamCount = sum(roleMembers)
-        leaves    = sum(roleLeaves)
-      - Also show per-role ideal/actual days + SP
+   Roles (optional):
+   - If roles exist: teamCount = sum(members), leaves = sum(leaves)
+   - Show role breakdown in a table
+   - Persist roles in localStorage
    ========================================================= */
 
 (() => {
   const $ = (id) => document.getElementById(id);
   const round2 = (n) => Math.round(n * 100) / 100;
+
+  const LS_KEY = "scrummer_forecast_roles_v1";
 
   function show(el, yes){
     if(!el) return;
@@ -59,7 +59,36 @@
   }
 
   // ---------------------------
-  // Roles helpers (OPTIONAL)
+  // Roles: storage
+  // ---------------------------
+  function saveRoles(){
+    const rows = getRoleRows();
+    const roles = rows.map(r => ({
+      name: (r.querySelector(".roleName")?.value || "Role").trim(),
+      members: Number(r.querySelector(".roleMembers")?.value || 0) || 0,
+      leaves: Number(r.querySelector(".roleLeaves")?.value || 0) || 0,
+    }));
+    localStorage.setItem(LS_KEY, JSON.stringify(roles));
+  }
+
+  function loadRoles(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      if(!Array.isArray(arr)) return [];
+      return arr.map(x => ({
+        name: String(x?.name ?? "Role"),
+        members: Number(x?.members ?? 0) || 0,
+        leaves: Number(x?.leaves ?? 0) || 0,
+      }));
+    } catch {
+      return [];
+    }
+  }
+
+  // ---------------------------
+  // Roles: helpers
   // ---------------------------
   function getRoleRows(){
     const wrap = $("rolesContainer");
@@ -79,7 +108,14 @@
       if(l > 0) leaves += l;
     });
 
-    return { members, leaves, hasRoles: rows.length > 0 };
+    return { members, leaves, hasRoles: rows.length > 0, count: rows.length };
+  }
+
+  function updateRoleTags(){
+    const t = roleTotals();
+    setText("rolesCountTag", `Roles: ${t.count}`);
+    setText("rolesMembersTag", `Members: ${round2(t.members)}`);
+    setText("rolesLeavesTag", `Leaves: ${round2(t.leaves)}`);
   }
 
   function applyRolesAutofill(){
@@ -87,14 +123,12 @@
 
     const teamEl = $("teamCount");
     const leavesEl = $("leaves");
-
     const teamHint = $("teamCountHint");
     const leavesHint = $("leavesHint");
 
     if(!teamEl || !leavesEl) return t;
 
     if(t.hasRoles){
-      // lock these to role totals
       teamEl.value = t.members;
       leavesEl.value = round2(t.leaves);
 
@@ -114,57 +148,70 @@
     return t;
   }
 
-  function addRoleRow(name="Dev", members="", leaves=""){
-    const wrap = $("rolesContainer");
-    if(!wrap) return;
-
+  function makeRoleRow({name="Role", members="", leaves=""} = {}){
     const row = document.createElement("div");
     row.className = "roleRow";
-    row.style.border = "1px solid var(--border)";
-    row.style.borderRadius = "16px";
-    row.style.padding = "12px";
-    row.style.background = "var(--bg-card)";
 
     row.innerHTML = `
-      <div style="display:grid; gap:10px;">
-        <div style="display:grid; grid-template-columns:1fr 140px; gap:10px;">
-          <div>
-            <div style="font-weight:900; margin-bottom:6px;">Role</div>
-            <input class="fun-input roleName" placeholder="e.g., Dev / QA / BA" value="${name}">
-          </div>
-          <div>
-            <div style="font-weight:900; margin-bottom:6px;">Members</div>
-            <input class="fun-input roleMembers" type="number" min="0" step="1" placeholder="0" value="${members}">
-          </div>
+      <div class="roleRowTop">
+        <div>
+          <div style="font-weight:900; margin-bottom:6px;">Role</div>
+          <input class="fun-input roleName" placeholder="e.g., Dev / QA / BA" value="${escapeHtml(name)}">
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 140px; gap:10px; align-items:end;">
-          <div>
-            <div style="font-weight:900; margin-bottom:6px;">Leaves (person-days)</div>
-            <input class="fun-input roleLeaves" type="number" min="0" step="0.5" placeholder="0" value="${leaves}">
-          </div>
-          <button class="btnGhost removeRoleBtn" type="button">Remove</button>
+        <div>
+          <div style="font-weight:900; margin-bottom:6px;">Members</div>
+          <input class="fun-input roleMembers mono" type="number" min="0" step="1" placeholder="0" value="${members}">
         </div>
+
+        <div>
+          <div style="font-weight:900; margin-bottom:6px;">Leaves</div>
+          <input class="fun-input roleLeaves mono" type="number" min="0" step="0.5" placeholder="0" value="${leaves}">
+        </div>
+
+        <button class="iconBtn removeRoleBtn" type="button" title="Remove role">✖</button>
       </div>
     `;
 
-    wrap.appendChild(row);
-
     row.querySelector(".removeRoleBtn").addEventListener("click", () => {
       row.remove();
+      saveRoles();
       calculate();
     });
 
-    row.querySelectorAll("input").forEach(inp => inp.addEventListener("input", calculate));
+    row.querySelectorAll("input").forEach(inp => {
+      inp.addEventListener("input", () => {
+        saveRoles();
+        calculate();
+      });
+    });
 
+    return row;
+  }
+
+  function addRoleRow(role){
+    const wrap = $("rolesContainer");
+    if(!wrap) return;
+    wrap.appendChild(makeRoleRow(role));
+    saveRoles();
     calculate();
   }
 
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
   // ---------------------------
-  // Velocity calculation
+  // Velocity
   // ---------------------------
   function calcVelocity(){
     clearWarn();
+    show($("summaryGrid"), false);
 
     const n  = num("velN", 0);
     const n1 = num("velN1", 0);
@@ -190,12 +237,68 @@
   }
 
   // ---------------------------
-  // Capacity calculation (exact + roles)
+  // Capacity (exact + summaries)
   // ---------------------------
+  function renderTeamSummary({
+    sprintDays, focusFactor, teamCount, spPerDay, leaves, weight,
+    idealPerPersonDays, totalIdealDays, totalActualDays, forecastSP
+  }){
+    setHTML("teamSummary", `
+      <div class="kvRow"><div class="kvLabel">Ideal days/person</div><div class="kvVal mono">${round2(idealPerPersonDays)}</div></div>
+      <div class="kvRow"><div class="kvLabel">Total ideal days</div><div class="kvVal mono">${round2(totalIdealDays)}</div></div>
+      <div class="kvRow"><div class="kvLabel">Leaves × weight</div><div class="kvVal mono">${round2(leaves)} × ${round2(weight)} = ${round2(leaves * weight)}</div></div>
+      <div class="kvRow"><div class="kvLabel">Total actual days</div><div class="kvVal mono">${round2(totalActualDays)}</div></div>
+      <div class="kvRow"><div class="kvLabel">Forecast SP</div><div class="kvVal mono">${round2(forecastSP)}</div></div>
+    `);
+  }
+
+  function renderRoleSummary({ idealPerPersonDays, spPerDay, weight }){
+    const rows = getRoleRows();
+    if(!rows.length){
+      setHTML("roleSummary", `<div style="color:var(--text-muted); font-weight:800;">No roles added.</div>`);
+      return;
+    }
+
+    let body = "";
+    rows.forEach(r => {
+      const roleName = (r.querySelector(".roleName")?.value || "Role").trim() || "Role";
+      const m = Number(r.querySelector(".roleMembers")?.value || 0) || 0;
+      const l = Number(r.querySelector(".roleLeaves")?.value || 0) || 0;
+
+      const roleIdealDays = m * idealPerPersonDays;
+      const roleActualDays = roleIdealDays - (l * weight);
+      const roleSP = Math.max(0, roleActualDays) * spPerDay;
+
+      body += `
+        <tr>
+          <td>${escapeHtml(roleName)}</td>
+          <td class="tableRight mono">${round2(m)}</td>
+          <td class="tableRight mono">${round2(Math.max(0, roleActualDays))}</td>
+          <td class="tableRight mono">${round2(roleSP)}</td>
+        </tr>
+      `;
+    });
+
+    setHTML("roleSummary", `
+      <table class="tableMini">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th class="tableRight">Members</th>
+            <th class="tableRight">Actual Days</th>
+            <th class="tableRight">SP</th>
+          </tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>
+    `);
+  }
+
   function calcCapacity(){
     clearWarn();
 
-    // Apply roles autofill if roles exist
+    // roles may auto-fill totals
+    updateRoleTags();
     const roleMeta = applyRolesAutofill();
 
     const sprintDays   = num("sprintDays", 0);
@@ -213,49 +316,28 @@
     if(weightRaw < 0 || weightRaw > 1) return warn("Unavailability Weight must be between 0 and 1.");
     if(leaves < 0) return warn("Leaves cannot be negative.");
 
-    // ✅ Your exact steps
+    // ✅ EXACT logic
     const idealPerPersonDays = sprintDays * focusFactor;
     const totalIdealDays = teamCount * idealPerPersonDays;
     const totalActualDays = totalIdealDays - (leaves * weight);
+    const forecastSP = Math.max(0, totalActualDays) * spPerDay;
 
     if(totalActualDays < 0){
       warn("Total Actual Capacity (Days) became negative. Reduce Leaves, Weight, or increase Days/Team/Focus.");
     }
 
-    const totalIdealSP = totalIdealDays * spPerDay;
-    const forecastSP = Math.max(0, totalActualDays) * spPerDay;
-
-    // Per-role breakdown (only if roles exist)
-    let roleBreakdownHTML = "";
-    if(roleMeta.hasRoles){
-      const rows = getRoleRows();
-
-      roleBreakdownHTML = `
-        <div style="margin-top:14px; font-weight:900; color:var(--text-main);">Role Breakdown</div>
-      `;
-
-      rows.forEach((r) => {
-        const roleName = (r.querySelector(".roleName")?.value || "Role").trim() || "Role";
-        const m = Number(r.querySelector(".roleMembers")?.value || 0) || 0;
-        const l = Number(r.querySelector(".roleLeaves")?.value || 0) || 0;
-
-        const roleIdealDays = m * idealPerPersonDays;
-        const roleActualDays = roleIdealDays - (l * weight);
-        const roleSP = Math.max(0, roleActualDays) * spPerDay;
-
-        roleBreakdownHTML += `
-          <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);">
-            <div style="font-weight:900; color:var(--text-main);">${roleName}</div>
-            <div>Ideal Days = ${round2(m)} × ${round2(idealPerPersonDays)} = <b>${round2(roleIdealDays)}</b></div>
-            <div>Actual Days = ${round2(roleIdealDays)} − (${round2(l)} × ${round2(weight)}) = <b>${round2(roleActualDays)}</b></div>
-            <div>Actual SP = max(0, ${round2(roleActualDays)}) × ${round2(spPerDay)} = <b>${round2(roleSP)}</b></div>
-          </div>
-        `;
-      });
-    }
-
     setText("resultTitle", "🟢 Capacity Forecast (Focus + Leaves Weight)");
     setText("resultMain", `Forecast SP = ${round2(forecastSP)} SP`);
+
+    // Show side-by-side only in capacity mode
+    show($("summaryGrid"), true);
+
+    renderTeamSummary({
+      sprintDays, focusFactor, teamCount, spPerDay, leaves, weight,
+      idealPerPersonDays, totalIdealDays, totalActualDays, forecastSP
+    });
+
+    renderRoleSummary({ idealPerPersonDays, spPerDay, weight });
 
     setHTML("formulaBox", `
       <div style="font-weight:900; color:var(--text-main); margin-bottom:6px;">Formulas (Exactly as requested)</div>
@@ -268,20 +350,18 @@
       <div>Total Ideal Days = Team Count × Ideal</div>
       <div>= ${round2(teamCount)} × ${round2(idealPerPersonDays)} = <b>${round2(totalIdealDays)}</b></div>
 
-      <div style="margin-top:10px;"><b>3) Total Ideal Capacity (SP)</b></div>
-      <div>Total Ideal SP = Total Ideal Days × SP/day</div>
-      <div>= ${round2(totalIdealDays)} × ${round2(spPerDay)} = <b>${round2(totalIdealSP)}</b></div>
-
-      <div style="margin-top:10px;"><b>4) Total Actual Capacity (Days)</b></div>
+      <div style="margin-top:10px;"><b>3) Total Actual Capacity (Days)</b></div>
       <div>Total Actual Days = Total Ideal Days − (Leaves × Weight)</div>
       <div>= ${round2(totalIdealDays)} − (${round2(leaves)} × ${round2(weight)})</div>
       <div>= ${round2(totalIdealDays)} − ${round2(leaves * weight)} = <b>${round2(totalActualDays)}</b></div>
 
-      <div style="margin-top:10px;"><b>5) Total Actual Capacity (SP)</b></div>
-      <div>Forecast SP = Total Actual Days × SP/day</div>
+      <div style="margin-top:10px;"><b>4) Total Actual Capacity (SP)</b></div>
+      <div>Forecast SP = max(0, Total Actual Days) × SP/day</div>
       <div>= ${round2(Math.max(0, totalActualDays))} × ${round2(spPerDay)} = <b>${round2(forecastSP)}</b></div>
 
-      ${roleBreakdownHTML}
+      ${roleMeta.hasRoles ? `<div style="margin-top:10px; color:var(--text-muted);">
+        Role totals auto-fill Team Count & Leaves from Roles.
+      </div>` : ``}
     `);
   }
 
@@ -295,15 +375,17 @@
     // Clear inputs
     document.querySelectorAll("input.fun-input").forEach(i => i.value = "");
 
-    // Remove roles
+    // Clear roles + storage
     const wrap = $("rolesContainer");
     if(wrap) wrap.innerHTML = "";
+    localStorage.removeItem(LS_KEY);
 
-    // sensible defaults
+    // Defaults
     if($("focusFactor")) $("focusFactor").value = "0.60";
     if($("spPerDay")) $("spPerDay").value = "4";
     if($("weight")) $("weight").value = "0.50";
 
+    updateRoleTags();
     calculate();
   }
 
@@ -312,7 +394,7 @@
     $("calcBtn")?.addEventListener("click", calculate);
     $("resetBtn")?.addEventListener("click", reset);
 
-    $("addRoleBtn")?.addEventListener("click", () => addRoleRow("Role", "", ""));
+    $("addRoleBtn")?.addEventListener("click", () => addRoleRow({ name:"Role", members:"", leaves:"" }));
 
     // Live recalculation on input changes
     [
@@ -320,7 +402,14 @@
       "sprintDays","focusFactor","teamCount","spPerDay","leaves","weight"
     ].forEach(id => $(id)?.addEventListener("input", calculate));
 
-    // start clean
+    // Restore roles from storage
+    const stored = loadRoles();
+    if(stored.length){
+      stored.forEach(r => addRoleRow(r));
+    } else {
+      updateRoleTags();
+    }
+
     calculate();
   }
 
