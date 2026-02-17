@@ -61,32 +61,75 @@
     <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
-        <h1 class="sectionTitle">Capacity Forecast (Role-Based)</h1>
-        <p class="sectionSub">Focus Factor × Team Roles × Weighted Leaves → Forecast Story Points</p>
+        <h1 class="sectionTitle">Sprint Forecast</h1>
+        <p class="sectionSub">Only 2 modes: Velocity Average or Capacity (Focus + Leaves Weight).</p>
 
         <div class="info-banner">
-          <strong>Logic:</strong>
-          Ideal per member = Sprint Days × Focus Factor →
-          Role Ideal Days = Members × Ideal →
-          Role Actual Days = Role Ideal Days − (Leaves × Weight) →
-          Forecast SP = Actual Days × SP/day
+          <strong>Goal:</strong> Get a clean, explainable forecast in Story Points.
         </div>
 
-        <!-- INPUTS -->
+        <!-- MODE SELECT -->
         <div style="margin-top:16px;">
-          <div class="kvKey">Sprint Inputs</div>
+          <div class="kvKey">Forecast Mode</div>
+          <select class="fun-input" id="forecastMode">
+            <option value="velocity">🔵 Velocity-Based (Avg of last 3)</option>
+            <option value="capacity" selected>🟢 Capacity-Based (Focus + Leaves Weight)</option>
+          </select>
+        </div>
 
-          <div style="display:grid; gap:12px;">
+        <!-- ============================= -->
+        <!-- VELOCITY MODE -->
+        <!-- ============================= -->
+        <div id="velocityBox" class="info-banner" style="margin-top:14px; display:none;">
+          <div style="font-weight:900;">🔵 Velocity-Based Forecast</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+            Average Velocity = (Sprint N + Sprint N-1 + Sprint N-2) / 3
+          </div>
+
+          <div style="display:grid; gap:10px; margin-top:12px;">
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Sprint N</div>
+              <input class="fun-input" id="velN" type="number" min="0" step="1" placeholder="e.g., 40">
+            </div>
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Sprint N-1</div>
+              <input class="fun-input" id="velN1" type="number" min="0" step="1" placeholder="e.g., 38">
+            </div>
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Sprint N-2</div>
+              <input class="fun-input" id="velN2" type="number" min="0" step="1" placeholder="e.g., 42">
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- CAPACITY MODE -->
+        <!-- ============================= -->
+        <div id="capacityBox" class="info-banner" style="margin-top:14px;">
+          <div style="font-weight:900;">🟢 Capacity-Based Forecast (Your Exact Logic)</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px; line-height:1.6;">
+            Ideal Capacity (Days per person) = Sprint Days × Focus Factor<br>
+            Total Ideal Capacity (Days) = Team Members × Ideal Capacity (Days per person)<br>
+            Total Actual Capacity (Days) = Total Ideal Capacity (Days) − (Leaves × Weight)<br>
+            Forecast SP = Total Actual Capacity (Days) × SP/day
+          </div>
+
+          <div style="display:grid; gap:10px; margin-top:12px;">
             <div>
               <div style="font-weight:900; margin-bottom:6px;">Total No. of Days in Sprint</div>
               <input class="fun-input" id="sprintDays" type="number" min="0" step="0.5" placeholder="e.g., 10">
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Focus Factor (0–1)</div>
+              <div style="font-weight:900; margin-bottom:6px;">Focus Factor (0 - 1)</div>
               <input class="fun-input" id="focusFactor" type="number" min="0" max="1" step="0.01" value="0.60">
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                Example: 0.60 means 60% of sprint time is productive for planned work.
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Total Team Count</div>
+              <input class="fun-input" id="teamCount" type="number" min="0" step="1" placeholder="e.g., 14">
+              <div id="teamCountHint" style="display:none; color:var(--text-muted); font-weight:800; margin-top:6px;">
+                Team Count is auto-calculated from Roles below.
               </div>
             </div>
 
@@ -96,36 +139,46 @@
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Unavailability Weight (0–1)</div>
-              <input class="fun-input" id="unavailabilityWeight" type="number" min="0" max="1" step="0.01" value="0.50">
+              <div style="font-weight:900; margin-bottom:6px;">Total No. of Leaves (single field)</div>
+              <input class="fun-input" id="leaves" type="number" min="0" step="0.5" placeholder="e.g., 10">
+              <div id="leavesHint" style="display:none; color:var(--text-muted); font-weight:800; margin-top:6px;">
+                Leaves are auto-calculated from Roles below.
+              </div>
+            </div>
+
+            <div>
+              <div style="font-weight:900; margin-bottom:6px;">Unavailability Weight (0 - 1)</div>
+              <input class="fun-input" id="weight" type="number" min="0" max="1" step="0.01" value="0.50">
               <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-                1 = 100% productivity loss • 0.5 = 50% loss • 0.6 = 60% loss
+                1 = 100% loss, 0.5 = 50% loss, 0.6 = 60% loss
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- ROLES -->
-        <div style="margin-top:16px;">
-          <div class="kvKey">Team Roles</div>
-
-          <div class="info-banner">
-            <div style="font-weight:900;">Add roles + member count + leaves</div>
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-              Leaves are entered as <b>person-days</b> for that role.
+          <!-- ✅ Roles Extension (Optional) -->
+          <div class="info-banner" style="margin-top:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <div style="font-weight:900;">Roles (optional)</div>
+              <button class="btnGhost" id="addRoleBtn" type="button">+ Add Role</button>
             </div>
 
-            <div id="rolesContainer" style="display:grid; gap:12px; margin-top:12px;"></div>
-
-            <div class="btnRow">
-              <button class="btnPrimary" id="addRoleBtn" type="button">+ Add Role</button>
-              <button class="btnGhost" id="resetBtn" type="button">Reset</button>
-              <button class="btnGhost" id="calcBtn" type="button">Calculate 📦</button>
+            <div style="color:var(--text-muted); font-weight:800; margin-top:6px; line-height:1.6;">
+              If you add roles, Scrummer will calculate:
+              <b>capacity per role</b> + totals, and auto-fill Team Count + Leaves above.
             </div>
+
+            <div id="rolesContainer" style="display:grid; gap:10px; margin-top:12px;"></div>
           </div>
+
         </div>
 
-        <!-- OUTPUT -->
+        <!-- BUTTONS -->
+        <div class="btnRow" style="margin-top:12px;">
+          <button class="btnPrimary" id="calcBtn" type="button">Calculate 📦</button>
+          <button class="btnGhost" id="resetBtn" type="button">Reset</button>
+        </div>
+
+        <!-- RESULTS -->
         <div style="margin-top:18px;">
           <div class="kvKey">Results</div>
 
@@ -134,12 +187,13 @@
             <div id="warnText" style="color:var(--text-muted); font-weight:800; margin-top:6px;"></div>
           </div>
 
-          <div class="info-banner">
-            <div id="idealPerMemberResult">Ideal Capacity per Member: —</div>
-            <div id="totalActualDays">Total Actual Capacity (Days): —</div>
-            <div id="totalActualSP">Total Actual Capacity (Story Points): —</div>
+          <div class="info-banner" id="resultsBox">
+            <div id="resultTitle" style="font-weight:900;">—</div>
+            <div id="resultMain" style="margin-top:8px;">—</div>
 
-            <div id="formulaBox" style="margin-top:12px; color:var(--text-muted); font-weight:800; line-height:1.7;"></div>
+            <hr style="margin:12px 0; opacity:.2;">
+
+            <div id="formulaBox" style="color:var(--text-muted); font-weight:800; line-height:1.7;"></div>
           </div>
         </div>
 
@@ -150,7 +204,7 @@
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
 
-  <!-- ✅ Role-based forecast logic -->
+  <!-- ✅ Forecast logic -->
   <script src="js/forecast.js"></script>
 </body>
 </html>
