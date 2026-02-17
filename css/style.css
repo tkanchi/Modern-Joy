@@ -608,3 +608,30 @@ h1,h2,h3,h4,h5{
 table, th, td{
   font-family: var(--font-ui);
 }
+
+/* --- Forecast: role rows --- */
+.roleRow{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  background: var(--bg-card);
+}
+
+.roleGrid{
+  display:grid;
+  gap:10px;
+}
+
+.roleActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.roleResult{
+  margin-top:10px;
+  color: var(--text-muted);
+  font-weight:800;
+  line-height:1.6;
+}
