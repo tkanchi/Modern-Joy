@@ -4,10 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Copilot</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-page="copilot">
   <div class="appShell">
     <aside class="sideNav">
       <div class="sideBrand">
@@ -66,8 +70,8 @@
 
         <!-- Dynamic mode banner -->
         <div class="info-banner" id="modeBanner" style="margin-top:12px; display:none;">
-          <div style="font-weight:900;" id="modeTitle">—</div>
-          <div id="modeBody" class="modeBody">—</div>
+          <div class="kvKey" id="modeTitle">—</div>
+          <div id="modeBody" class="modeBody" style="color:var(--text-muted); font-weight:450; margin-top:6px; line-height:1.7;">—</div>
         </div>
 
         <!-- Ceremony buttons -->
@@ -81,29 +85,31 @@
 
         <!-- Prompt panel -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
-          <div id="panelBody" class="panelBody">Your prompts will appear here.</div>
+          <div class="kvKey" style="font-size:16px;" id="panelTitle">Choose a ceremony</div>
+          <div id="panelBody" class="panelBody" style="color:var(--text-muted); font-weight:450; margin-top:6px; line-height:1.7;">
+            Your prompts will appear here.
+          </div>
         </div>
 
         <!-- Notes -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">Capture decisions</div>
-          <div class="mutedText" style="margin-top:6px;">
+          <div class="kvKey">Capture decisions</div>
+          <div class="mutedText" style="margin-top:6px; color:var(--text-muted); font-weight:450;">
             Saved locally in your browser. (Later we can sync this to cloud too.)
           </div>
 
           <textarea class="fun-input" id="decisionNotes" rows="5" placeholder="Decisions / risks / owners..."></textarea>
 
-          <div class="btnRow">
+          <div class="btnRow" style="margin-top:10px;">
             <button class="btnPrimary" id="saveBtn" type="button">Save</button>
             <button class="btnGhost" id="clearBtn" type="button">Reset</button>
           </div>
 
-          <div style="margin-top:10px; font-weight:900;" id="saveStatus"></div>
-          <div class="mutedText" style="margin-top:6px;" id="saveHint"></div>
+          <div style="margin-top:10px; font-weight:650;" id="saveStatus"></div>
+          <div class="mutedText" style="margin-top:6px; color:var(--text-muted); font-weight:450;" id="saveHint"></div>
         </div>
 
-        <div class="btnRow">
+        <div class="btnRow" style="margin-top:12px;">
           <a class="btnGhost" href="suggestions.html">← Back to Actions</a>
           <a class="btnGhost" href="index.html">Back to Setup</a>
         </div>
@@ -485,12 +491,7 @@
     })();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supa.js"></script>
-
-  <footer>
-  <a href="about.html">About</a> |
-  <a href="feedback.html">Feedback</a>
-</footer>
+  <!-- NOTE: Supabase removed from this page to avoid duplicate loads.
+       Keep Supabase only where you need auth/cloud (auth.html + pages that actually sync). -->
 </body>
 </html>
