@@ -6,8 +6,6 @@
   <title>Scrummer — Actions</title>
 
   <link rel="stylesheet" href="css/style.css?v=3"/>
-
-  <!-- Unified Font (keep this on every page) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -22,7 +20,6 @@
         </div>
       </div>
 
-      <!-- Nav Bar (linear order) -->
       <nav class="nav">
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
@@ -31,7 +28,6 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
         <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-
         <hr>
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
@@ -44,11 +40,7 @@
           </div>
           <div id="moodBadge">🐆 Calm</div>
         </div>
-
-        <div class="xpBar">
-          <div class="xpFill" id="xpFill"></div>
-        </div>
-
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
         <div class="xpMeta">
           <span id="xpText">0 / 300 XP</span>
           <span id="streakText">🧊 streak reset</span>
@@ -66,23 +58,25 @@
         <p class="sectionSub">Battle plan to reduce risk and boost confidence.</p>
 
         <div class="info-banner">
-          <strong>Works offline:</strong> Actions generate even if <b>metrics.js</b> isn’t available.
+          <strong>Note:</strong> Actions are generated from Setup inputs + your latest snapshot.
         </div>
 
         <div id="actionsWrap" style="display:grid; gap:12px; margin-top:10px;"></div>
 
-        <!-- ✅ FLOW FOOTER (consistent with Setup/Insights/Health) -->
-        <div class="btnRow" style="margin-top:14px;">
-          <a class="btnGhost" href="health.html">← Back: Health</a>
-          <button class="btnPrimary" id="refreshBtn" type="button">Refresh Actions</button>
-          <a class="btnGhost" href="workspace.html">Next: Copilot →</a>
+        <div class="stageIndicator">Flow: Setup → Insights → 🛡️ Health → Actions</div>
+        <div class="stageFooter">
+          <div class="left">
+            <a class="btnStage btnStage-back" href="health.html">← Back: 🛡️ Health</a>
+          </div>
+          <div class="right">
+            <button class="btnStage btnStage-action" id="refreshBtn" type="button">Refresh Actions</button>
+            <a class="btnStage btnStage-next" href="workspace.html">Next: Copilot →</a>
+          </div>
         </div>
-
       </div>
     </main>
   </div>
 
-  <!-- Keep these (local signals + UI) -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
@@ -92,11 +86,7 @@
       const STORAGE_KEY = "scrummer_setup_v1";
       const wrap = document.getElementById("actionsWrap");
 
-      function loadSetupUnified() {
-        const api = window.Scrummer && window.Scrummer.setup;
-        if (api && typeof api.loadSetup === "function") {
-          try { return api.loadSetup() || {}; } catch {}
-        }
+      function loadSetup() {
         try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
         catch { return {}; }
       }
@@ -136,18 +126,12 @@
         return { riskScore:risk, confidence, capacitySP, overcommitRatio, vol };
       }
 
-      // allow actions with at least 1 velocity
       function hasMinimumSetup(setup) {
         const sprintDaysOK = Number(setup.sprintDays) > 0;
         const teamOK = Number(setup.teamMembers) > 0;
         const committedOK = setup.committedSP !== undefined && setup.committedSP !== null && setup.committedSP !== "";
-
-        const v1 = Number(setup.v1) || 0;
-        const v2 = Number(setup.v2) || 0;
-        const v3 = Number(setup.v3) || 0;
-        const velCount = [v1, v2, v3].filter(x => x > 0).length;
-
-        return sprintDaysOK && teamOK && committedOK && velCount >= 1;
+        const vCount = [Number(setup.v1)||0, Number(setup.v2)||0, Number(setup.v3)||0].filter(x => x > 0).length;
+        return sprintDaysOK && teamOK && committedOK && vCount >= 1;
       }
 
       function card(title, why, how, tier) {
@@ -156,18 +140,18 @@
         el.innerHTML = `
           <div class="kvKey" style="font-size:16px;">${tier} ${title}</div>
 
-          <div style="margin-top:10px; font-weight:600;">Why</div>
-          <div style="color:var(--text-muted); font-weight:450; margin-top:4px; white-space:pre-line; line-height:1.7;">${why}</div>
+          <div style="margin-top:10px; font-weight:650;">Why</div>
+          <div class="mutedText" style="margin-top:4px; white-space:pre-line; line-height:1.7;">${why}</div>
 
-          <div style="margin-top:12px; font-weight:600;">How</div>
-          <div style="color:var(--text-muted); font-weight:450; margin-top:4px; white-space:pre-line; line-height:1.7;">${how}</div>
+          <div style="margin-top:12px; font-weight:650;">How</div>
+          <div class="mutedText" style="margin-top:4px; white-space:pre-line; line-height:1.7;">${how}</div>
         `;
         return el;
       }
 
       function render() {
         wrap.innerHTML = "";
-        const setup = loadSetupUnified();
+        const setup = loadSetup();
 
         const compute = window.Scrummer && window.Scrummer.computeSignals;
         let s = null;
@@ -179,8 +163,8 @@
         if (!hasMinimumSetup(setup)) {
           wrap.appendChild(card(
             "Setup first",
-            "I can’t generate strong actions without your sprint inputs.",
-            "Go to 🚀 Setup → enter sprint days, team members, committed SP, and at least 1 past velocity.\nThen click Save ✅.",
+            "Actions depend on sprint days, team size, committed SP, and at least 1 past velocity.",
+            "Go to 🚀 Setup → fill inputs → Save Setup.\nThen open Insights → Refresh + Save Snapshot.\nCome back here and Refresh Actions.",
             "⚠️"
           ));
           return;
@@ -197,8 +181,8 @@
           const pct = Math.round((over - 1) * 100);
           wrap.appendChild(card(
             "De-scope or renegotiate commitment",
-            `You’re overcommitted by ~${pct}%. This is the #1 spillover trigger.`,
-            `Move 10–20% scope into Stretch.\nSplit the biggest story into must-have vs nice-to-have.\nLock scope daily (no silent creep).`,
+            `Commitment is above capacity by ~${pct}%. This is the #1 spillover driver.`,
+            `Move 10–20% scope into Stretch.\nSplit the biggest story into must-have vs nice-to-have.\nMake scope changes explicit (no silent creep).`,
             "⭐ P0"
           ));
         }
@@ -207,7 +191,7 @@
           wrap.appendChild(card(
             "Fix capacity mismatch",
             `Committed (${committed}) is above capacity (~${Math.round(cap)}).`,
-            `Confirm leave + interrupts.\nReserve buffer lane for support.\nReduce scope until committed ≤ capacity.`,
+            `Reconfirm leave + interrupts.\nReserve a buffer lane for support.\nReduce scope until committed ≤ capacity.`,
             "⭐ P0"
           ));
         }
@@ -215,7 +199,7 @@
         if (vol >= 0.30) {
           wrap.appendChild(card(
             "Reduce volatility (slice smaller)",
-            `Recent delivery is volatile. Forecasting becomes unreliable.`,
+            `Recent delivery is volatile. Predictability will suffer.`,
             `Slice stories into 1–2 day pieces.\nFinish-first rule.\nLimit WIP (start less, finish more).`,
             "🏅 P1"
           ));
@@ -224,7 +208,7 @@
         if (conf < 60) {
           wrap.appendChild(card(
             "Add a mid-sprint checkpoint",
-            `Confidence is below 60%. You need an early reality check.`,
+            `Confidence is below 60%. Run an early reality check.`,
             `Day-3 checkpoint:\n- If behind → de-scope fast\n- If on track → pull stretch carefully`,
             "🏅 P1"
           ));
@@ -233,7 +217,7 @@
         if (!wrap.children.length) {
           const tier = risk >= 70 ? "🔴" : risk >= 40 ? "🟡" : "🟢";
           wrap.appendChild(card(
-            "Maintain flow (keep the streak alive)",
+            "Maintain flow",
             `Signals look stable.\nCurrent risk tier: ${tier}`,
             `Protect focus time.\nKeep WIP low.\nReview scope changes daily.\nCelebrate wins in Review.`,
             "🎮 P2"
