@@ -32,15 +32,13 @@
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
 
-      <!-- ✅ XP WIDGET (no inline styles on mood badge) -->
+      <!-- ✅ XP WIDGET -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
             <div class="lvl" id="xpLevel">Level 1</div>
             <div class="title" id="xpTitle">Rookie</div>
           </div>
-
-          <!-- 🐆 Mood -->
           <div id="moodBadge">🐆 Calm</div>
         </div>
 
@@ -68,6 +66,12 @@
           <strong>Pro move:</strong> Use Copilot in Daily Scrum to keep your streak alive. 🏆
         </div>
 
+        <!-- ✅ Dynamic mode banner -->
+        <div class="info-banner" id="modeBanner" style="margin-top:12px; display:none;">
+          <div style="font-weight:900;" id="modeTitle">—</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="modeBody">—</div>
+        </div>
+
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
           <button class="btnGhost" type="button" data-cer="planning">🗺️ Planning</button>
           <button class="btnGhost" type="button" data-cer="daily">🧩 Daily</button>
@@ -78,7 +82,9 @@
 
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="panelBody">
+
+          <!-- ✅ richer prompt block -->
+          <div style="color:var(--text-muted); font-weight:800; margin-top:8px; white-space:pre-line; line-height:1.7;" id="panelBody">
             Your prompts will appear here.
           </div>
         </div>
@@ -86,15 +92,19 @@
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900;">Capture decisions</div>
           <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-            Save key outcomes so your next sprint gets smarter.
+            Saved locally in your browser. If cloud sync is enabled, it can be extended later.
           </div>
 
-          <textarea class="fun-input" id="decisionNotes" rows="4" placeholder="Decisions / risks / owners..."></textarea>
+          <textarea class="fun-input" id="decisionNotes" rows="5" placeholder="Decisions / risks / owners..."></textarea>
 
           <div class="btnRow">
             <button class="btnPrimary" id="saveBtn" type="button">Save</button>
             <button class="btnGhost" id="clearBtn" type="button">Reset</button>
           </div>
+
+          <!-- ✅ save status -->
+          <div style="margin-top:10px; font-weight:900;" id="saveStatus"></div>
+          <div style="margin-top:6px; color:var(--text-muted); font-weight:800;" id="saveHint"></div>
         </div>
 
         <div class="btnRow">
@@ -110,37 +120,380 @@
 
   <script>
     (function () {
-      const title = document.getElementById("panelTitle");
-      const body = document.getElementById("panelBody");
-      const notes = document.getElementById("decisionNotes");
+      const STORAGE_KEY = "scrummer_setup_v1";
+      const NOTES_KEY = "scrummer_copilot_notes_v1";
 
-      const prompts = {
-        planning: { title:"🗺️ Sprint Planning", body:"1) Sprint Goal?\n2) Top 3 risks?\n3) What goes to Stretch?\n4) Dependencies?" },
-        daily:    { title:"🧩 Daily Scrum",      body:"1) On track?\n2) Blockers?\n3) Scope creep?\n4) Who needs help?" },
-        refine:   { title:"🧠 Refinement",       body:"1) Stories small?\n2) AC clear?\n3) Dependencies?\n4) Riskiest story?" },
-        review:   { title:"🎬 Sprint Review",    body:"1) Value shipped?\n2) Feedback?\n3) Next adjustments?\n4) Follow-ups?" },
-        retro:    { title:"♻️ Retro",            body:"1) Went well?\n2) Slowed us?\n3) 1 improvement (owner+date)\n4) Protect focus?" }
-      };
+      const $ = (id) => document.getElementById(id);
+
+      const panelTitle = $("panelTitle");
+      const panelBody  = $("panelBody");
+      const notes      = $("decisionNotes");
+
+      const modeBanner = $("modeBanner");
+      const modeTitle  = $("modeTitle");
+      const modeBody   = $("modeBody");
+
+      const saveStatus = $("saveStatus");
+      const saveHint   = $("saveHint");
+
+      function safeParse(str, fallback){
+        try { return JSON.parse(str); } catch { return fallback; }
+      }
+
+      function loadSetup(){
+        return safeParse(localStorage.getItem(STORAGE_KEY) || "{}", {});
+      }
+
+      function num(v){
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      // ---------- Risk compute (offline fallback) ----------
+      function computeRisk(setup){
+        const sprintDays  = num(setup.sprintDays);
+        const teamMembers = num(setup.teamMembers);
+        const leaveDays   = num(setup.leaveDays);
+        const committedSP = num(setup.committedSP);
+
+        const v1 = num(setup.v1);
+        const v2 = num(setup.v2);
+        const v3 = num(setup.v3);
+
+        const velocities = [v1,v2,v3].filter(x => x > 0);
+        const avgVel = velocities.length
+          ? velocities.reduce((a,b)=>a+b,0) / velocities.length
+          : 0;
+
+        const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
+        const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays));
+
+        const capacitySP = avgVel * (1 - leaveRatio);
+        const over = capacitySP > 0 ? committedSP / capacitySP : 0;
+
+        let risk = 0;
+        if (committedSP <= 0 || avgVel <= 0) risk += 30;
+        if (over > 1) risk += Math.min(50, (over - 1) * 120);
+
+        return Math.max(0, Math.min(100, Math.round(risk)));
+      }
+
+      function modeFromRisk(risk){
+        if (risk >= 70) return "rescue";
+        if (risk >= 40) return "watch";
+        return "stable";
+      }
+
+      function recommendCeremony(mode){
+        if (mode === "rescue") return "daily";
+        if (mode === "watch") return "planning";
+        return "refine";
+      }
+
+      function renderMode(mode, risk){
+        modeBanner.style.display = "block";
+
+        if (mode === "rescue") {
+          modeTitle.textContent = `🔴 Copilot Mode: Rescue (Risk ${risk}/100)`;
+          modeBody.textContent =
+            "This sprint looks fragile. Copilot will push de-scope, daily control, and fast escalation.\nSuggested ceremony now: 🧩 Daily Scrum.";
+          return;
+        }
+
+        if (mode === "watch") {
+          modeTitle.textContent = `🟡 Copilot Mode: Watchlist (Risk ${risk}/100)`;
+          modeBody.textContent =
+            "This sprint is tight. Copilot will focus on commitment discipline, early checkpoints, and risk ownership.\nSuggested ceremony now: 🗺️ Planning.";
+          return;
+        }
+
+        modeTitle.textContent = `🟢 Copilot Mode: Stable (Risk ${risk}/100)`;
+        modeBody.textContent =
+          "Signals look stable. Copilot will optimize flow, reduce WIP, and help you push learning.\nSuggested ceremony now: 🧠 Refinement.";
+      }
+
+      // ---------- Dynamic prompts ----------
+      function getPrompts(ceremony, mode){
+        const P = {
+          planning: {
+            stable:
+`🎯 Sprint Planning (Stable)
+1) Sprint Goal (outcome, not a list):
+   - What user/business value are we shipping?
+
+2) Commitment check:
+   - Which 3 items are must-have?
+   - What becomes stretch?
+
+3) Flow plan:
+   - Who pairs on the riskiest story?
+   - What gets done first to unblock others?
+
+4) Guardrails:
+   - How will we prevent scope creep?
+   - What is our “stop doing” list?`,
+
+            watch:
+`⚠️ Sprint Planning (Watchlist)
+1) Reality check:
+   - What is the forecast capacity vs committed SP?
+   - Which item can be dropped with least pain?
+
+2) Risk ownership:
+   - Top 3 risks + named owners
+   - Dependency list + escalation path
+
+3) Checkpoint:
+   - Day-3 checkpoint rule:
+     If behind → de-scope immediately.
+
+4) WIP discipline:
+   - What WIP limit will we follow?`,
+
+            rescue:
+`🚨 Sprint Planning (Rescue)
+1) Reduce scope NOW:
+   - Cut 10–20% immediately.
+   - Lock ONLY the sprint goal.
+
+2) Freeze churn:
+   - No new work unless goal is safe.
+   - Force finish-first rule.
+
+3) Escalations:
+   - What needs leadership/support today?
+   - Who will escalate by when?
+
+4) Daily control:
+   - Mandatory daily checkpoint owner.`
+          },
+
+          daily: {
+            stable:
+`🟢 Daily Scrum (Stable)
+1) Are we on track for sprint goal?
+2) Any blocked item > 24h?
+3) WIP check:
+   - Are we starting too much?
+4) Team help:
+   - Who needs pairing/support today?`,
+
+            watch:
+`🟡 Daily Scrum (Watchlist)
+1) Plan vs actual:
+   - Are we behind today?
+
+2) Risk check:
+   - Which story is most likely to spill?
+
+3) Interruption control:
+   - What unplanned work entered yesterday?
+
+4) Decision:
+   - What do we de-scope if we slip again tomorrow?`,
+
+            rescue:
+`🔴 Daily Scrum (Rescue)
+1) Goal survival:
+   - Is sprint goal still achievable?
+
+2) Cut list:
+   - What can we drop TODAY?
+
+3) Ownership:
+   - Who takes the top blocker now?
+
+4) Escalation:
+   - What needs escalation before noon?`
+          },
+
+          refine: {
+            stable:
+`🧠 Refinement (Stable)
+1) Slice stories smaller (1–2 day chunks)
+2) Acceptance criteria clarity check
+3) Dependencies: identify + remove early
+4) Define “ready” checklist for next sprint`,
+
+            watch:
+`🧠 Refinement (Watchlist)
+1) Kill ambiguity:
+   - Missing AC? Add now.
+
+2) Identify risk story:
+   - Spike or split?
+
+3) Reduce volatility:
+   - Slice large stories.
+   - Remove 16/32 bombs if possible.`,
+
+            rescue:
+`🧠 Refinement (Rescue)
+1) Stop big stories entering sprint
+2) Split anything > 2–3 days
+3) Remove dependencies before planning
+4) Default to safest scope`
+          },
+
+          review: {
+            stable:
+`🎬 Sprint Review (Stable)
+1) Value shipped: what changed for users?
+2) Feedback: what should we adjust next?
+3) Scope lessons: what surprised us?
+4) Follow-ups: capture owners + deadlines`,
+
+            watch:
+`🎬 Sprint Review (Watchlist)
+1) What didn’t ship and why?
+2) Was commitment too high?
+3) Where did we lose time (interruptions)?
+4) One change for predictability next sprint`,
+
+            rescue:
+`🎬 Sprint Review (Rescue)
+1) Root causes: why did we slip?
+2) What must change immediately?
+3) What do we STOP doing next sprint?
+4) Escalation items + owners`
+          },
+
+          retro: {
+            stable:
+`♻️ Retro (Stable)
+1) What increased throughput?
+2) What reduced stress?
+3) One improvement to protect flow
+4) One experiment for next sprint`,
+
+            watch:
+`♻️ Retro (Watchlist)
+1) Where did volatility come from?
+2) Which risks were missed early?
+3) One process guardrail to add
+4) Owner + date for improvement`,
+
+            rescue:
+`♻️ Retro (Rescue)
+1) System failure: where did process break?
+2) Biggest constraint (WIP? interruptions? deps?)
+3) One non-negotiable rule next sprint
+4) What do we stop immediately?`
+          }
+        };
+
+        const group = P[ceremony];
+        if (!group) return "Choose a ceremony.";
+        return group[mode] || group.stable;
+      }
+
+      // ---------- Ceremony click ----------
+      function onCeremony(key){
+        const setup = loadSetup();
+
+        // If you already have computeSignals from metrics.js, use it if present
+        let risk = null;
+        const compute = window.Scrummer && window.Scrummer.computeSignals;
+        if (typeof compute === "function") {
+          try {
+            const s = compute(setup || {});
+            if (s && s.riskScore !== undefined) risk = Number(s.riskScore);
+          } catch {}
+        }
+        if (!Number.isFinite(risk)) risk = computeRisk(setup);
+
+        const mode = modeFromRisk(risk);
+        renderMode(mode, risk);
+
+        const titles = {
+          planning: "🗺️ Sprint Planning",
+          daily: "🧩 Daily Scrum",
+          refine: "🧠 Refinement",
+          review: "🎬 Sprint Review",
+          retro: "♻️ Retro"
+        };
+
+        panelTitle.textContent = titles[key] || "Ceremony";
+        panelBody.textContent = getPrompts(key, mode);
+      }
 
       document.querySelectorAll("[data-cer]").forEach(btn => {
         btn.addEventListener("click", () => {
-          const key = btn.getAttribute("data-cer");
-          title.textContent = prompts[key].title;
-          body.textContent = prompts[key].body;
+          onCeremony(btn.getAttribute("data-cer"));
         });
       });
 
-      document.getElementById("saveBtn").addEventListener("click", () => {
-        localStorage.setItem("scrummer_copilot_notes", notes.value || "");
-        alert("Saved ✅");
+      // ---------- Save decisions ----------
+      function nowStamp(){
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2,"0");
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+
+      function loadNotes(){
+        const obj = safeParse(localStorage.getItem(NOTES_KEY) || "{}", {});
+        return {
+          text: obj.text || "",
+          updatedAt: obj.updatedAt || ""
+        };
+      }
+
+      function saveNotes(text){
+        localStorage.setItem(NOTES_KEY, JSON.stringify({
+          text: text || "",
+          updatedAt: nowStamp()
+        }));
+      }
+
+      function renderSaveStatus(){
+        const n = loadNotes();
+        if (!n.text) {
+          saveStatus.textContent = "🟡 Nothing saved yet";
+          saveHint.textContent = `Saved locally in this browser (key: ${NOTES_KEY}).`;
+          return;
+        }
+        saveStatus.textContent = `✅ Saved locally`;
+        saveHint.textContent = `Last saved: ${n.updatedAt} • Stored in localStorage (key: ${NOTES_KEY}).`;
+      }
+
+      $("saveBtn").addEventListener("click", () => {
+        saveNotes(notes.value || "");
+        renderSaveStatus();
+        alert("Saved locally ✅");
       });
 
-      document.getElementById("clearBtn").addEventListener("click", () => {
+      $("clearBtn").addEventListener("click", () => {
         notes.value = "";
-        localStorage.removeItem("scrummer_copilot_notes");
+        localStorage.removeItem(NOTES_KEY);
+        renderSaveStatus();
       });
 
-      notes.value = localStorage.getItem("scrummer_copilot_notes") || "";
+      // Init
+      const existing = loadNotes();
+      notes.value = existing.text || "";
+      renderSaveStatus();
+
+      // Auto render mode once (suggest ceremony)
+      (function bootMode(){
+        const setup = loadSetup();
+        let risk = null;
+        const compute = window.Scrummer && window.Scrummer.computeSignals;
+        if (typeof compute === "function") {
+          try {
+            const s = compute(setup || {});
+            if (s && s.riskScore !== undefined) risk = Number(s.riskScore);
+          } catch {}
+        }
+        if (!Number.isFinite(risk)) risk = computeRisk(setup);
+
+        const mode = modeFromRisk(risk);
+        renderMode(mode, risk);
+
+        const rec = recommendCeremony(mode);
+        // Optional: preselect recommended ceremony if you want it auto-filled:
+        // onCeremony(rec);
+      })();
+
     })();
   </script>
 
