@@ -67,31 +67,28 @@
         <!-- Dynamic mode banner -->
         <div class="info-banner" id="modeBanner" style="margin-top:12px; display:none;">
           <div style="font-weight:900;" id="modeTitle">—</div>
-          <div style="color:var(--text-muted); font-weight:600; margin-top:6px; white-space:pre-line; line-height:1.7;" id="modeBody">—</div>
+          <div id="modeBody" class="modeBody">—</div>
         </div>
 
         <!-- Ceremony buttons -->
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;" id="ceremonyRow">
-          <button class="btnGhost" type="button" data-cer="planning">🗺️ Planning</button>
-          <button class="btnGhost" type="button" data-cer="daily">🧩 Daily</button>
-          <button class="btnGhost" type="button" data-cer="refine">🧠 Refinement</button>
-          <button class="btnGhost" type="button" data-cer="review">🎬 Review</button>
-          <button class="btnGhost" type="button" data-cer="retro">♻️ Retro</button>
+        <div class="ceremonyRow" id="ceremonyRow">
+          <button class="btnGhost cerBtn" type="button" data-cer="planning">🗺️ Planning</button>
+          <button class="btnGhost cerBtn" type="button" data-cer="daily">🧩 Daily</button>
+          <button class="btnGhost cerBtn" type="button" data-cer="refine">🧠 Refinement</button>
+          <button class="btnGhost cerBtn" type="button" data-cer="review">🎬 Review</button>
+          <button class="btnGhost cerBtn" type="button" data-cer="retro">♻️ Retro</button>
         </div>
 
         <!-- Prompt panel -->
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
-          <!-- NOTE: weight controlled by CSS (#panelBody) so only headings/labels in <b> are bold -->
-          <div id="panelBody" style="margin-top:8px;">
-            Your prompts will appear here.
-          </div>
+          <div id="panelBody" class="panelBody">Your prompts will appear here.</div>
         </div>
 
         <!-- Notes -->
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900;">Capture decisions</div>
-          <div style="color:var(--text-muted); font-weight:600; margin-top:6px;">
+          <div class="mutedText" style="margin-top:6px;">
             Saved locally in your browser. (Later we can sync this to cloud too.)
           </div>
 
@@ -103,7 +100,7 @@
           </div>
 
           <div style="margin-top:10px; font-weight:900;" id="saveStatus"></div>
-          <div style="margin-top:6px; color:var(--text-muted); font-weight:600;" id="saveHint"></div>
+          <div class="mutedText" style="margin-top:6px;" id="saveHint"></div>
         </div>
 
         <div class="btnRow">
@@ -120,7 +117,7 @@
   <script>
     (function () {
       const STORAGE_KEY = "scrummer_setup_v1";
-      const NOTES_KEY = "scrummer_copilot_notes_v1";
+      const NOTES_KEY   = "scrummer_copilot_notes_v1";
 
       const $ = (id) => document.getElementById(id);
 
@@ -136,6 +133,7 @@
       const saveHint   = $("saveHint");
 
       let recommendedKey = null;
+      let activeKey = null;
 
       function safeParse(str, fallback){
         try { return JSON.parse(str); } catch { return fallback; }
@@ -150,7 +148,6 @@
         return Number.isFinite(n) ? n : 0;
       }
 
-      // ---------- Risk compute (offline fallback) ----------
       function computeRisk(setup){
         const sprintDays  = num(setup.sprintDays);
         const teamMembers = num(setup.teamMembers);
@@ -194,26 +191,23 @@
       function renderMode(mode, risk){
         modeBanner.style.display = "block";
 
-        if (mode === "rescue") {
-          modeTitle.textContent = `🔴 Copilot Mode: Rescue (Risk ${risk}/100)`;
-          modeBody.textContent =
-            "This sprint looks fragile.\nCopilot will push de-scope, daily control, and fast escalation.\n⭐ Suggested ceremony: 🧩 Daily Scrum";
-          return;
-        }
+        const map = {
+          rescue: { icon:"🔴", label:"Rescue", msg:"This sprint looks fragile. Copilot will push de-scope, daily control, and fast escalation." },
+          watch:  { icon:"🟡", label:"Watchlist", msg:"This sprint is tight. Copilot will focus on commitment discipline + early checkpoints." },
+          stable: { icon:"🟢", label:"Stable", msg:"Signals look stable. Copilot will optimize flow + reduce WIP." }
+        };
 
-        if (mode === "watch") {
-          modeTitle.textContent = `🟡 Copilot Mode: Watchlist (Risk ${risk}/100)`;
-          modeBody.textContent =
-            "This sprint is tight.\nCopilot will focus on commitment discipline + early checkpoints.\n⭐ Suggested ceremony: 🗺️ Planning";
-          return;
-        }
+        const recLabel = (recommendedKey === "daily") ? "🧩 Daily" :
+                         (recommendedKey === "planning") ? "🗺️ Planning" :
+                         (recommendedKey === "refine") ? "🧠 Refinement" :
+                         (recommendedKey === "review") ? "🎬 Review" :
+                         (recommendedKey === "retro") ? "♻️ Retro" : "—";
 
-        modeTitle.textContent = `🟢 Copilot Mode: Stable (Risk ${risk}/100)`;
-        modeBody.textContent =
-          "Signals look stable.\nCopilot will optimize flow + reduce WIP.\n⭐ Suggested ceremony: 🧠 Refinement";
+        const m = map[mode] || map.stable;
+        modeTitle.innerHTML = `${m.icon} Copilot Mode: ${m.label} (Risk ${risk}/100) <span class="recBadge">⭐ Recommended: ${recLabel}</span>`;
+        modeBody.textContent = m.msg;
       }
 
-      // ---------- Prompts as HTML ----------
       function getPromptsHTML(ceremony, mode){
         const P = {
           planning: {
@@ -245,13 +239,12 @@
               </ul>
             `
           },
-
           daily: {
             stable: `
               <div><b>🟢 Daily Scrum (Stable)</b></div>
               <ul>
                 <li><b>On track?</b> Are we progressing toward the sprint goal?</li>
-                <li><b>Blockers:</b> Any blocked item > 24h?</li>
+                <li><b>Blockers:</b> Any blocked item &gt; 24h?</li>
                 <li><b>WIP check:</b> Are we starting too much vs finishing?</li>
                 <li><b>Help:</b> Who needs pairing/support today?</li>
               </ul>
@@ -275,7 +268,6 @@
               </ul>
             `
           },
-
           refine: {
             stable: `
               <div><b>🧠 Refinement (Stable)</b></div>
@@ -297,13 +289,12 @@
             rescue: `
               <div><b>🧠 Refinement (Rescue)</b></div>
               <ul>
-                <li><b>No big stories:</b> Stop anything > 2–3 days entering sprint.</li>
+                <li><b>No big stories:</b> Stop anything &gt; 2–3 days entering sprint.</li>
                 <li><b>De-risk:</b> Remove dependencies before planning.</li>
                 <li><b>Safest scope:</b> Default to minimum viable sprint goal.</li>
               </ul>
             `
           },
-
           review: {
             stable: `
               <div><b>🎬 Sprint Review (Stable)</b></div>
@@ -333,7 +324,6 @@
               </ul>
             `
           },
-
           retro: {
             stable: `
               <div><b>♻️ Retro (Stable)</b></div>
@@ -370,44 +360,24 @@
         return group[mode] || group.stable;
       }
 
-      // ---------- Button visuals: recommended + selected ----------
-      function clearVisualStates(){
-        document.querySelectorAll("[data-cer]").forEach(btn => {
-          btn.style.background = "";
-          btn.style.borderColor = "";
-          btn.style.boxShadow = "";
-          btn.style.color = "";
+      function setButtonStates(){
+        document.querySelectorAll(".cerBtn").forEach(btn => {
+          const key = btn.getAttribute("data-cer");
+          btn.classList.toggle("is-active", key === activeKey);
+          btn.classList.toggle("is-rec", key === recommendedKey);
 
-          const badge = btn.querySelector(".recBadge");
-          if (badge) badge.remove();
+          const existing = btn.querySelector(".recBadge");
+          if (existing) existing.remove();
+
+          if (key === recommendedKey) {
+            const b = document.createElement("span");
+            b.className = "recBadge";
+            b.textContent = "⭐ Recommended";
+            btn.appendChild(b);
+          }
         });
       }
 
-      function applyRecommendedBadge(key){
-        recommendedKey = key;
-        document.querySelectorAll("[data-cer]").forEach(btn => {
-          if (btn.getAttribute("data-cer") !== key) return;
-
-          const b = document.createElement("span");
-          b.className = "recBadge";
-          b.textContent = "⭐ Recommended";
-          btn.appendChild(b);
-        });
-      }
-
-      function setActiveButton(key){
-        document.querySelectorAll("[data-cer]").forEach(btn => {
-          const isActive = btn.getAttribute("data-cer") === key;
-          if (!isActive) return;
-
-          btn.style.background = "rgba(11,87,208,.10)";
-          btn.style.borderColor = "rgba(11,87,208,.30)";
-          btn.style.boxShadow = "0 10px 24px rgba(11,87,208,.10)";
-          btn.style.color = "var(--text-main)";
-        });
-      }
-
-      // ---------- Ceremony click ----------
       function onCeremony(key){
         const setup = loadSetup();
 
@@ -422,6 +392,8 @@
         if (!Number.isFinite(risk)) risk = computeRisk(setup);
 
         const mode = modeFromRisk(risk);
+
+        activeKey = key;
         renderMode(mode, risk);
 
         const titles = {
@@ -433,18 +405,12 @@
         };
 
         panelTitle.textContent = titles[key] || "Ceremony";
-        panelBody.innerHTML = getPromptsHTML(key, mode);   /* HTML enables bold headings/labels only */
+        panelBody.innerHTML = getPromptsHTML(key, mode);
 
-        clearVisualStates();
-        if (recommendedKey) applyRecommendedBadge(recommendedKey);
-        setActiveButton(key);
+        setButtonStates();
       }
 
-      document.querySelectorAll("[data-cer]").forEach(btn => {
-        btn.addEventListener("click", () => onCeremony(btn.getAttribute("data-cer")));
-      });
-
-      // ---------- Save decisions ----------
+      // Notes save
       function nowStamp(){
         const d = new Date();
         const pad = (n) => String(n).padStart(2,"0");
@@ -467,11 +433,11 @@
         const n = loadNotes();
         if (!n.text) {
           saveStatus.textContent = "🟡 Nothing saved yet";
-          saveHint.textContent = `Saved locally in this browser (localStorage key: ${NOTES_KEY}).`;
+          saveHint.textContent = `Saved locally (localStorage key: ${NOTES_KEY}).`;
           return;
         }
         saveStatus.textContent = `✅ Saved locally`;
-        saveHint.textContent = `Last saved: ${n.updatedAt} • Stored in localStorage (key: ${NOTES_KEY}).`;
+        saveHint.textContent = `Last saved: ${n.updatedAt} • localStorage key: ${NOTES_KEY}`;
       }
 
       $("saveBtn").addEventListener("click", () => {
@@ -485,12 +451,17 @@
         renderSaveStatus();
       });
 
+      // Bind ceremony buttons
+      document.querySelectorAll(".cerBtn").forEach(btn => {
+        btn.addEventListener("click", () => onCeremony(btn.getAttribute("data-cer")));
+      });
+
       // Init notes
       const existing = loadNotes();
       notes.value = existing.text || "";
       renderSaveStatus();
 
-      // Auto render mode + auto-open recommended ceremony
+      // Boot mode + auto-open recommended
       (function bootMode(){
         const setup = loadSetup();
 
@@ -505,15 +476,10 @@
         if (!Number.isFinite(risk)) risk = computeRisk(setup);
 
         const mode = modeFromRisk(risk);
-        renderMode(mode, risk);
+        recommendedKey = recommendCeremony(mode);
+        setButtonStates();
 
-        const rec = recommendCeremony(mode);
-        recommendedKey = rec;
-
-        clearVisualStates();
-        applyRecommendedBadge(rec);
-
-        onCeremony(rec);
+        onCeremony(recommendedKey);
       })();
 
     })();
