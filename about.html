@@ -7,110 +7,101 @@
 
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Handwritten Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
+  <!-- Handwritten (warm) accent font -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      background: #f6f4ef; /* warm paper background */
-      margin: 0;
-    }
-
-    .notepad {
-      max-width: 720px;
-      margin: 60px auto;
-      padding: 50px 45px;
-      background: #fffdf8;
-      border-radius: 18px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-
-    .aboutTitle {
+    /* Playful premium: handwriting only where it counts */
+    .aboutTitle,
+    .aboutSignature{
       font-family: 'Dancing Script', cursive;
-      font-size: 44px;
-      margin-bottom: 24px;
     }
 
-    .aboutContent {
-      font-family: 'Dancing Script', cursive;
-      font-size: 22px;
-      line-height: 1.9;
-      letter-spacing: 0.4px;
+    .aboutTitle{
+      font-size: 46px;
+      line-height: 1.1;
+      margin: 0 0 18px;
+      letter-spacing: .2px;
     }
 
-    .aboutContent ul {
-      margin-top: 10px;
-      margin-bottom: 20px;
-      padding-left: 20px;
+    .aboutBody{
+      font-size: 16px;          /* readable */
+      line-height: 1.75;
+      color: var(--text-main);  /* not grey */
+      font-weight: 450;
     }
 
-    .aboutSignature {
-      margin-top: 30px;
-      font-size: 26px;
+    .aboutBody .muted{
+      color: var(--text-muted);
     }
 
-    .topActions {
-      display: flex;
+    .aboutSignature{
+      margin-top: 22px;
+      font-size: 28px;
+    }
+
+    /* Make list feel like “notes” */
+    .aboutBody ul{
+      margin: 10px 0 14px;
+      padding-left: 18px;
+    }
+    .aboutBody li{
+      margin: 8px 0;
+    }
+
+    /* Tiny “paper pin” vibe (optional) */
+    .aboutChipRow{
+      display:flex;
       gap: 10px;
-      margin-bottom: 30px;
-    }
-
-    @media (max-width: 768px) {
-      .notepad {
-        margin: 30px 16px;
-        padding: 35px 25px;
-      }
+      flex-wrap:wrap;
+      margin-bottom: 14px;
     }
   </style>
 </head>
 
-<body>
-
+<body class="aboutPaper">
   <div class="notepad">
 
-    <div class="topActions">
+    <div class="aboutChipRow">
       <button class="btnGhost" type="button" onclick="history.back()">← Back</button>
       <a class="btnGhost" href="index.html">🏠 Home</a>
+      <a class="btnGhost" href="feedback.html">💌 Feedback</a>
     </div>
 
     <h1 class="aboutTitle">About Scrummer</h1>
 
-    <div class="aboutContent">
-
-      <p>
-        Scrummer was created to help Scrum Masters and delivery teams
-        interpret sprint metrics more intelligently.
+    <div class="aboutBody">
+      <p class="muted" style="margin-top:0;">
+        A small tool with a big intention: help teams explain sprint reality with context — not blame.
       </p>
 
       <p>
-        After years of working in Agile environments, I observed a recurring pattern:
-        metrics were often used without context, leading to confusion, pressure,
-        and sometimes misplaced blame.
+        Scrummer was created to help Scrum Masters and delivery teams interpret sprint metrics more intelligently.
+      </p>
+
+      <p>
+        After years of working in Agile environments, I noticed a recurring pattern:
+        metrics were often discussed without the “why” behind them — which can create confusion, pressure,
+        and sometimes misplaced blame on individuals.
       </p>
 
       <p>Scrummer aims to change that by:</p>
 
       <ul>
-        <li>Providing realistic forecasting support</li>
-        <li>Highlighting risk early</li>
-        <li>Explaining metric trends clearly</li>
-        <li>Encouraging system-level thinking instead of individual blame</li>
+        <li>Making forecasting more realistic and explainable</li>
+        <li>Highlighting risk early (before it becomes a “surprise”)</li>
+        <li>Helping you explain trends in plain language</li>
+        <li>Encouraging system-level thinking over individual blame</li>
       </ul>
 
       <p>
-        Built with practical Agile experience and a strong focus on clarity,
-        Scrummer is evolving into an intelligent sprint interpretation tool
-        for teams of all sizes.
+        Scrummer is evolving into a lightweight, practical sprint interpretation tool — for Scrum Masters,
+        teams, and leaders who want clarity without heavy process overhead.
       </p>
 
-      <div class="aboutSignature">
-        — Tulasi
-      </div>
-
+      <div class="aboutSignature">— Tulasi</div>
     </div>
 
   </div>
-
 </body>
 </html>
