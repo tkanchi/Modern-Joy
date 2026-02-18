@@ -7,7 +7,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 /* =========================================================
-   SCRUMMER — GAMIFIED SIDEBAR UI (Modern-Joy)
+   Tokens
    ========================================================= */
 
 :root{
@@ -24,9 +24,7 @@
 
   --accent:#0b57d0;
 
-  /* ✅ stronger borders so they don't blend */
   --border:rgba(0,0,0,.12);
-
   --shadow:0 20px 50px rgba(0,0,0,.06);
 
   --r-xl:28px;
@@ -42,9 +40,7 @@ body.dark-mode{
   --text-muted:#94a3b8;
   --text-light:#64748b;
 
-  /* ✅ stronger borders for dark too */
   --border:rgba(255,255,255,.18);
-
   --shadow:0 20px 50px rgba(0,0,0,.25);
 }
 
@@ -65,14 +61,20 @@ body{
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ---------- App Shell ---------- */
+/* =========================================================
+   App Shell
+   ========================================================= */
+
 .appShell{
   min-height:100vh;
   display:grid;
   grid-template-columns: 280px 1fr;
 }
 
-/* ---------- Sidebar ---------- */
+/* =========================================================
+   Sidebar
+   ========================================================= */
+
 .sideNav{
   padding:16px;
   border-right:1px solid var(--border);
@@ -98,10 +100,9 @@ body{
   font-size:20px;
 }
 
-/* ✅ Arcade brand */
 .brandName{
   font-family: var(--font-display);
-  font-weight: 400;                 /* Bungee is single-weight */
+  font-weight: 400; /* Bungee single weight */
   text-transform: uppercase;
   letter-spacing:.12em;
   font-size:13px;
@@ -123,7 +124,6 @@ body{
   margin-top:6px;
 }
 
-/* ✅ Divider inside sidebar nav (for separating Account/Auth) */
 .nav hr{
   width:100%;
   border:none;
@@ -162,11 +162,6 @@ body{
   box-shadow: 0 10px 24px rgba(11,87,208,.10);
 }
 
-.sideActions{
-  margin-top:14px;
-  padding:10px;
-}
-
 .themeToggle{
   width:100%;
   border:1px solid var(--border);
@@ -181,7 +176,10 @@ body{
 }
 .themeToggle:hover{ transform: translateY(-1px); }
 
-/* ---------- Main ---------- */
+/* =========================================================
+   Main + Card
+   ========================================================= */
+
 .main{
   padding:16px 18px 22px;
 }
@@ -192,6 +190,24 @@ body{
   border-radius:var(--r-xl);
   box-shadow:var(--shadow);
   padding:16px;
+
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.sectionCard:hover{
+  transform: translateY(-2px);
+  border-color: rgba(11,87,208,.18);
+  box-shadow: 0 26px 70px rgba(0,0,0,.08);
+}
+
+:root[data-theme="dark"] .sectionCard:hover,
+body.dark-mode .sectionCard:hover{
+  border-color: rgba(11,87,208,.28);
+  box-shadow: 0 26px 70px rgba(0,0,0,.35);
+}
+
+@media (hover: none){
+  .sectionCard:hover{ transform:none; }
 }
 
 .sectionTitle{
@@ -199,7 +215,7 @@ body{
   font-family: var(--font-display);
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: .04em; /* tighter than brand */
+  letter-spacing: .04em;
   font-size:22px;
   line-height:1.1;
 }
@@ -212,33 +228,32 @@ body{
 }
 
 /* =========================================================
-   Step 2: Softer, Premium Info Banners
+   Info Banner
    ========================================================= */
 
 .info-banner{
   border-radius:18px;
   padding:14px 16px;
-
   background: var(--bg-card);
   border: 1px solid var(--border);
-
   color: var(--text-main);
   font-family: var(--font-ui);
   transition: background .18s ease, border-color .18s ease;
 }
 
-/* Subtle hover polish (desktop only) */
 .info-banner:hover{
   border-color: rgba(11,87,208,.25);
 }
 
-/* Dark mode refinement */
 :root[data-theme="dark"] .info-banner,
 body.dark-mode .info-banner{
   background: rgba(255,255,255,.02);
 }
 
-/* Inputs */
+/* =========================================================
+   Inputs
+   ========================================================= */
+
 .fun-input{
   width:100%;
   border-radius:16px;
@@ -259,7 +274,9 @@ body.dark-mode .info-banner{
 :root[data-theme="dark"] .fun-input,
 body.dark-mode .fun-input{ background:#0f172a; }
 
-/* ---------- Buttons (Final Unified System) ---------- */
+/* =========================================================
+   Buttons (Unified System)
+   ========================================================= */
 
 .btnRow{
   display:flex;
@@ -268,7 +285,6 @@ body.dark-mode .fun-input{ background:#0f172a; }
   margin-top:12px;
 }
 
-/* Base button style for both <button> and <a> */
 .btnPrimary,
 .btnGhost{
   display:inline-flex;
@@ -295,7 +311,6 @@ body.dark-mode .fun-input{ background:#0f172a; }
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
 }
 
-/* Normalize button defaults across browsers */
 button.btnPrimary,
 button.btnGhost{
   appearance:none;
@@ -303,56 +318,47 @@ button.btnGhost{
   background-clip:padding-box;
 }
 
-/* PRIMARY */
 .btnPrimary{
   background: var(--accent);
   color:#fff;
   border:1px solid var(--accent);
   box-shadow: 0 6px 16px rgba(11,87,208,.18);
 }
-
 .btnPrimary:hover{
   transform: translateY(-1px);
   box-shadow: 0 10px 22px rgba(11,87,208,.22);
 }
-
 .btnPrimary:active{
   transform: translateY(0px);
   box-shadow: 0 4px 10px rgba(11,87,208,.18);
 }
 
-/* GHOST */
 .btnGhost{
   background: var(--bg-card);
   color: var(--text-main);
   border:1px solid var(--border);
 }
-
 .btnGhost:hover{
   transform: translateY(-1px);
   background: rgba(11,87,208,.06);
   border-color: rgba(11,87,208,.30);
 }
-
 :root[data-theme="dark"] .btnGhost:hover,
 body.dark-mode .btnGhost:hover{
   background: rgba(11,87,208,.10);
 }
 
-/* Focus ring */
 .btnPrimary:focus-visible,
 .btnGhost:focus-visible{
   outline:3px solid rgba(11,87,208,.25);
   outline-offset:2px;
 }
 
-/* Prevent weird stretching inside btnRow */
 .btnRow .btnPrimary,
 .btnRow .btnGhost{
   white-space:nowrap;
 }
 
-/* Optional: make all rows feel same width on mobile */
 @media (max-width: 520px){
   .btnRow .btnPrimary,
   .btnRow .btnGhost{
@@ -360,7 +366,10 @@ body.dark-mode .btnGhost:hover{
   }
 }
 
-/* Simple grid blocks */
+/* =========================================================
+   Small Key Title
+   ========================================================= */
+
 .kv{ display:grid; grid-template-columns:1fr; gap:10px; }
 .kvKey{
   color:var(--text-muted);
@@ -372,7 +381,10 @@ body.dark-mode .btnGhost:hover{
   text-transform: uppercase;
 }
 
-/* Mobile */
+/* =========================================================
+   Mobile Layout
+   ========================================================= */
+
 @media (max-width: 900px){
   .appShell{ grid-template-columns:1fr; }
   .sideNav{
@@ -384,7 +396,10 @@ body.dark-mode .btnGhost:hover{
   }
 }
 
-/* ---------- XP Widget (Gamified) ---------- */
+/* =========================================================
+   XP Widget
+   ========================================================= */
+
 .xpWidget{
   margin-top:14px;
   padding:12px 12px;
@@ -401,9 +416,7 @@ body.dark-mode .btnGhost:hover{
   gap:10px;
 }
 
-.xpTop .lvl{
-  font-weight:900;
-}
+.xpTop .lvl{ font-weight:900; }
 
 .xpTop .title{
   color:var(--text-muted);
@@ -422,109 +435,12 @@ body.dark-mode .btnGhost:hover{
 }
 
 .xpFill{
+  position: relative;
   height:100%;
   width:0%;
   border-radius:999px;
   background: var(--accent);
   transition: width .35s ease;
-}
-
-.xpMeta{
-  margin-top:10px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  color:var(--text-muted);
-  font-weight:900;
-  font-size:12px;
-}
-
-:root[data-theme="dark"] .xpWidget,
-body.dark-mode .xpWidget{
-  background: rgba(11,87,208,.10);
-}
-
-/* =========================================================
-   Step 1: Premium card hover lift
-   ========================================================= */
-
-.sectionCard{
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-
-.sectionCard:hover{
-  transform: translateY(-2px);
-  border-color: rgba(11,87,208,.18);
-  box-shadow: 0 26px 70px rgba(0,0,0,.08);
-}
-
-:root[data-theme="dark"] .sectionCard:hover,
-body.dark-mode .sectionCard:hover{
-  border-color: rgba(11,87,208,.28);
-  box-shadow: 0 26px 70px rgba(0,0,0,.35);
-}
-
-/* Mobile: disable hover lift (prevents odd tap feel) */
-@media (hover: none){
-  .sectionCard:hover{ transform:none; }
-}
-
-/* =========================================================
-   Step 3: Mood badge styling (Calm / Alert / Sprinting)
-   ========================================================= */
-
-#moodBadge{
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  font-weight:900;
-  font-size:12px;
-  line-height:1;
-  white-space:nowrap;
-  font-family: var(--font-ui);
-}
-
-/* Calm = green tint */
-#moodBadge.mood-calm{
-  background: rgba(16,185,129,.10);
-  border-color: rgba(16,185,129,.28);
-  color: rgba(16,185,129,1);
-}
-
-/* Alert = amber tint */
-#moodBadge.mood-alert{
-  background: rgba(245,158,11,.12);
-  border-color: rgba(245,158,11,.30);
-  color: rgba(245,158,11,1);
-}
-
-/* Sprinting = red tint */
-#moodBadge.mood-sprinting{
-  background: rgba(239,68,68,.12);
-  border-color: rgba(239,68,68,.32);
-  color: rgba(239,68,68,1);
-}
-
-/* Dark mode: slightly stronger fill */
-:root[data-theme="dark"] #moodBadge.mood-calm,
-body.dark-mode #moodBadge.mood-calm{
-  background: rgba(16,185,129,.16);
-}
-:root[data-theme="dark"] #moodBadge.mood-alert,
-body.dark-mode #moodBadge.mood-alert{
-  background: rgba(245,158,11,.18);
-}
-:root[data-theme="dark"] #moodBadge.mood-sprinting,
-body.dark-mode #moodBadge.mood-sprinting{
-  background: rgba(239,68,68,.18);
-}
-
-/* =========================================================
-   Step 4: XP bar animation + pulse
-   ========================================================= */
-
-.xpFill{
-  position: relative;
   will-change: width;
 }
 
@@ -547,7 +463,6 @@ body.dark-mode #moodBadge.mood-sprinting{
 .xpWidget.xp-bump{
   animation: xpBump .35s ease;
 }
-
 .xpWidget.xp-bump .xpFill::after{
   animation: xpShine .6s ease;
   opacity:1;
@@ -558,35 +473,89 @@ body.dark-mode #moodBadge.mood-sprinting{
   50%{ transform: translateY(-1px); }
   100%{ transform: translateY(0); }
 }
-
 @keyframes xpShine{
   0%{ transform: translateX(-40%); opacity:0; }
   30%{ opacity:1; }
   100%{ transform: translateX(140%); opacity:0; }
 }
 
-/* respect reduced motion */
 @media (prefers-reduced-motion: reduce){
   .xpWidget.xp-bump{ animation:none; }
   .xpWidget.xp-bump .xpFill::after{ animation:none; }
 }
 
+.xpMeta{
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  color:var(--text-muted);
+  font-weight:900;
+  font-size:12px;
+}
+
+:root[data-theme="dark"] .xpWidget,
+body.dark-mode .xpWidget{
+  background: rgba(11,87,208,.10);
+}
+
 /* =========================================================
-   Remove mobile tap highlight + ugly focus rectangles
+   Mood Badge
    ========================================================= */
 
-/* Kill the Android/Chrome tap highlight */
+#moodBadge{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-weight:900;
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+  font-family: var(--font-ui);
+}
+
+/* Calm */
+#moodBadge.mood-calm{
+  background: rgba(16,185,129,.10);
+  border-color: rgba(16,185,129,.28);
+  color: rgba(16,185,129,1);
+}
+
+/* Alert */
+#moodBadge.mood-alert{
+  background: rgba(245,158,11,.12);
+  border-color: rgba(245,158,11,.30);
+  color: rgba(245,158,11,1);
+}
+
+/* Sprinting */
+#moodBadge.mood-sprinting{
+  background: rgba(239,68,68,.12);
+  border-color: rgba(239,68,68,.32);
+  color: rgba(239,68,68,1);
+}
+
+/* Dark mode stronger fill */
+:root[data-theme="dark"] #moodBadge.mood-calm,
+body.dark-mode #moodBadge.mood-calm{ background: rgba(16,185,129,.16); }
+
+:root[data-theme="dark"] #moodBadge.mood-alert,
+body.dark-mode #moodBadge.mood-alert{ background: rgba(245,158,11,.18); }
+
+:root[data-theme="dark"] #moodBadge.mood-sprinting,
+body.dark-mode #moodBadge.mood-sprinting{ background: rgba(239,68,68,.18); }
+
+/* =========================================================
+   Tap highlight / Focus cleanup
+   ========================================================= */
+
 a, button, .navlink, .btnGhost, .btnPrimary, .themeToggle{
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Remove default focus outline (we'll keep a nicer focus-visible) */
 .navlink:focus,
-.navlink:active{
-  outline: none;
-}
+.navlink:active{ outline: none; }
 
-/* Optional: better keyboard focus (desktop accessibility) */
 .navlink:focus-visible{
   outline: 3px solid rgba(11,87,208,.25);
   outline-offset: 2px;
@@ -594,32 +563,29 @@ a, button, .navlink, .btnGhost, .btnPrimary, .themeToggle{
 }
 
 /* =========================================================
-   Extra safety: ensure default elements inherit UI font
+   Global Font Inheritance
    ========================================================= */
-input, select, textarea, button{
-  font-family: var(--font-ui);
-}
+
+input, select, textarea, button{ font-family: var(--font-ui); }
 h1,h2,h3,h4,h5{
   font-family: var(--font-display);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: .04em;
 }
-table, th, td{
-  font-family: var(--font-ui);
-}
+table, th, td{ font-family: var(--font-ui); }
 
-/* --- Forecast: role rows --- */
+/* =========================================================
+   Forecast / Roles / Summary
+   ========================================================= */
+
+.roleGrid{ display:grid; gap:10px; }
+
 .roleRow{
   border:1px solid var(--border);
-  border-radius:16px;
+  border-radius:18px;
   padding:12px;
   background: var(--bg-card);
-}
-
-.roleGrid{
-  display:grid;
-  gap:10px;
 }
 
 .roleActions{
@@ -635,10 +601,6 @@ table, th, td{
   font-weight:800;
   line-height:1.6;
 }
-
-/* ================================
-   Forecast — Roles + Summary Polish
-   ================================ */
 
 .summaryGrid{
   display:grid;
@@ -716,13 +678,6 @@ body.dark-mode .kvRow{
   margin-top:12px;
 }
 
-.roleRow{
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:12px;
-  background: var(--bg-card);
-}
-
 .roleRowTop{
   display:grid;
   grid-template-columns: 1fr 140px 140px auto;
@@ -731,9 +686,7 @@ body.dark-mode .kvRow{
 }
 
 @media (max-width: 900px){
-  .roleRowTop{
-    grid-template-columns: 1fr 1fr;
-  }
+  .roleRowTop{ grid-template-columns: 1fr 1fr; }
 }
 
 .iconBtn{
@@ -789,35 +742,62 @@ body.dark-mode .tableMini td{
 .mono{ font-variant-numeric: tabular-nums; }
 
 /* =========================================================
-   Copilot Prompt — Normal text (only headings/labels bold)
+   Copilot — Normal text (only headings/labels bold)
    ========================================================= */
 
-#panelBody{
-  font-weight: 500;
+.panelBody{
+  margin-top:8px;
+  font-weight:500;
   color: var(--text-muted);
-  line-height: 1.75;
-  white-space: normal; /* allow HTML lists */
+  line-height:1.75;
+}
+.panelBody b,
+.panelBody strong{
+  font-weight:900;
+  color: var(--text-main);
+}
+.panelBody ul{
+  margin:10px 0 0 18px;
+  padding:0;
+}
+.panelBody li{ margin:7px 0; }
+
+.modeBody{
+  color: var(--text-muted);
+  font-weight:500;
+  margin-top:6px;
+  white-space:pre-line;
+  line-height:1.7;
 }
 
-#panelBody b,
-#panelBody strong{
-  font-weight: 900;
+.mutedText{
+  color: var(--text-muted);
+  font-weight:500;
+}
+
+/* Ceremony row */
+.ceremonyRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+/* Selected ceremony */
+.cerBtn.is-active{
+  background: rgba(11,87,208,.10);
+  border-color: rgba(11,87,208,.30);
+  box-shadow: 0 10px 24px rgba(11,87,208,.10);
   color: var(--text-main);
 }
 
-#panelBody ul{
-  margin: 10px 0 0 18px;
-  padding: 0;
-}
-#panelBody li{
-  margin: 7px 0;
+/* Recommended ceremony */
+.cerBtn.is-rec{
+  border-color: rgba(245,158,11,.40);
+  box-shadow: 0 10px 26px rgba(245,158,11,.10);
 }
 
-/* =========================================================
-   Premium ⭐ Recommended Badge (no inline styles)
-   Use: <span class="recBadge">⭐ Recommended</span>
-   ========================================================= */
-
+/* Premium ⭐ Recommended badge */
 .recBadge{
   display:inline-flex;
   align-items:center;
@@ -827,20 +807,25 @@ body.dark-mode .tableMini td{
   padding:5px 10px;
 
   border-radius:999px;
-  border:1px solid rgba(11,87,208,.28);
-  background: linear-gradient(180deg, rgba(11,87,208,.14), rgba(11,87,208,.06));
+  border:1px solid rgba(245,158,11,.30);
+  background: linear-gradient(180deg, rgba(245,158,11,.14), rgba(245,158,11,.06));
 
   color: var(--text-main);
   font-weight:900;
   font-size:12px;
   letter-spacing:.2px;
 
-  box-shadow: 0 10px 22px rgba(11,87,208,.10);
+  box-shadow: 0 10px 22px rgba(245,158,11,.10);
 }
 
 :root[data-theme="dark"] .recBadge,
 body.dark-mode .recBadge{
-  border-color: rgba(11,87,208,.38);
-  background: linear-gradient(180deg, rgba(11,87,208,.18), rgba(11,87,208,.10));
-  box-shadow: 0 12px 26px rgba(11,87,208,.14);
+  border-color: rgba(245,158,11,.38);
+  background: linear-gradient(180deg, rgba(245,158,11,.18), rgba(245,158,11,.10));
+  box-shadow: 0 12px 26px rgba(245,158,11,.14);
+}
+
+/* Badge inside mode title looks aligned */
+#modeTitle .recBadge{
+  transform: translateY(-1px);
 }
