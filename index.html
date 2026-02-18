@@ -23,22 +23,20 @@
         </div>
       </div>
 
-       <!-- Nav Bar -->
+      <!-- Nav Bar -->
+      <nav class="nav">
+        <a class="navlink active" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="health.html">🛡️ Health</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
-    <nav class="nav">
-  <a class="navlink active" href="index.html">🚀 Setup</a>
-  <a class="navlink" href="intelligence.html">📊 Insights</a>
-  <a class="navlink" href="health.html">🛡️ Health</a>
-  <a class="navlink" href="suggestions.html">🎯 Actions</a>
-  <a class="navlink" href="workspace.html">🤖 Copilot</a>
-  <a class="navlink" href="forecast.html">📦 Forecast</a>
-  <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+        <hr>
 
-  <hr>
-
-  <a class="navlink" href="auth.html">🔐 Account</a>
-
-</nav>
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
 
       <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
@@ -71,6 +69,9 @@
       <div class="sectionCard">
         <h1 class="sectionTitle">Launchpad</h1>
         <p class="sectionSub">Enter your sprint basics. This powers Insights + Actions.</p>
+
+        <!-- ✅ Step indicator (Flow UX) -->
+        <div class="stageIndicator">Step 1 of 5 • Setup</div>
 
         <div class="info-banner">
           <strong>XP Tip:</strong> Accuracy here = better forecasts + fewer surprises. 🏆
@@ -111,9 +112,22 @@
             </div>
           </div>
 
-          <div class="btnRow" style="margin-top:14px;">
-            <button class="btnPrimary" id="saveBtn" type="button">Save ✅</button>
-            <a class="btnGhost" href="intelligence.html">Next: Insights</a>
+          <!-- ✅ Unified footer (replaces old btnRow) -->
+          <div class="stageFooter">
+            <a class="btnStage btnStage-back" href="index.html" aria-disabled="true">← Setup</a>
+
+            <!-- keep your existing Save button id -->
+            <button class="btnStage btnStage-primary" id="saveBtn" type="button">
+              Save Setup
+            </button>
+
+            <a class="btnStage btnStage-next" href="intelligence.html">
+              Next: Insights →
+            </a>
+          </div>
+
+          <!-- (optional) keep Reset, but put it under footer so flow stays clean -->
+          <div class="btnRow" style="margin-top:10px;">
             <button class="btnGhost" id="resetBtn" type="button">Reset</button>
           </div>
 
@@ -215,7 +229,7 @@
         if (!p) return;
         writeForm(p);
         saveSetup(p);
-        setStatus(`Preset applied: ${type.toUpperCase()} ✅`);
+        setStatus(\`Preset applied: \${type.toUpperCase()} ✅\`);
       }
 
       const existing = loadSetup();
