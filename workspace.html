@@ -85,7 +85,15 @@
 
         <!-- Prompt panel -->
         <div class="info-banner" style="margin-top:14px;">
-          <div class="kvKey" style="font-size:16px;" id="panelTitle">Choose a ceremony</div>
+          <div class="kvKey" style="font-size:16px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <span id="panelTitle">Choose a ceremony</span>
+
+            <!-- New angle -->
+            <button class="btnGhost" id="newAngleBtn" type="button" style="padding:8px 10px;">
+              🔄 New angle
+            </button>
+          </div>
+
           <div id="panelBody" class="panelBody" style="color:var(--text-muted); font-weight:450; margin-top:6px; line-height:1.7;">
             Your prompts will appear here.
           </div>
@@ -107,6 +115,15 @@
 
           <div style="margin-top:10px; font-weight:650;" id="saveStatus"></div>
           <div class="mutedText" style="margin-top:6px; color:var(--text-muted); font-weight:450;" id="saveHint"></div>
+
+          <!-- ✅ Saved Decisions History (visible on screen) -->
+          <div class="info-banner" style="margin-top:12px;">
+            <div class="kvKey">Saved Decisions</div>
+            <div id="decisionsEmpty" style="color:var(--text-muted); font-weight:450; margin-top:6px;">
+              No saved decisions yet.
+            </div>
+            <div id="decisionsList" style="display:grid; gap:10px; margin-top:10px;"></div>
+          </div>
         </div>
 
         <div class="btnRow" style="margin-top:12px;">
@@ -123,7 +140,12 @@
   <script>
     (function () {
       const STORAGE_KEY = "scrummer_setup_v1";
-      const NOTES_KEY   = "scrummer_copilot_notes_v1";
+
+      // ✅ history-based notes
+      const NOTES_KEY   = "scrummer_copilot_notes_v2";
+
+      // ✅ anti-repeat prompt variation
+      const VAR_KEY     = "scrummer_copilot_variant_v1";
 
       const $ = (id) => document.getElementById(id);
 
@@ -138,7 +160,6 @@
       const saveStatus = $("saveStatus");
       const saveHint   = $("saveHint");
 
-      let recommendedKey = null;
       let activeKey = null;
 
       function safeParse(str, fallback){
@@ -154,30 +175,43 @@
         return Number.isFinite(n) ? n : 0;
       }
 
-      function computeRisk(setup){
+      function round2(n){ return Math.round((Number(n)||0) * 100) / 100; }
+
+      // -------------------------
+      // Context builder
+      // -------------------------
+      function buildContext(setup){
         const sprintDays  = num(setup.sprintDays);
         const teamMembers = num(setup.teamMembers);
         const leaveDays   = num(setup.leaveDays);
         const committedSP = num(setup.committedSP);
 
-        const v1 = num(setup.v1);
-        const v2 = num(setup.v2);
-        const v3 = num(setup.v3);
-
+        const v1 = num(setup.v1), v2 = num(setup.v2), v3 = num(setup.v3);
         const velocities = [v1,v2,v3].filter(x => x > 0);
-        const avgVel = velocities.length
-          ? velocities.reduce((a,b)=>a+b,0) / velocities.length
-          : 0;
+        const avgVel = velocities.length ? velocities.reduce((a,b)=>a+b,0) / velocities.length : 0;
 
         const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
         const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays));
-
         const capacitySP = avgVel * (1 - leaveRatio);
-        const over = capacitySP > 0 ? committedSP / capacitySP : 0;
 
+        const over = capacitySP > 0 ? (committedSP / capacitySP) : 0;
+        const overPct = over > 0 ? Math.round((over - 1) * 100) : 0;
+
+        return {
+          sprintDays, teamMembers, leaveDays, committedSP,
+          v1, v2, v3, avgVel,
+          capacitySP,
+          over,
+          overPct
+        };
+      }
+
+      function computeRisk(setup){
+        const c = buildContext(setup);
         let risk = 0;
-        if (committedSP <= 0 || avgVel <= 0) risk += 30;
-        if (over > 1) risk += Math.min(50, (over - 1) * 120);
+
+        if (c.committedSP <= 0 || c.avgVel <= 0) risk += 30;
+        if (c.over > 1) risk += Math.min(50, (c.over - 1) * 120);
 
         return Math.max(0, Math.min(100, Math.round(risk)));
       }
@@ -188,13 +222,8 @@
         return "stable";
       }
 
-      function recommendCeremony(mode){
-        if (mode === "rescue") return "daily";
-        if (mode === "watch") return "planning";
-        return "refine";
-      }
-
-      function renderMode(mode, risk){
+      // ✅ Mode banner without “recommended”
+      function renderMode(mode, risk, ctx){
         modeBanner.style.display = "block";
 
         const map = {
@@ -203,189 +232,412 @@
           stable: { icon:"🟢", label:"Stable", msg:"Signals look stable. Copilot will optimize flow + reduce WIP." }
         };
 
-        const recLabel = (recommendedKey === "daily") ? "🧩 Daily" :
-                         (recommendedKey === "planning") ? "🗺️ Planning" :
-                         (recommendedKey === "refine") ? "🧠 Refinement" :
-                         (recommendedKey === "review") ? "🎬 Review" :
-                         (recommendedKey === "retro") ? "♻️ Retro" : "—";
-
         const m = map[mode] || map.stable;
-        modeTitle.innerHTML = `${m.icon} Copilot Mode: ${m.label} (Risk ${risk}/100) <span class="recBadge">⭐ Recommended: ${recLabel}</span>`;
-        modeBody.textContent = m.msg;
+
+        const ctxLine = (ctx.avgVel > 0 && ctx.committedSP > 0)
+          ? `Avg velocity ~${round2(ctx.avgVel)} SP. Capacity est ~${round2(ctx.capacitySP)} SP.`
+          : `Add velocities + committed SP in Setup to unlock stronger guidance.`;
+
+        modeTitle.textContent = `${m.icon} Copilot Mode: ${m.label} (Risk ${risk}/100)`;
+        modeBody.textContent  = `${m.msg} ${ctxLine}`;
       }
 
-      function getPromptsHTML(ceremony, mode){
-        const P = {
+      // -------------------------
+      // Anti-repeat variation engine
+      // -------------------------
+      function getVariantState(){
+        return safeParse(localStorage.getItem(VAR_KEY) || "{}", {});
+      }
+      function setVariantState(obj){
+        localStorage.setItem(VAR_KEY, JSON.stringify(obj || {}));
+      }
+
+      function pickVariantIndex(key, total, force=false){
+        const state = getVariantState();
+        const last = Number(state[key] ?? -1);
+
+        let idx = Math.floor(Math.random() * total);
+        if (total > 1 && idx === last) idx = (idx + 1) % total;
+
+        // if force and still equals last (edge), shift again
+        if (force && total > 1 && idx === last) idx = (idx + 1) % total;
+
+        state[key] = idx;
+        setVariantState(state);
+        return idx;
+      }
+
+      // -------------------------
+      // Prompt bank (multiple variants per ceremony+mode)
+      // -------------------------
+      function getPromptsHTML(ceremony, mode, ctx, forceRefresh=false){
+        const key = `${ceremony}:${mode}`;
+        const banks = buildPromptBanks(ctx);
+
+        const variants = (banks[ceremony] && banks[ceremony][mode]) ? banks[ceremony][mode] : null;
+        if (!variants || !variants.length) return `<div>Select a ceremony.</div>`;
+
+        const idx = pickVariantIndex(key, variants.length, forceRefresh);
+        return variants[idx];
+      }
+
+      function buildPromptBanks(ctx){
+        const capLine = (ctx.avgVel > 0)
+          ? `Context: avg velocity ~<b>${round2(ctx.avgVel)}</b> SP, capacity est ~<b>${round2(ctx.capacitySP)}</b> SP, committed <b>${round2(ctx.committedSP)}</b> SP.`
+          : `Context: add velocities + committed SP in Setup for sharper prompts.`;
+
+        const overLine = (ctx.over > 1.05)
+          ? `You look overcommitted by ~<b>${Math.max(0, ctx.overPct)}%</b>. Treat this as a de-scope trigger.`
+          : `Keep commitment disciplined: protect flow and avoid silent scope creep.`;
+
+        return {
           planning: {
-            stable: `
-              <div><b>🎯 Sprint Planning (Stable)</b></div>
-              <ul>
-                <li><b>Sprint Goal:</b> What user/business outcome are we shipping?</li>
-                <li><b>Commitment:</b> Which 3 items are must-have? What is stretch?</li>
-                <li><b>Flow plan:</b> Who pairs on the riskiest story? What unblocks others first?</li>
-                <li><b>Guardrails:</b> How do we prevent scope creep? What do we stop doing?</li>
-              </ul>
-            `,
-            watch: `
-              <div><b>⚠️ Sprint Planning (Watchlist)</b></div>
-              <ul>
-                <li><b>Reality check:</b> Forecast capacity vs committed SP. What can drop with least pain?</li>
-                <li><b>Risk ownership:</b> Top 3 risks + owners. Dependencies + escalation path.</li>
-                <li><b>Checkpoint:</b> Day-3 rule — if behind, de-scope immediately.</li>
-                <li><b>WIP discipline:</b> What WIP limit will we follow?</li>
-              </ul>
-            `,
-            rescue: `
-              <div><b>🚨 Sprint Planning (Rescue)</b></div>
-              <ul>
-                <li><b>Cut scope now:</b> Remove 10–20% immediately. Lock only the sprint goal.</li>
-                <li><b>Freeze churn:</b> No new work unless the goal is safe. Finish-first rule.</li>
-                <li><b>Escalations:</b> What needs leadership/support today? Who escalates by when?</li>
-                <li><b>Daily control:</b> Assign a checkpoint owner for daily tracking.</li>
-              </ul>
-            `
+            stable: [
+              `
+                <div><b>🗺️ Planning (Stable) — value + flow</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <ul>
+                  <li><b>Sprint Goal:</b> What user outcome are we shipping?</li>
+                  <li><b>Must vs Stretch:</b> Pick top 3 must-haves, mark stretch clearly.</li>
+                  <li><b>Flow:</b> Who pairs on the riskiest story? What finishes first?</li>
+                  <li><b>Guardrail:</b> What do we stop doing if scope creeps?</li>
+                </ul>
+              `,
+              `
+                <div><b>🗺️ Planning (Stable) — clarity + ownership</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <ul>
+                  <li><b>Define Done:</b> What does “done” look like for the goal?</li>
+                  <li><b>Ownership map:</b> Who owns each must-have story?</li>
+                  <li><b>Dependencies:</b> What needs unblocking on day 1?</li>
+                  <li><b>Quality:</b> What quality checks are non-negotiable?</li>
+                </ul>
+              `
+            ],
+            watch: [
+              `
+                <div><b>⚠️ Planning (Watchlist) — capacity reality check</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>De-scope now:</b> Remove 10–15% into stretch.</li>
+                  <li><b>Day-3 checkpoint:</b> If behind → de-scope immediately.</li>
+                  <li><b>WIP limit:</b> Agree a WIP cap for the sprint.</li>
+                  <li><b>Risks + owners:</b> Top 3 risks + escalation path.</li>
+                </ul>
+              `,
+              `
+                <div><b>⚠️ Planning (Watchlist) — protect the goal</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Goal-only planning:</b> Smallest scope that still achieves the goal?</li>
+                  <li><b>Kill ambiguity:</b> No missing acceptance criteria allowed.</li>
+                  <li><b>Dependency kill list:</b> What must be removed before work starts?</li>
+                  <li><b>Support buffer:</b> Reserve capacity for interruptions.</li>
+                </ul>
+              `
+            ],
+            rescue: [
+              `
+                <div><b>🚨 Planning (Rescue) — survival plan</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Cut scope today:</b> Remove 15–25% immediately.</li>
+                  <li><b>Freeze churn:</b> No new work unless goal is safe.</li>
+                  <li><b>Escalations:</b> What must be escalated before noon?</li>
+                  <li><b>Daily control:</b> Define daily checkpoint owner.</li>
+                </ul>
+              `,
+              `
+                <div><b>🚨 Planning (Rescue) — remove constraints</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Constraint:</b> dependencies, WIP, or interruptions?</li>
+                  <li><b>Stop list:</b> What stops this sprint from collapsing?</li>
+                  <li><b>Owner map:</b> Assign owners for top 2 blockers.</li>
+                  <li><b>Reduce batch size:</b> Slice to 1–2 day pieces.</li>
+                </ul>
+              `
+            ]
           },
+
           daily: {
-            stable: `
-              <div><b>🟢 Daily Scrum (Stable)</b></div>
-              <ul>
-                <li><b>On track?</b> Are we progressing toward the sprint goal?</li>
-                <li><b>Blockers:</b> Any blocked item &gt; 24h?</li>
-                <li><b>WIP check:</b> Are we starting too much vs finishing?</li>
-                <li><b>Help:</b> Who needs pairing/support today?</li>
-              </ul>
-            `,
-            watch: `
-              <div><b>🟡 Daily Scrum (Watchlist)</b></div>
-              <ul>
-                <li><b>Plan vs actual:</b> Are we behind today?</li>
-                <li><b>Spillover risk:</b> Which story is most likely to slip?</li>
-                <li><b>Interruptions:</b> What unplanned work entered yesterday?</li>
-                <li><b>Decision:</b> If we slip tomorrow, what do we de-scope?</li>
-              </ul>
-            `,
-            rescue: `
-              <div><b>🔴 Daily Scrum (Rescue)</b></div>
-              <ul>
-                <li><b>Goal survival:</b> Is the sprint goal still achievable?</li>
-                <li><b>Cut list:</b> What drops today?</li>
-                <li><b>Ownership:</b> Who takes the top blocker now?</li>
-                <li><b>Escalate:</b> What must be escalated before noon?</li>
-              </ul>
-            `
+            stable: [
+              `
+                <div><b>🧩 Daily (Stable) — finish-first</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <ul>
+                  <li><b>Sprint goal:</b> Are we moving the goal forward today?</li>
+                  <li><b>Blockers:</b> Anything blocked &gt; 24h?</li>
+                  <li><b>WIP:</b> Are we starting too much vs finishing?</li>
+                  <li><b>Help:</b> Who needs pairing support today?</li>
+                </ul>
+              `,
+              `
+                <div><b>🧩 Daily (Stable) — flow hygiene</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <ul>
+                  <li><b>Aging work:</b> Which item is stuck longest?</li>
+                  <li><b>Hand-offs:</b> Any handoff slowing us down?</li>
+                  <li><b>Next finish:</b> What will we finish today?</li>
+                  <li><b>Risk:</b> Any new risk that changes the plan?</li>
+                </ul>
+              `
+            ],
+            watch: [
+              `
+                <div><b>🟡 Daily (Watchlist) — track slip early</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Plan vs actual:</b> Are we behind today?</li>
+                  <li><b>Slip candidate:</b> Which story is most likely to slip?</li>
+                  <li><b>Interruptions:</b> What unplanned work entered yesterday?</li>
+                  <li><b>Decision:</b> If we slip tomorrow, what de-scopes?</li>
+                </ul>
+              `,
+              `
+                <div><b>🟡 Daily (Watchlist) — protect capacity</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Top blocker:</b> Who owns it right now?</li>
+                  <li><b>WIP cut:</b> What do we stop starting today?</li>
+                  <li><b>Scope check:</b> Any scope added silently?</li>
+                  <li><b>Checkpoint:</b> What will be true by tomorrow’s daily?</li>
+                </ul>
+              `
+            ],
+            rescue: [
+              `
+                <div><b>🔴 Daily (Rescue) — goal survival</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Goal survival:</b> Is sprint goal still achievable?</li>
+                  <li><b>Cut list:</b> What drops today?</li>
+                  <li><b>Ownership:</b> Who takes the top blocker now?</li>
+                  <li><b>Escalate:</b> What must be escalated before noon?</li>
+                </ul>
+              `,
+              `
+                <div><b>🔴 Daily (Rescue) — unblock-first</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Single unblock:</b> What’s the biggest unblock right now?</li>
+                  <li><b>Pairing:</b> Who pairs to finish the critical item?</li>
+                  <li><b>Cut scope:</b> Remove least user-impactful scope.</li>
+                  <li><b>Update plan:</b> What changes today because of reality?</li>
+                </ul>
+              `
+            ]
           },
+
           refine: {
-            stable: `
-              <div><b>🧠 Refinement (Stable)</b></div>
-              <ul>
-                <li><b>Slicing:</b> Break stories into 1–2 day chunks.</li>
-                <li><b>Criteria:</b> Are acceptance criteria unambiguous?</li>
-                <li><b>Dependencies:</b> Identify + remove early.</li>
-                <li><b>Ready rules:</b> Define a “ready” checklist.</li>
-              </ul>
-            `,
-            watch: `
-              <div><b>🧠 Refinement (Watchlist)</b></div>
-              <ul>
-                <li><b>Kill ambiguity:</b> Missing AC? Add now.</li>
-                <li><b>Risk story:</b> Split or spike?</li>
-                <li><b>Reduce volatility:</b> Slice large stories; avoid 16/32 bombs.</li>
-              </ul>
-            `,
-            rescue: `
-              <div><b>🧠 Refinement (Rescue)</b></div>
-              <ul>
-                <li><b>No big stories:</b> Stop anything &gt; 2–3 days entering sprint.</li>
-                <li><b>De-risk:</b> Remove dependencies before planning.</li>
-                <li><b>Safest scope:</b> Default to minimum viable sprint goal.</li>
-              </ul>
-            `
+            stable: [
+              `
+                <div><b>🧠 Refinement (Stable) — slice + ready</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <ul>
+                  <li><b>Slicing:</b> Break stories into 1–2 day chunks.</li>
+                  <li><b>AC clarity:</b> Are acceptance criteria unambiguous?</li>
+                  <li><b>Dependencies:</b> Identify + remove early.</li>
+                  <li><b>Ready checklist:</b> Confirm Definition of Ready.</li>
+                </ul>
+              `,
+              `
+                <div><b>🧠 Refinement (Stable) — de-risk early</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <ul>
+                  <li><b>Risk story:</b> Spike vs split — decide now.</li>
+                  <li><b>Tech unknowns:</b> What needs a quick proof?</li>
+                  <li><b>Testability:</b> Can QA validate easily?</li>
+                  <li><b>Thin slices:</b> Remove “big-bang” stories.</li>
+                </ul>
+              `
+            ],
+            watch: [
+              `
+                <div><b>🧠 Refinement (Watchlist) — remove ambiguity</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Kill ambiguity:</b> Missing AC? Add now.</li>
+                  <li><b>Stop big stories:</b> Slice anything &gt; 2–3 days.</li>
+                  <li><b>Dependency removal:</b> What can we remove today?</li>
+                </ul>
+              `,
+              `
+                <div><b>🧠 Refinement (Watchlist) — protect predictability</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Estimate sanity:</b> Any story too vague to estimate?</li>
+                  <li><b>Split strategy:</b> Must-have vs nice-to-have slices.</li>
+                  <li><b>Ready gate:</b> No “not ready” story enters sprint.</li>
+                </ul>
+              `
+            ],
+            rescue: [
+              `
+                <div><b>🧠 Refinement (Rescue) — shrink the batch</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>No big stories:</b> Stop anything &gt; 2–3 days entering sprint.</li>
+                  <li><b>De-risk:</b> Remove dependencies before planning.</li>
+                  <li><b>Safest scope:</b> Default to minimum viable sprint goal.</li>
+                </ul>
+              `,
+              `
+                <div><b>🧠 Refinement (Rescue) — stop future failure</b></div>
+                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div style="margin-top:6px;">${overLine}</div>
+                <ul>
+                  <li><b>Failure point:</b> What will break the sprint?</li>
+                  <li><b>Prevention:</b> Smallest mitigation action?</li>
+                  <li><b>Ready rule:</b> Make one rule non-negotiable.</li>
+                </ul>
+              `
+            ]
           },
+
           review: {
-            stable: `
-              <div><b>🎬 Sprint Review (Stable)</b></div>
-              <ul>
-                <li><b>Value:</b> What changed for users?</li>
-                <li><b>Feedback:</b> What should we adjust next?</li>
-                <li><b>Surprises:</b> What surprised us in scope/time?</li>
-                <li><b>Follow-ups:</b> Capture owners + dates.</li>
-              </ul>
-            `,
-            watch: `
-              <div><b>🎬 Sprint Review (Watchlist)</b></div>
-              <ul>
-                <li><b>Not shipped:</b> What didn’t ship and why?</li>
-                <li><b>Commitment:</b> Was commitment too high?</li>
-                <li><b>Time loss:</b> Where did we lose time (interruptions)?</li>
-                <li><b>One change:</b> Improve predictability next sprint.</li>
-              </ul>
-            `,
-            rescue: `
-              <div><b>🎬 Sprint Review (Rescue)</b></div>
-              <ul>
-                <li><b>Root cause:</b> Why did we slip?</li>
-                <li><b>Immediate change:</b> What must change now?</li>
-                <li><b>Stop doing:</b> What do we stop next sprint?</li>
-                <li><b>Escalations:</b> Owners + deadlines.</li>
-              </ul>
-            `
+            stable: [
+              `
+                <div><b>🎬 Review (Stable) — value + feedback</b></div>
+                <ul>
+                  <li><b>Value:</b> What changed for users?</li>
+                  <li><b>Feedback:</b> What should we adjust next?</li>
+                  <li><b>Surprises:</b> What surprised us in scope/time?</li>
+                  <li><b>Follow-ups:</b> Capture owners + dates.</li>
+                </ul>
+              `,
+              `
+                <div><b>🎬 Review (Stable) — narrative</b></div>
+                <ul>
+                  <li><b>Story:</b> “We aimed for X, shipped Y, learned Z.”</li>
+                  <li><b>Stakeholder asks:</b> Any new ask or shift?</li>
+                  <li><b>Next sprint:</b> What’s the strongest next step?</li>
+                </ul>
+              `
+            ],
+            watch: [
+              `
+                <div><b>🎬 Review (Watchlist) — explain gaps safely</b></div>
+                <ul>
+                  <li><b>Not shipped:</b> What didn’t ship and why (system factors)?</li>
+                  <li><b>Commitment:</b> Was commitment too high?</li>
+                  <li><b>Time loss:</b> Where did we lose time (interruptions/dep)?</li>
+                  <li><b>One change:</b> Improve predictability next sprint.</li>
+                </ul>
+              `,
+              `
+                <div><b>🎬 Review (Watchlist) — protect trust</b></div>
+                <ul>
+                  <li><b>Transparent gap:</b> What caused the gap (not who)?</li>
+                  <li><b>Decision:</b> What decision prevents this next sprint?</li>
+                  <li><b>Ask:</b> What help do we need from stakeholders?</li>
+                </ul>
+              `
+            ],
+            rescue: [
+              `
+                <div><b>🎬 Review (Rescue) — recovery plan</b></div>
+                <ul>
+                  <li><b>Root cause:</b> Why did we slip (system)?</li>
+                  <li><b>Immediate change:</b> What must change now?</li>
+                  <li><b>Stop doing:</b> What do we stop next sprint?</li>
+                  <li><b>Escalations:</b> Owners + deadlines.</li>
+                </ul>
+              `,
+              `
+                <div><b>🎬 Review (Rescue) — executive clarity</b></div>
+                <ul>
+                  <li><b>Signal:</b> What warned us early?</li>
+                  <li><b>Constraint:</b> What constraint dominated?</li>
+                  <li><b>Action:</b> One action to remove the constraint.</li>
+                </ul>
+              `
+            ]
           },
+
           retro: {
-            stable: `
-              <div><b>♻️ Retro (Stable)</b></div>
-              <ul>
-                <li><b>Boosted throughput:</b> What helped us ship more?</li>
-                <li><b>Reduced stress:</b> What kept it calm?</li>
-                <li><b>Protect flow:</b> One improvement to lock in.</li>
-                <li><b>Experiment:</b> One experiment next sprint.</li>
-              </ul>
-            `,
-            watch: `
-              <div><b>♻️ Retro (Watchlist)</b></div>
-              <ul>
-                <li><b>Volatility:</b> Where did it come from?</li>
-                <li><b>Missed risks:</b> Which risks were missed early?</li>
-                <li><b>Guardrail:</b> One guardrail to add next sprint.</li>
-                <li><b>Owner + date:</b> Make it real.</li>
-              </ul>
-            `,
-            rescue: `
-              <div><b>♻️ Retro (Rescue)</b></div>
-              <ul>
-                <li><b>System failure:</b> Where did process break?</li>
-                <li><b>Biggest constraint:</b> WIP, interruptions, dependencies?</li>
-                <li><b>Non-negotiable rule:</b> One rule next sprint.</li>
-                <li><b>Stop now:</b> What do we stop immediately?</li>
-              </ul>
-            `
+            stable: [
+              `
+                <div><b>♻️ Retro (Stable) — lock in wins</b></div>
+                <ul>
+                  <li><b>Boosted throughput:</b> What helped us ship more?</li>
+                  <li><b>Reduced stress:</b> What kept it calm?</li>
+                  <li><b>Protect flow:</b> One improvement to lock in.</li>
+                  <li><b>Experiment:</b> One experiment next sprint.</li>
+                </ul>
+              `,
+              `
+                <div><b>♻️ Retro (Stable) — quality & flow</b></div>
+                <ul>
+                  <li><b>Flow:</b> What improved flow?</li>
+                  <li><b>Quality:</b> What reduced rework?</li>
+                  <li><b>Next:</b> One small change with big impact.</li>
+                </ul>
+              `
+            ],
+            watch: [
+              `
+                <div><b>♻️ Retro (Watchlist) — predictability</b></div>
+                <ul>
+                  <li><b>Volatility:</b> Where did it come from?</li>
+                  <li><b>Missed risks:</b> Which risks were missed early?</li>
+                  <li><b>Guardrail:</b> One guardrail next sprint.</li>
+                  <li><b>Owner + date:</b> Make it real.</li>
+                </ul>
+              `,
+              `
+                <div><b>♻️ Retro (Watchlist) — interruptions</b></div>
+                <ul>
+                  <li><b>Interruptions:</b> What interrupted us most?</li>
+                  <li><b>Shield:</b> How do we shield the sprint?</li>
+                  <li><b>Agreement:</b> What agreement with stakeholders?</li>
+                </ul>
+              `
+            ],
+            rescue: [
+              `
+                <div><b>♻️ Retro (Rescue) — system failure</b></div>
+                <ul>
+                  <li><b>System failure:</b> Where did process break?</li>
+                  <li><b>Constraint:</b> WIP, interruptions, dependencies?</li>
+                  <li><b>Non-negotiable:</b> One rule next sprint.</li>
+                  <li><b>Stop now:</b> What do we stop immediately?</li>
+                </ul>
+              `,
+              `
+                <div><b>♻️ Retro (Rescue) — prevent repeat</b></div>
+                <ul>
+                  <li><b>Early warning:</b> What did we ignore?</li>
+                  <li><b>Decision:</b> What decision changes the outcome?</li>
+                  <li><b>Commitment rule:</b> What prevents overcommit?</li>
+                </ul>
+              `
+            ]
           }
         };
-
-        const group = P[ceremony];
-        if (!group) return `<div>Select a ceremony.</div>`;
-        return group[mode] || group.stable;
       }
 
       function setButtonStates(){
         document.querySelectorAll(".cerBtn").forEach(btn => {
           const key = btn.getAttribute("data-cer");
           btn.classList.toggle("is-active", key === activeKey);
-          btn.classList.toggle("is-rec", key === recommendedKey);
-
-          const existing = btn.querySelector(".recBadge");
-          if (existing) existing.remove();
-
-          if (key === recommendedKey) {
-            const b = document.createElement("span");
-            b.className = "recBadge";
-            b.textContent = "⭐ Recommended";
-            btn.appendChild(b);
-          }
         });
       }
 
-      function onCeremony(key){
+      function onCeremony(key, forceRefresh=false){
         const setup = loadSetup();
+        const ctx = buildContext(setup);
 
         let risk = null;
         const compute = window.Scrummer && window.Scrummer.computeSignals;
@@ -400,7 +652,7 @@
         const mode = modeFromRisk(risk);
 
         activeKey = key;
-        renderMode(mode, risk);
+        renderMode(mode, risk, ctx);
 
         const titles = {
           planning: "🗺️ Sprint Planning",
@@ -411,87 +663,174 @@
         };
 
         panelTitle.textContent = titles[key] || "Ceremony";
-        panelBody.innerHTML = getPromptsHTML(key, mode);
+        panelBody.innerHTML = getPromptsHTML(key, mode, ctx, forceRefresh);
 
         setButtonStates();
       }
 
-      // Notes save
+      // -------------------------
+      // ✅ Decisions History (real saved items)
+      // -------------------------
       function nowStamp(){
         const d = new Date();
         const pad = (n) => String(n).padStart(2,"0");
         return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
       }
 
-      function loadNotes(){
-        const obj = safeParse(localStorage.getItem(NOTES_KEY) || "{}", {});
-        return { text: obj.text || "", updatedAt: obj.updatedAt || "" };
+      function uid(){
+        return Math.random().toString(16).slice(2) + Date.now().toString(16);
       }
 
-      function saveNotes(text){
-        localStorage.setItem(NOTES_KEY, JSON.stringify({
-          text: text || "",
-          updatedAt: nowStamp()
-        }));
+      function escapeHtml(s){
+        return String(s || "")
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
       }
 
-      function renderSaveStatus(){
-        const n = loadNotes();
-        if (!n.text) {
-          saveStatus.textContent = "🟡 Nothing saved yet";
-          saveHint.textContent = `Saved locally (localStorage key: ${NOTES_KEY}).`;
+      function loadDecisionHistory(){
+        const arr = safeParse(localStorage.getItem(NOTES_KEY) || "[]", []);
+        return Array.isArray(arr) ? arr : [];
+      }
+
+      function saveDecisionHistory(arr){
+        localStorage.setItem(NOTES_KEY, JSON.stringify(arr || []));
+      }
+
+      function renderDecisionHistory(){
+        const list = $("decisionsList");
+        const empty = $("decisionsEmpty");
+        if(!list || !empty) return;
+
+        const arr = loadDecisionHistory();
+
+        if(!arr.length){
+          empty.style.display = "block";
+          list.innerHTML = "";
           return;
         }
-        saveStatus.textContent = `✅ Saved locally`;
-        saveHint.textContent = `Last saved: ${n.updatedAt} • localStorage key: ${NOTES_KEY}`;
+
+        empty.style.display = "none";
+
+        list.innerHTML = arr.slice().reverse().map(item => {
+          const title = item.ceremony ? item.ceremony.toUpperCase() : "NOTE";
+          const stamp = item.updatedAt || "";
+          const text  = (item.text || "").trim();
+
+          return `
+            <div class="info-banner" style="padding:12px;">
+              <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+                <div>
+                  <div style="font-weight:650;">📝 ${escapeHtml(title)}</div>
+                  <div style="color:var(--text-muted); font-weight:450; margin-top:2px;">${escapeHtml(stamp)}</div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button class="btnGhost" type="button" data-act="load" data-id="${escapeHtml(item.id)}" style="padding:8px 10px;">Open</button>
+                  <button class="btnGhost" type="button" data-act="copy" data-id="${escapeHtml(item.id)}" style="padding:8px 10px;">Copy</button>
+                  <button class="btnGhost" type="button" data-act="del"  data-id="${escapeHtml(item.id)}" style="padding:8px 10px;">Delete</button>
+                </div>
+              </div>
+
+              <div style="margin-top:10px; color:var(--text-main); font-weight:450; white-space:pre-wrap; line-height:1.6;">
+                ${escapeHtml(text) || "<span style='color:var(--text-muted)'>—</span>"}
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // event delegation
+        list.querySelectorAll("button[data-act]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const act = btn.getAttribute("data-act");
+            const id  = btn.getAttribute("data-id");
+            const arr = loadDecisionHistory();
+            const item = arr.find(x => x.id === id);
+            if(!item) return;
+
+            if(act === "load"){
+              notes.value = item.text || "";
+              saveStatus.textContent = "🟢 Loaded from history";
+              saveHint.textContent = `Loaded note from ${item.updatedAt || ""}`;
+              return;
+            }
+
+            if(act === "copy"){
+              navigator.clipboard?.writeText(item.text || "");
+              saveStatus.textContent = "✅ Copied";
+              saveHint.textContent = "Copied decision text to clipboard.";
+              return;
+            }
+
+            if(act === "del"){
+              const next = arr.filter(x => x.id !== id);
+              saveDecisionHistory(next);
+              renderDecisionHistory();
+              saveStatus.textContent = "🗑️ Deleted";
+              saveHint.textContent = "Removed from saved decisions.";
+              return;
+            }
+          });
+        });
       }
 
+      // Save button -> append to history
       $("saveBtn").addEventListener("click", () => {
-        saveNotes(notes.value || "");
-        renderSaveStatus();
+        const text = (notes.value || "").trim();
+        if(!text){
+          saveStatus.textContent = "🟡 Nothing to save";
+          saveHint.textContent = "Write a decision/risk/owner note first.";
+          return;
+        }
+
+        const arr = loadDecisionHistory();
+        arr.push({
+          id: uid(),
+          ceremony: activeKey || "",
+          text,
+          updatedAt: nowStamp()
+        });
+        saveDecisionHistory(arr);
+
+        saveStatus.textContent = "✅ Saved";
+        saveHint.textContent = `Saved to history (${arr.length} total).`;
+
+        renderDecisionHistory();
       });
 
+      // Reset -> clear editor only
       $("clearBtn").addEventListener("click", () => {
         notes.value = "";
-        localStorage.removeItem(NOTES_KEY);
-        renderSaveStatus();
+        saveStatus.textContent = "🟦 Cleared editor";
+        saveHint.textContent = "Saved Decisions history is unchanged.";
+      });
+
+      // New angle button (re-roll variant)
+      $("newAngleBtn").addEventListener("click", () => {
+        if (!activeKey) return;
+        onCeremony(activeKey, true);
       });
 
       // Bind ceremony buttons
       document.querySelectorAll(".cerBtn").forEach(btn => {
-        btn.addEventListener("click", () => onCeremony(btn.getAttribute("data-cer")));
+        btn.addEventListener("click", () => onCeremony(btn.getAttribute("data-cer"), false));
       });
 
-      // Init notes
-      const existing = loadNotes();
-      notes.value = existing.text || "";
-      renderSaveStatus();
+      // Boot: open daily by default, but don’t show “recommended”
+      (function boot(){
+        renderDecisionHistory();
 
-      // Boot mode + auto-open recommended
-      (function bootMode(){
-        const setup = loadSetup();
+        // Default to a ceremony (daily feels most useful)
+        onCeremony("daily", false);
 
-        let risk = null;
-        const compute = window.Scrummer && window.Scrummer.computeSignals;
-        if (typeof compute === "function") {
-          try {
-            const s = compute(setup || {});
-            if (s && s.riskScore !== undefined) risk = Number(s.riskScore);
-          } catch {}
-        }
-        if (!Number.isFinite(risk)) risk = computeRisk(setup);
-
-        const mode = modeFromRisk(risk);
-        recommendedKey = recommendCeremony(mode);
-        setButtonStates();
-
-        onCeremony(recommendedKey);
+        saveStatus.textContent = "🟡 Ready";
+        saveHint.textContent = `Decisions are saved locally (key: ${NOTES_KEY}).`;
       })();
 
     })();
   </script>
 
-  <!-- NOTE: Supabase removed from this page to avoid duplicate loads.
-       Keep Supabase only where you need auth/cloud (auth.html + pages that actually sync). -->
+  <!-- NOTE: Supabase removed from this page to avoid duplicate loads. -->
 </body>
 </html>
