@@ -5,45 +5,71 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>About — Scrummer</title>
 
-  <!-- Main Styles -->
   <link rel="stylesheet" href="css/style.css">
 
   <!-- Handwritten Font -->
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
 
   <style>
+    body {
+      background: #f6f4ef; /* warm paper background */
+      margin: 0;
+    }
+
+    .notepad {
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 50px 45px;
+      background: #fffdf8;
+      border-radius: 18px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
     .aboutTitle {
       font-family: 'Dancing Script', cursive;
-      font-size: 42px;
-      font-weight: 600;
-      margin-bottom: 18px;
+      font-size: 44px;
+      margin-bottom: 24px;
     }
 
     .aboutContent {
       font-family: 'Dancing Script', cursive;
       font-size: 22px;
-      line-height: 1.8;
+      line-height: 1.9;
       letter-spacing: 0.4px;
     }
 
     .aboutContent ul {
       margin-top: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      padding-left: 20px;
     }
 
     .aboutSignature {
-      margin-top: 24px;
+      margin-top: 30px;
       font-size: 26px;
-      font-weight: 600;
+    }
+
+    .topActions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .notepad {
+        margin: 30px 16px;
+        padding: 35px 25px;
+      }
     }
   </style>
 </head>
 
-<body data-page="about">
-  <div class="container">
+<body>
 
-    <!-- Back + Home -->
-    <div style="margin: 10px 0 16px; display:flex; gap:10px; flex-wrap:wrap;">
+  <div class="notepad">
+
+    <div class="topActions">
       <button class="btnGhost" type="button" onclick="history.back()">← Back</button>
       <a class="btnGhost" href="index.html">🏠 Home</a>
     </div>
@@ -78,10 +104,13 @@
         for teams of all sizes.
       </p>
 
-      <div class="aboutSignature">— Tulasi</div>
+      <div class="aboutSignature">
+        — Tulasi
+      </div>
 
     </div>
 
   </div>
+
 </body>
 </html>
