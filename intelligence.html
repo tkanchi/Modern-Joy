@@ -6,15 +6,11 @@
   <title>Scrummer — Insights</title>
 
   <link rel="stylesheet" href="css/style.css?v=3"/>
-
-  <!-- Unified Executive Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body data-page="insights">
   <div class="appShell">
-
-    <!-- SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark"><span>S</span></div>
@@ -32,7 +28,6 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
         <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-
         <hr>
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
@@ -45,11 +40,7 @@
           </div>
           <div id="moodBadge">🐆 Calm</div>
         </div>
-
-        <div class="xpBar">
-          <div class="xpFill" id="xpFill"></div>
-        </div>
-
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
         <div class="xpMeta">
           <span id="xpText">0 / 300 XP</span>
           <span id="streakText">🧊 streak reset</span>
@@ -61,75 +52,65 @@
       </button>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
-
         <h1 class="sectionTitle">Sprint Intelligence</h1>
         <p class="sectionSub">Risk, confidence, and capacity signals for this sprint.</p>
 
         <div class="info-banner">
-          <strong>Executive View:</strong> Data-driven sprint signal engine.
+          <strong>Executive View:</strong> Clear signals, no blame. Save a snapshot to power 🛡️ Health.
         </div>
 
-        <!-- Toast -->
         <div class="info-banner" id="toast"
              style="display:none; margin-top:12px; border-left:4px solid rgba(99,102,241,.55);">
           —
         </div>
 
         <div style="display:grid; gap:12px; margin-top:12px;">
-
           <div class="info-banner">
             <div class="kvKey">Risk Score</div>
-            <div style="font-size:24px; font-weight:600; margin-top:4px;" id="riskScore">—</div>
-            <div style="color:var(--text-muted); margin-top:2px;" id="riskBand">—</div>
+            <div style="font-size:24px; font-weight:650; margin-top:4px;" id="riskScore">—</div>
+            <div class="mutedText" style="margin-top:2px;" id="riskBand">—</div>
           </div>
 
           <div class="info-banner">
             <div class="kvKey">Confidence</div>
-            <div style="font-size:24px; font-weight:600; margin-top:4px;">
+            <div style="font-size:24px; font-weight:650; margin-top:4px;">
               <span id="confidence">—</span>%
             </div>
-            <div style="color:var(--text-muted); margin-top:2px;" id="confidenceLabel">—</div>
+            <div class="mutedText" style="margin-top:2px;" id="confidenceLabel">—</div>
           </div>
 
           <div class="info-banner">
             <div class="kvKey">Capacity Health</div>
-            <div style="font-size:18px; font-weight:600; margin-top:4px;" id="health">—</div>
-            <div style="color:var(--text-muted); margin-top:2px;" id="capacityNote">—</div>
+            <div style="font-size:18px; font-weight:650; margin-top:4px;" id="health">—</div>
+            <div class="mutedText" style="margin-top:2px;" id="capacityNote">—</div>
           </div>
-
-        </div>
-
-        <!-- ✅ FLOW FOOTER (Setup → Insights → Health → Actions) -->
-        <div class="btnRow" style="margin-top:16px;">
-          <a class="btnGhost" href="index.html">← Back: Setup</a>
-
-          <!-- Primary action always does the important thing -->
-          <button class="btnPrimary" id="saveSnapshotBtn" type="button">
-            Refresh + Save Snapshot
-          </button>
-
-          <!-- Next step is Health (no skipping) -->
-          <a class="btnGhost" href="health.html">Next: Health →</a>
         </div>
 
         <div class="info-banner" style="margin-top:14px;">
           <div class="kvKey">Inputs detected</div>
-          <div style="color:var(--text-muted); margin-top:6px;" id="inputsDetected">—</div>
+          <div class="mutedText" style="margin-top:6px;" id="inputsDetected">—</div>
+        </div>
+
+        <div class="stageIndicator">Flow: Setup → Insights → 🛡️ Health → Actions</div>
+        <div class="stageFooter">
+          <div class="left">
+            <a class="btnStage btnStage-back" href="index.html">← Back: Setup</a>
+          </div>
+          <div class="right">
+            <button class="btnStage btnStage-action" id="refreshAndSaveBtn" type="button">Refresh + Save Snapshot</button>
+            <a class="btnStage btnStage-next" href="health.html">Next: 🛡️ Health →</a>
+          </div>
         </div>
 
       </div>
     </main>
   </div>
 
-  <!-- Scripts -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
-
-  <!-- MUST load before inline script -->
   <script src="js/history.js"></script>
 
   <script>
@@ -243,11 +224,12 @@
 
     function saveSnapshot(signals){
       const history = window.Scrummer && window.Scrummer.history;
-
       if (!history || typeof history.saveSnapshot !== "function") {
         showToast("⚠️ history.js not loaded — snapshot not saved.");
         return;
       }
+
+      const before = history.getHistory ? (history.getHistory() || []).length : null;
 
       history.saveSnapshot({
         riskScore: Number(signals.riskScore ?? 0),
@@ -258,24 +240,23 @@
         capacitySP: Number(signals.capacitySP ?? 0)
       });
 
-      // history.js prevents duplicates within 60 seconds — message should reflect that.
-      showToast("✅ Snapshot attempted (duplicates within 60s are skipped).");
+      const after = history.getHistory ? (history.getHistory() || []).length : null;
+
+      if (before !== null && after !== null && after === before) {
+        showToast("ℹ️ Snapshot skipped (saved recently — 60s duplicate protection).");
+      } else {
+        showToast("✅ Snapshot saved. Open 🛡️ Health to see trends.");
+      }
     }
 
-    // Initial render
     render();
 
-    // Primary: Refresh + Save Snapshot
-    $("saveSnapshotBtn")?.addEventListener("click", () => {
+    $("refreshAndSaveBtn")?.addEventListener("click", () => {
       const s = render();
       saveSnapshot(s);
     });
 
   })();
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supa.js"></script>
-
 </body>
 </html>
