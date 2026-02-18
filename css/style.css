@@ -219,8 +219,8 @@ body{
   border-radius:18px;
   padding:14px 16px;
 
-  background: var(--bg-card);         /* neutral */
-  border: 1px solid var(--border);    /* consistent system border */
+  background: var(--bg-card);
+  border: 1px solid var(--border);
 
   color: var(--text-main);
   font-family: var(--font-ui);
@@ -279,8 +279,8 @@ body.dark-mode .fun-input{ background:#0f172a; }
   min-height:44px;
   padding:12px 18px;
 
-  border-radius:14px;      /* ✅ less chunky than 16 */
-  font-weight:800;         /* ✅ reduces arrow boldness */
+  border-radius:14px;
+  font-weight:800;
   font-size:14px;
   line-height:1;
   letter-spacing:.2px;
@@ -303,7 +303,7 @@ button.btnGhost{
   background-clip:padding-box;
 }
 
-/* PRIMARY (Save) — ✅ looks premium, not odd */
+/* PRIMARY */
 .btnPrimary{
   background: var(--accent);
   color:#fff;
@@ -321,7 +321,7 @@ button.btnGhost{
   box-shadow: 0 4px 10px rgba(11,87,208,.18);
 }
 
-/* GHOST — ✅ borders visible + better contrast */
+/* GHOST */
 .btnGhost{
   background: var(--bg-card);
   color: var(--text-main);
@@ -787,3 +787,60 @@ body.dark-mode .tableMini td{
 
 .tableRight{ text-align:right; }
 .mono{ font-variant-numeric: tabular-nums; }
+
+/* =========================================================
+   Copilot Prompt — Normal text (only headings/labels bold)
+   ========================================================= */
+
+#panelBody{
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.75;
+  white-space: normal; /* allow HTML lists */
+}
+
+#panelBody b,
+#panelBody strong{
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+#panelBody ul{
+  margin: 10px 0 0 18px;
+  padding: 0;
+}
+#panelBody li{
+  margin: 7px 0;
+}
+
+/* =========================================================
+   Premium ⭐ Recommended Badge (no inline styles)
+   Use: <span class="recBadge">⭐ Recommended</span>
+   ========================================================= */
+
+.recBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  margin-left:10px;
+  padding:5px 10px;
+
+  border-radius:999px;
+  border:1px solid rgba(11,87,208,.28);
+  background: linear-gradient(180deg, rgba(11,87,208,.14), rgba(11,87,208,.06));
+
+  color: var(--text-main);
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.2px;
+
+  box-shadow: 0 10px 22px rgba(11,87,208,.10);
+}
+
+:root[data-theme="dark"] .recBadge,
+body.dark-mode .recBadge{
+  border-color: rgba(11,87,208,.38);
+  background: linear-gradient(180deg, rgba(11,87,208,.18), rgba(11,87,208,.10));
+  box-shadow: 0 12px 26px rgba(11,87,208,.14);
+}
