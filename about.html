@@ -5,42 +5,35 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>About — Scrummer</title>
 
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="css/style.css?v=3"/>
 
-  <!-- Handwritten (warm) accent font -->
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Playful premium: handwriting only where it counts */
-    .aboutTitle,
-    .aboutSignature{
-      font-family: 'Dancing Script', cursive;
+    /* Slightly playful premium founder-note styling (NO font change) */
+    .aboutTitle{
+      font-size: 28px;
+      font-weight: 650;
+      letter-spacing: .2px;
+      margin: 0 0 10px;
     }
 
-    .aboutTitle{
-      font-size: 46px;
-      line-height: 1.1;
-      margin: 0 0 18px;
-      letter-spacing: .2px;
+    .aboutKicker{
+      color: var(--text-muted);
+      font-weight: 450;
+      margin: 0 0 16px;
+      line-height: 1.6;
     }
 
     .aboutBody{
-      font-size: 16px;          /* readable */
+      font-size: 16px;
       line-height: 1.75;
-      color: var(--text-main);  /* not grey */
-      font-weight: 450;
+      color: var(--text-main);
+      font-weight: 400;
     }
 
-    .aboutBody .muted{
-      color: var(--text-muted);
-    }
-
-    .aboutSignature{
-      margin-top: 22px;
-      font-size: 28px;
-    }
-
-    /* Make list feel like “notes” */
     .aboutBody ul{
       margin: 10px 0 14px;
       padding-left: 18px;
@@ -49,12 +42,25 @@
       margin: 8px 0;
     }
 
-    /* Tiny “paper pin” vibe (optional) */
+    .aboutSignature{
+      margin-top: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
     .aboutChipRow{
       display:flex;
       gap: 10px;
       flex-wrap:wrap;
       margin-bottom: 14px;
+    }
+
+    /* Optional small divider to feel like a note */
+    .noteDivider{
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0 18px;
+      opacity: .9;
     }
   </style>
 </head>
@@ -69,12 +75,13 @@
     </div>
 
     <h1 class="aboutTitle">About Scrummer</h1>
+    <p class="aboutKicker">
+      A small tool with a big intention: help teams explain sprint reality with context — not blame.
+    </p>
+
+    <div class="noteDivider"></div>
 
     <div class="aboutBody">
-      <p class="muted" style="margin-top:0;">
-        A small tool with a big intention: help teams explain sprint reality with context — not blame.
-      </p>
-
       <p>
         Scrummer was created to help Scrum Masters and delivery teams interpret sprint metrics more intelligently.
       </p>
@@ -85,7 +92,7 @@
         and sometimes misplaced blame on individuals.
       </p>
 
-      <p>Scrummer aims to change that by:</p>
+      <p style="margin-bottom:8px; font-weight:600;">Scrummer aims to change that by:</p>
 
       <ul>
         <li>Making forecasting more realistic and explainable</li>
