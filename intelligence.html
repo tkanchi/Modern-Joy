@@ -4,10 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Insights</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-page="insights">
   <div class="appShell">
     <aside class="sideNav">
       <div class="sideBrand">
@@ -39,8 +43,6 @@
             <div class="lvl" id="xpLevel">Level 1</div>
             <div class="title" id="xpTitle">Rookie</div>
           </div>
-
-          <!-- 🐆 Mood (no inline styles — css handles #moodBadge) -->
           <div id="moodBadge">🐆 Calm</div>
         </div>
 
@@ -70,35 +72,35 @@
 
         <div style="display:grid; gap:12px; margin-top:10px;">
           <div class="info-banner">
-            <div style="font-weight:900;">Risk Score</div>
-            <div style="font-size:22px; font-weight:900; margin-top:4px;" id="riskScore">—</div>
-            <div style="color:var(--text-muted); font-weight:800;" id="riskBand">—</div>
+            <div class="kvKey">Risk Score</div>
+            <div style="font-size:24px; font-weight:650; margin-top:4px;" id="riskScore">—</div>
+            <div style="color:var(--text-muted); font-weight:450; margin-top:2px;" id="riskBand">—</div>
           </div>
 
           <div class="info-banner">
-            <div style="font-weight:900;">Confidence</div>
-            <div style="font-size:22px; font-weight:900; margin-top:4px;">
+            <div class="kvKey">Confidence</div>
+            <div style="font-size:24px; font-weight:650; margin-top:4px;">
               <span id="confidence">—</span>%
             </div>
-            <div style="color:var(--text-muted); font-weight:800;" id="confidenceLabel">—</div>
+            <div style="color:var(--text-muted); font-weight:450; margin-top:2px;" id="confidenceLabel">—</div>
           </div>
 
           <div class="info-banner">
-            <div style="font-weight:900;">Capacity Health</div>
-            <div style="font-size:18px; font-weight:900; margin-top:4px;" id="health">—</div>
-            <div style="color:var(--text-muted); font-weight:800;" id="capacityNote">—</div>
+            <div class="kvKey">Capacity Health</div>
+            <div style="font-size:18px; font-weight:650; margin-top:4px;" id="health">—</div>
+            <div style="color:var(--text-muted); font-weight:450; margin-top:2px;" id="capacityNote">—</div>
           </div>
         </div>
 
-        <div class="btnRow">
+        <div class="btnRow" style="margin-top:12px;">
           <a class="btnGhost" href="index.html">Back to Setup</a>
           <button class="btnPrimary" id="refreshBtn" type="button">Refresh Insights</button>
           <a class="btnGhost" href="suggestions.html">Next: Actions</a>
         </div>
 
         <div class="info-banner" style="margin-top:12px;">
-          <div style="font-weight:900;">Inputs detected</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="inputsDetected">—</div>
+          <div class="kvKey">Inputs detected</div>
+          <div style="color:var(--text-muted); font-weight:450; margin-top:6px;" id="inputsDetected">—</div>
         </div>
       </div>
     </main>
@@ -222,6 +224,5 @@
   <!-- Supabase (cloud sync bridge) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supa.js"></script>
-
 </body>
 </html>
