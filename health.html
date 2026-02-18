@@ -6,18 +6,14 @@
   <title>Scrummer — Health</title>
 
   <link rel="stylesheet" href="css/style.css?v=3"/>
-
-  <!-- Unified Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body data-page="health">
   <div class="appShell">
-
-    <!-- SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
-        <div class="brandMark"><span style="font-weight:800;">S</span></div>
+        <div class="brandMark"><span>S</span></div>
         <div>
           <div class="brandName">SCRUMMER</div>
           <div class="brandTag">Gamified Scrum OS</div>
@@ -32,12 +28,10 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
         <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-
         <hr>
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
 
-      <!-- XP -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
@@ -46,11 +40,7 @@
           </div>
           <div id="moodBadge">🐆 Calm</div>
         </div>
-
-        <div class="xpBar">
-          <div class="xpFill" id="xpFill"></div>
-        </div>
-
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
         <div class="xpMeta">
           <span id="xpText">0 / 300 XP</span>
           <span id="streakText">🧊 streak reset</span>
@@ -62,7 +52,6 @@
       </button>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
         <h1 class="sectionTitle">Sprint Health Dashboard</h1>
@@ -72,13 +61,11 @@
           <strong>Tip:</strong> Health improves when risk trends down and commitment matches capacity.
         </div>
 
-        <!-- Toast -->
         <div class="info-banner" id="toast"
              style="display:none; margin-top:12px; border-left:4px solid rgba(99,102,241,.55);">
           —
         </div>
 
-        <!-- TOP: KPI GRID -->
         <div class="healthGrid" style="margin-top:12px;">
           <div class="info-banner">
             <div class="kvKey">Stability Index</div>
@@ -105,23 +92,18 @@
           </div>
         </div>
 
-        <!-- Narrative -->
         <div class="info-banner" style="margin-top:12px;">
           <div class="kvKey">Executive Narrative</div>
-          <div id="narrative" style="margin-top:8px; line-height:1.8; font-weight:450; color:var(--text-main);">
-            —
-          </div>
+          <div id="narrative" style="margin-top:8px; line-height:1.8; font-weight:450; color:var(--text-main);">—</div>
         </div>
 
-        <!-- Trend Table -->
         <div class="info-banner" style="margin-top:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
             <div class="kvKey">Last 5 sprint snapshots</div>
-
-            <!-- ✅ Secondary actions (ghost) -->
             <div class="btnRow" style="margin:0;">
               <button class="btnGhost" id="newSprintBtn" type="button">➕ New Sprint</button>
               <button class="btnGhost" id="clearHistoryBtn" type="button">🧹 Clear History</button>
+              <button class="btnPrimary" id="refreshHealthBtn" type="button">Refresh</button>
             </div>
           </div>
 
@@ -141,7 +123,7 @@
               <tbody id="historyRows">
                 <tr>
                   <td colspan="7" style="padding:10px; color:var(--text-muted);">
-                    No snapshots yet. Go to <b>Insights</b> → click <b>Refresh + Save Snapshot</b>.
+                    No snapshots yet. Go to Insights → “Refresh + Save Snapshot”.
                   </td>
                 </tr>
               </tbody>
@@ -149,28 +131,39 @@
           </div>
 
           <div class="mutedText" style="margin-top:10px;">
-            *History is saved locally in your browser. Later we can add cloud sync.
+            *History is saved locally in your browser.
           </div>
         </div>
 
-        <!-- ✅ FLOW FOOTER (consistent) -->
-        <div class="btnRow" style="margin-top:12px;">
-          <a class="btnGhost" href="intelligence.html">← Back: Insights</a>
-          <button class="btnPrimary" id="refreshHealthBtn" type="button">Refresh Health</button>
-          <a class="btnGhost" href="suggestions.html">Next: Actions →</a>
+        <div class="stageIndicator">Flow: Setup → Insights → 🛡️ Health → Actions</div>
+        <div class="stageFooter">
+          <div class="left">
+            <a class="btnStage btnStage-back" href="intelligence.html">← Back: Insights</a>
+          </div>
+          <div class="right">
+            <button class="btnStage btnStage-action" id="refreshHealthBtn2" type="button">Refresh Health</button>
+            <a class="btnStage btnStage-next" href="suggestions.html">Next: Actions →</a>
+          </div>
         </div>
 
       </div>
     </main>
   </div>
 
-  <!-- Scripts -->
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
-
-  <!-- History engine must load BEFORE health.js -->
   <script src="js/history.js"></script>
   <script src="js/health.js"></script>
 
+  <script>
+    // Mirror button (so footer refresh works even if health.js binds only one id)
+    (function(){
+      const a = document.getElementById("refreshHealthBtn");
+      const b = document.getElementById("refreshHealthBtn2");
+      if(a && b){
+        b.addEventListener("click", () => a.click());
+      }
+    })();
+  </script>
 </body>
 </html>
