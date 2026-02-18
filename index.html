@@ -4,10 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Setup</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-page="setup">
   <div class="appShell">
     <!-- LEFT SIDEBAR -->
     <aside class="sideNav">
@@ -41,7 +45,6 @@
             <div class="title" id="xpTitle">Rookie</div>
           </div>
 
-          <!-- 🐆 Mood (no inline styles — css handles #moodBadge) -->
           <div id="moodBadge">🐆 Calm</div>
         </div>
 
@@ -70,22 +73,22 @@
           <strong>XP Tip:</strong> Accuracy here = better forecasts + fewer surprises. 🏆
         </div>
 
-        <div style="margin-top:10px;">
-          <div style="font-weight:900; margin-bottom:6px;">Sprint length (working days)</div>
+        <div style="margin-top:10px; max-width:720px;">
+          <div class="kvKey" style="margin-bottom:6px;">Sprint length (working days)</div>
           <input class="fun-input" id="sprintDays" type="number" min="1" placeholder="10"/>
 
-          <div style="font-weight:900; margin:12px 0 6px;">Team members</div>
+          <div class="kvKey" style="margin:12px 0 6px;">Team members</div>
           <input class="fun-input" id="teamMembers" type="number" min="1" placeholder="7"/>
 
-          <div style="font-weight:900; margin:12px 0 6px;">Leave days (total person-days)</div>
+          <div class="kvKey" style="margin:12px 0 6px;">Leave days (total person-days)</div>
           <input class="fun-input" id="leaveDays" type="number" min="0" placeholder="0"/>
 
-          <div style="font-weight:900; margin:12px 0 6px;">Committed story points</div>
+          <div class="kvKey" style="margin:12px 0 6px;">Committed story points</div>
           <input class="fun-input" id="committedSP" type="number" min="0" placeholder="40"/>
 
           <div class="info-banner" style="margin-top:14px;">
-            <div style="font-weight:900;">Last 3 sprint velocities (completed SP)</div>
-            <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+            <div class="kvKey">Last 3 sprint velocities (completed SP)</div>
+            <div style="color:var(--text-muted); font-weight:450; margin-top:6px;">
               Used for average + volatility.
             </div>
 
@@ -97,7 +100,7 @@
           </div>
 
           <div style="margin-top:14px;">
-            <div style="font-weight:900; margin-bottom:6px;">Quick presets</div>
+            <div class="kvKey" style="margin-bottom:6px;">Quick presets</div>
             <div class="btnRow" style="margin-top:8px;">
               <button class="btnGhost" id="presetExcellent" type="button">🟢 Excellent</button>
               <button class="btnGhost" id="presetNormal" type="button">🟡 Normal</button>
@@ -105,15 +108,15 @@
             </div>
           </div>
 
-          <div class="btnRow">
+          <div class="btnRow" style="margin-top:14px;">
             <button class="btnPrimary" id="saveBtn" type="button">Save ✅</button>
             <a class="btnGhost" href="intelligence.html">Next: Insights</a>
             <button class="btnGhost" id="resetBtn" type="button">Reset</button>
           </div>
 
           <div class="info-banner" style="margin-top:16px;">
-            <div style="font-weight:900;">Save status</div>
-            <div id="saveStatus" style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+            <div class="kvKey">Save status</div>
+            <div id="saveStatus" style="color:var(--text-muted); font-weight:450; margin-top:6px;">
               Not saved yet.
             </div>
           </div>
