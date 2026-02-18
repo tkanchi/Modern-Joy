@@ -663,3 +663,78 @@ p, li{
   color: var(--text-main);
   font-weight: 400;
 }
+
+/* ==========================================
+   HEALTH DASHBOARD — EXECUTIVE POLISH
+   ========================================== */
+
+.healthGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.bigMetric {
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 6px;
+  letter-spacing: -0.5px;
+}
+
+.healthTable th {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 6px;
+  color: #6b7280;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+.healthTable td {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.healthTable tr:hover {
+  background: rgba(0,0,0,.02);
+}
+
+/* Executive emphasis */
+.sectionTitle {
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.sectionSub {
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Subtle premium card feel */
+.info-banner {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+/* Muted secondary text */
+.mutedText {
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Buttons refinement */
+.btnGhost {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,.1);
+  font-weight: 500;
+}
+
+.btnGhost:hover {
+  background: rgba(0,0,0,.04);
+}
+
+.btnPrimary {
+  font-weight: 600;
+}
