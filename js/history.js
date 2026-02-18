@@ -40,6 +40,7 @@
 
   function clearHistory(){
     localStorage.removeItem(KEY);
+    localStorage.removeItem(SPRINT_ID_KEY);
   }
 
   function detectMode(risk){
@@ -49,9 +50,19 @@
     return "stable";
   }
 
-  // ✅ call this from Insights when you compute signals
-  function saveSnapshot(data){
-    if (!data || typeof data !== "object") return;
+  /**
+   * saveSnapshot(data, opts)
+   * opts.force: boolean -> bypass duplicate 60s protection
+   *
+   * returns:
+   *  { ok:true, reason:"saved", snapshot }
+   *  { ok:false, reason:"invalid_data" }
+   *  { ok:false, reason:"duplicate_60s", snapshot }
+   */
+  function saveSnapshot(data, opts = {}){
+    if (!data || typeof data !== "object") {
+      return { ok:false, reason:"invalid_data" };
+    }
 
     const history = loadHistory();
 
@@ -70,9 +81,13 @@
       mode: detectMode(Number(data.riskScore || 0))
     };
 
-    // Prevent duplicates within same minute
+    // Prevent duplicates within 60 seconds unless forced
     const last = history[history.length - 1];
-    if (last && Math.abs((last.timestamp || 0) - snapshot.timestamp) < 60000) return;
+    const within60s = last && Math.abs((last.timestamp || 0) - snapshot.timestamp) < 60000;
+
+    if (within60s && !opts.force) {
+      return { ok:false, reason:"duplicate_60s", snapshot };
+    }
 
     history.push(snapshot);
 
@@ -80,6 +95,7 @@
     if (history.length > 30) history.splice(0, history.length - 30);
 
     saveHistory(history);
+    return { ok:true, reason:"saved", snapshot };
   }
 
   function getHistory(){ return loadHistory(); }
@@ -102,7 +118,7 @@
     getHistory,
     getLast,
     getTrend,
-    resetCurrentSprint, // ✅ REQUIRED by health.js
-    clearHistory         // ✅ REQUIRED by health.js
+    resetCurrentSprint,
+    clearHistory
   };
 })();
