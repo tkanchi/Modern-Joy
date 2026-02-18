@@ -4,10 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Forecast</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-page="forecast">
   <div class="appShell">
 
     <!-- SIDEBAR -->
@@ -79,22 +83,22 @@
         <!-- VELOCITY MODE -->
         <!-- ============================= -->
         <div id="velocityBox" class="info-banner" style="margin-top:14px; display:none;">
-          <div style="font-weight:900;">🔵 Velocity-Based Forecast</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+          <div class="kvKey">🔵 Velocity-Based Forecast</div>
+          <div style="color:var(--text-muted); font-weight:450; margin-top:6px;">
             Average Velocity = (Sprint N + Sprint N-1 + Sprint N-2) / 3
           </div>
 
           <div style="display:grid; gap:10px; margin-top:12px;">
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Sprint N</div>
+              <div class="kvKey" style="margin-bottom:6px;">Sprint N</div>
               <input class="fun-input" id="velN" type="number" min="0" step="1" placeholder="e.g., 40">
             </div>
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Sprint N-1</div>
+              <div class="kvKey" style="margin-bottom:6px;">Sprint N-1</div>
               <input class="fun-input" id="velN1" type="number" min="0" step="1" placeholder="e.g., 38">
             </div>
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Sprint N-2</div>
+              <div class="kvKey" style="margin-bottom:6px;">Sprint N-2</div>
               <input class="fun-input" id="velN2" type="number" min="0" step="1" placeholder="e.g., 42">
             </div>
           </div>
@@ -104,8 +108,8 @@
         <!-- CAPACITY MODE -->
         <!-- ============================= -->
         <div id="capacityBox" class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">🟢 Capacity-Based Forecast (Your Exact Logic)</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px; line-height:1.6;">
+          <div class="kvKey">🟢 Capacity-Based Forecast (Your Exact Logic)</div>
+          <div style="color:var(--text-muted); font-weight:450; margin-top:6px; line-height:1.6;">
             Ideal (Days/person) = Sprint Days × Focus Factor<br>
             Total Ideal Days = Team Members × Ideal (Days/person)<br>
             Total Actual Days = Total Ideal Days − (Leaves × Weight)<br>
@@ -114,40 +118,40 @@
 
           <div style="display:grid; gap:10px; margin-top:12px;">
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Total No. of Days in Sprint</div>
+              <div class="kvKey" style="margin-bottom:6px;">Total No. of Days in Sprint</div>
               <input class="fun-input" id="sprintDays" type="number" min="0" step="0.5" placeholder="e.g., 10">
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Focus Factor (0 - 1)</div>
+              <div class="kvKey" style="margin-bottom:6px;">Focus Factor (0 - 1)</div>
               <input class="fun-input" id="focusFactor" type="number" min="0" max="1" step="0.01" value="0.60">
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Total Team Count</div>
+              <div class="kvKey" style="margin-bottom:6px;">Total Team Count</div>
               <input class="fun-input" id="teamCount" type="number" min="0" step="1" placeholder="e.g., 14">
-              <div id="teamCountHint" style="display:none; color:var(--text-muted); font-weight:800; margin-top:6px;">
+              <div id="teamCountHint" style="display:none; color:var(--text-muted); font-weight:450; margin-top:6px;">
                 Team Count is auto-calculated from Roles below.
               </div>
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Story Points per Day (per member)</div>
+              <div class="kvKey" style="margin-bottom:6px;">Story Points per Day (per member)</div>
               <input class="fun-input" id="spPerDay" type="number" min="0" step="0.1" value="4">
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Total No. of Leaves (single field)</div>
+              <div class="kvKey" style="margin-bottom:6px;">Total No. of Leaves (single field)</div>
               <input class="fun-input" id="leaves" type="number" min="0" step="0.5" placeholder="e.g., 10">
-              <div id="leavesHint" style="display:none; color:var(--text-muted); font-weight:800; margin-top:6px;">
+              <div id="leavesHint" style="display:none; color:var(--text-muted); font-weight:450; margin-top:6px;">
                 Leaves are auto-calculated from Roles below.
               </div>
             </div>
 
             <div>
-              <div style="font-weight:900; margin-bottom:6px;">Unavailability Weight (0 - 1)</div>
+              <div class="kvKey" style="margin-bottom:6px;">Unavailability Weight (0 - 1)</div>
               <input class="fun-input" id="weight" type="number" min="0" max="1" step="0.01" value="0.50">
-              <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+              <div style="color:var(--text-muted); font-weight:450; margin-top:6px;">
                 1 = 100% loss, 0.5 = 50% loss, 0.6 = 60% loss
               </div>
             </div>
@@ -155,7 +159,7 @@
 
           <!-- Roles (optional) -->
           <div class="rolesHeader">
-            <div style="font-weight:900;">Roles (optional)</div>
+            <div class="kvKey">Roles (optional)</div>
             <button class="btnGhost" id="addRoleBtn" type="button">+ Add Role</button>
           </div>
 
@@ -165,7 +169,7 @@
             <span class="miniTag" id="rolesLeavesTag">Leaves: 0</span>
           </div>
 
-          <div style="color:var(--text-muted); font-weight:800; margin-top:8px; line-height:1.6;">
+          <div style="color:var(--text-muted); font-weight:450; margin-top:8px; line-height:1.6;">
             If roles exist, Team Count + Leaves are auto-filled from roles, and you get per-role capacity output.
           </div>
 
@@ -183,12 +187,12 @@
           <div class="kvKey">Results</div>
 
           <div class="info-banner" id="warnBox" style="display:none; margin-bottom:12px;">
-            <div style="font-weight:900;">⚠ Check Inputs</div>
-            <div id="warnText" style="color:var(--text-muted); font-weight:800; margin-top:6px;"></div>
+            <div class="kvKey">⚠ Check Inputs</div>
+            <div id="warnText" style="color:var(--text-muted); font-weight:450; margin-top:6px;"></div>
           </div>
 
           <div class="info-banner" id="resultsBox">
-            <div id="resultTitle" style="font-weight:900;">—</div>
+            <div id="resultTitle" class="kvKey">—</div>
             <div id="resultMain" style="margin-top:8px;">—</div>
 
             <!-- ✅ Side-by-side summaries -->
@@ -214,7 +218,7 @@
 
             <!-- 📘 STATIC FORMULA REFERENCE (Always Visible) -->
             <div id="formulaReference" class="info-banner" style="margin-bottom:12px;">
-              <div style="font-weight:900; margin-bottom:6px;">📘 Forecast Formulas (Reference)</div>
+              <div class="kvKey" style="margin-bottom:6px;">📘 Forecast Formulas (Reference)</div>
 
               <div><b>1) Ideal Capacity (Days per person)</b></div>
               <div>Ideal = Sprint Days × Focus Factor</div>
@@ -230,7 +234,7 @@
             </div>
 
             <!-- 🧮 DYNAMIC ACTUAL CALCULATION -->
-            <div id="formulaActual" class="info-banner" style="color:var(--text-muted); font-weight:800; line-height:1.7;">
+            <div id="formulaActual" class="info-banner">
               Enter values and click Calculate to see step-by-step calculation.
             </div>
 
