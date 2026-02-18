@@ -27,7 +27,7 @@
       <nav class="nav">
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink active" href="intelligence.html">📊 Insights</a>
-        <a class="navlink" href="health.html">🛡 Health</a>
+        <a class="navlink" href="health.html">🛡️ Health</a>
         <a class="navlink" href="suggestions.html">🎯 Actions</a>
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
@@ -137,7 +137,7 @@
       t.style.display = "block";
       t.innerHTML = msg;
       clearTimeout(showToast._tm);
-      showToast._tm = setTimeout(() => { t.style.display = "none"; }, 2200);
+      showToast._tm = setTimeout(() => { t.style.display = "none"; }, 2400);
     }
 
     function loadSetup() {
@@ -232,24 +232,29 @@
         ? `Capacity ≈ ${Math.round(s.capacitySP)} SP`
         : "Capacity unavailable";
 
-      // ✅ Snapshot save (no v1 gating)
+      // ✅ Snapshot save + correct toast
       if (saveHistory) {
         const history = window.Scrummer && window.Scrummer.history;
+
         if (history && typeof history.saveSnapshot === "function") {
-          history.saveSnapshot({
+          // Force save on manual refresh (so user always sees it create)
+          const res = history.saveSnapshot({
             riskScore: Number(s.riskScore ?? 0),
             confidence: Number(s.confidence ?? 0),
             overcommitRatio: Number(s.overcommitRatio ?? 0),
             avgVelocity: Number(s.avgVelocity ?? 0),
             committedSP: Number(s.committedSP ?? 0),
             capacitySP: Number(s.capacitySP ?? 0)
-          });
+          }, { force: true });
 
-          // Note: history.js skips duplicates within 60 seconds
-          const last = history.getLast && history.getLast();
-          showToast(last
-            ? `✅ Snapshot saved (${new Date(last.timestamp).toLocaleString()})`
-            : `✅ Snapshot saved`);
+          if (res && res.ok) {
+            const ts = res.snapshot && res.snapshot.timestamp
+              ? new Date(res.snapshot.timestamp).toLocaleString()
+              : "";
+            showToast(`✅ Snapshot saved ${ts ? "(" + ts + ")" : ""}`);
+          } else {
+            showToast("⚠️ Snapshot not saved.");
+          }
         } else {
           showToast("⚠️ history.js not loaded — snapshot not saved.");
         }
@@ -258,7 +263,7 @@
 
     render(false);
 
-    $("refreshBtn").addEventListener("click", () => {
+    $("refreshBtn")?.addEventListener("click", () => {
       render(true);
     });
 
