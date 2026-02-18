@@ -445,8 +445,6 @@
           </ul>
         `;
 
-        // NOTE: planning/refine/review content kept as-is from previous version (works well).
-        // Retro + Daily + Planning now contain the "must not miss" and purpose content.
         return {
           planning: {
             stable: [
@@ -800,7 +798,7 @@
         onCeremony(activeKey, true);
       });
 
-      // ✅ Copy Retro Summary button
+      // ✅ SMART Copy Retro Summary (auto-extract actions, owners, dates, themes, facts)
       $("copyRetroBtn").addEventListener("click", () => {
         const setup = loadSetup();
         const ctx = buildContext(setup);
@@ -808,6 +806,7 @@
         const mode = modeFromRisk(risk);
 
         const arr = loadDecisionHistory();
+
         const findLatest = (ceremony) => {
           for (let i = arr.length - 1; i >= 0; i--) {
             if ((arr[i].ceremony || "").toLowerCase() === ceremony) return arr[i];
@@ -821,6 +820,156 @@
 
         const retroRec = retroRecommendation(ctx, mode, false);
 
+        function norm(s){ return String(s || "").trim(); }
+
+        function splitLines(text){
+          return norm(text)
+            .replace(/\r/g, "")
+            .split("\n")
+            .map(l => l.trim())
+            .filter(Boolean);
+        }
+
+        function looksLikeAction(line){
+          const l = line.toLowerCase();
+          return (
+            l.startsWith("- ") ||
+            l.startsWith("•") ||
+            l.startsWith("* ") ||
+            l.startsWith("action") ||
+            l.startsWith("decision") ||
+            l.startsWith("experiment") ||
+            l.startsWith("we will") ||
+            l.startsWith("try ") ||
+            l.includes(" owner") ||
+            l.includes(" due") ||
+            l.includes(" by ") ||
+            l.includes(" next sprint") ||
+            l.includes(" agree") ||
+            l.includes(" stop ") ||
+            l.includes(" start ") ||
+            l.includes(" continue ")
+          );
+        }
+
+        function extractOwner(line){
+          const m1 = line.match(/owner\s*[:\-]\s*([A-Za-z0-9 _@.\-]+)/i);
+          if (m1 && m1[1]) return m1[1].trim();
+
+          const m2 = line.match(/@\w+/);
+          if (m2) return m2[0];
+
+          const m3 = line.match(/assigned to\s*([A-Za-z0-9 _@.\-]+)/i);
+          if (m3 && m3[1]) return m3[1].trim();
+
+          return "";
+        }
+
+        function extractDue(line){
+          const m1 = line.match(/(due|by)\s*[:\-]\s*([A-Za-z0-9 ,\-\/]+)/i);
+          if (m1 && m1[2]) return m1[2].trim();
+
+          const m2 = line.match(/\b(20\d{2}[-\/]\d{1,2}[-\/]\d{1,2})\b/);
+          if (m2) return m2[1];
+
+          const m3 = line.match(/\b(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})\b/);
+          if (m3) return m3[1];
+
+          const m4 = line.match(/\b(mon|tue|wed|thu|fri|sat|sun)\b/i);
+          if (m4) return m4[1];
+
+          return "";
+        }
+
+        function extractMeasure(line){
+          const m = line.match(/(measure|success)\s*[:\-]\s*(.+)$/i);
+          return m && m[2] ? m[2].trim() : "";
+        }
+
+        function stripBullet(line){
+          return line.replace(/^(\-|\*|•)\s*/,"").trim();
+        }
+
+        function pickTopThemes(lines){
+          const cand = [];
+          lines.forEach(l => {
+            const x = l.toLowerCase();
+            if (x.startsWith("theme") || x.startsWith("because") || x.startsWith("issue") || x.startsWith("problem")) cand.push(l);
+          });
+          return cand.slice(0,2);
+        }
+
+        function collectFacts(lines){
+          const cand = [];
+          lines.forEach(l => {
+            const x = l.toLowerCase();
+            if (
+              /\d/.test(l) ||
+              x.includes("shipped") ||
+              x.includes("missed") ||
+              x.includes("spill") ||
+              x.includes("blocked") ||
+              x.includes("delay") ||
+              x.includes("interrupt")
+            ) cand.push(l);
+          });
+          return cand.slice(0,4);
+        }
+
+        function buildActions(lines){
+          const actions = [];
+
+          lines.forEach(line => {
+            if (!looksLikeAction(line)) return;
+
+            const raw = stripBullet(line);
+            const parts = raw.split("|").map(p => p.trim()).filter(Boolean);
+
+            let text = parts[0] || raw;
+            text = text.replace(/^(action|decision|experiment)\s*[:\-]\s*/i,"").trim();
+
+            let owner = "";
+            let due = "";
+            let measure = "";
+
+            [raw, ...parts].forEach(p => {
+              owner = owner || extractOwner(p);
+              due = due || extractDue(p);
+              measure = measure || extractMeasure(p);
+            });
+
+            owner = owner || extractOwner(raw);
+            due = due || extractDue(raw);
+            measure = measure || extractMeasure(raw);
+
+            if (!text) return;
+
+            actions.push({ text, owner, due, measure });
+          });
+
+          const seen = new Set();
+          const uniq = [];
+          actions.forEach(a => {
+            const k = a.text.toLowerCase();
+            if (seen.has(k)) return;
+            seen.add(k);
+            uniq.push(a);
+          });
+
+          return uniq.slice(0,6);
+        }
+
+        const rawNotes = best ? (best.text || "") : "";
+        const lines = splitLines(rawNotes);
+
+        const themes = pickTopThemes(lines);
+        const facts = collectFacts(lines);
+        const actions = buildActions(lines);
+
+        function fmtLine(label, value){
+          return value ? `- ${label}: ${value}` : `- ${label}: —`;
+        }
+
         const header = `# Sprint Retro Summary
 Date: ${nowStamp()}
 Mode: ${mode.toUpperCase()} (Risk ${risk}/100)
@@ -828,37 +977,44 @@ Template: ${retroRec.template.name}
 Icebreaker: ${retroRec.icebreaker}
 
 ## Context
-- Avg velocity: ${ctx.avgVel > 0 ? round2(ctx.avgVel) + " SP" : "—"}
-- Capacity est: ${ctx.capacitySP > 0 ? round2(ctx.capacitySP) + " SP" : "—"}
-- Committed: ${ctx.committedSP > 0 ? round2(ctx.committedSP) + " SP" : "—"}
-- Overcommit: ${ctx.over > 0 ? (ctx.over > 1 ? ("YES (~" + Math.max(0, ctx.overPct) + "%)") : "No") : "—"}
+${fmtLine("Avg velocity", ctx.avgVel > 0 ? round2(ctx.avgVel) + " SP" : "")}
+${fmtLine("Capacity est", ctx.capacitySP > 0 ? round2(ctx.capacitySP) + " SP" : "")}
+${fmtLine("Committed", ctx.committedSP > 0 ? round2(ctx.committedSP) + " SP" : "")}
+${fmtLine("Overcommit", ctx.over > 0 ? (ctx.over > 1 ? ("YES (~" + Math.max(0, ctx.overPct) + "%)") : "No") : "")}
 
 ## What happened (facts)
-- [Add 2–4 factual observations]
+${facts.length ? facts.map(x => `- ${x}`).join("\n") : "- [Add 2–4 factual observations]"}
 
 ## Themes (top 1–2)
-- Theme 1:
-- Theme 2:
+${themes.length ? themes.map(x => `- ${x}`).join("\n") : "- Theme 1:\n- Theme 2:"}
 
 ## Decisions / Actions (experiments)
-- Experiment 1: [If we do X, then Y improves] | Owner: ___ | Due: ___ | Measure: ___
-- Experiment 2: [Optional] | Owner: ___ | Due: ___ | Measure: ___
-
-## Notes captured
 `;
 
-        const body = best ? (best.text || "").trim() : "— (No saved notes yet. Use this section to paste your decision notes.)";
+        const actionsBlock = actions.length
+          ? actions.map((a, i) => {
+              const owner = a.owner ? a.owner : "___";
+              const due = a.due ? a.due : "___";
+              const measure = a.measure ? a.measure : "___";
+              return `- Experiment ${i+1}: ${a.text}\n  Owner: ${owner} | Due: ${due} | Measure: ${measure}`;
+            }).join("\n")
+          : `- Experiment 1: [If we do X, then Y improves]\n  Owner: ___ | Due: ___ | Measure: ___\n- Experiment 2: [Optional]\n  Owner: ___ | Due: ___ | Measure: ___`;
 
-        const out = header + body + `
+        const notesBlock = `
+## Raw notes captured
+${rawNotes.trim() ? rawNotes.trim() : "— (No saved notes yet. Paste your notes here.)"}
 
 ## Follow-up
 - Check progress in: [Next Retro / Mid-sprint checkpoint]
 `;
 
+        const out = header + actionsBlock + notesBlock;
+
         navigator.clipboard?.writeText(out);
-        saveStatus.textContent = "📋 Retro Summary copied";
-        saveHint.textContent = best
-          ? "Copied using your latest saved notes."
+
+        saveStatus.textContent = "📋 Retro Summary copied (smart extract)";
+        saveHint.textContent = rawNotes.trim()
+          ? "Copied with auto-extracted actions/owners/dates where possible."
           : "Copied a ready-to-fill template (no notes found yet).";
       });
 
