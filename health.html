@@ -17,7 +17,6 @@
     <!-- SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
-        <!-- ✅ Keep logo consistent across OS: use text mark instead of emoji -->
         <div class="brandMark"><span style="font-weight:800;">S</span></div>
         <div>
           <div class="brandName">SCRUMMER</div>
@@ -25,18 +24,16 @@
         </div>
       </div>
 
-      <!-- ✅ Single clean nav (no duplicates) -->
       <nav class="nav">
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
-        <a class="navlink active" href="health.html">📈 Health</a>
+        <a class="navlink active" href="health.html">🛡️ Health</a>
         <a class="navlink" href="suggestions.html">🎯 Actions</a>
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
         <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
         <hr>
-
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
 
@@ -75,7 +72,7 @@
           <strong>Tip:</strong> Health improves when risk trends down and commitment matches capacity.
         </div>
 
-        <!-- ✅ Toast placeholder (use instead of alerts in health.js) -->
+        <!-- Toast -->
         <div class="info-banner" id="toast"
              style="display:none; margin-top:12px; border-left:4px solid rgba(99,102,241,.55);">
           —
@@ -120,10 +117,11 @@
         <div class="info-banner" style="margin-top:12px;">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
             <div class="kvKey">Last 5 sprint snapshots</div>
+
+            <!-- ✅ Secondary actions (ghost) -->
             <div class="btnRow" style="margin:0;">
               <button class="btnGhost" id="newSprintBtn" type="button">➕ New Sprint</button>
               <button class="btnGhost" id="clearHistoryBtn" type="button">🧹 Clear History</button>
-              <button class="btnPrimary" id="refreshHealthBtn" type="button">Refresh</button>
             </div>
           </div>
 
@@ -143,7 +141,7 @@
               <tbody id="historyRows">
                 <tr>
                   <td colspan="7" style="padding:10px; color:var(--text-muted);">
-                    No snapshots yet. Click <b>Refresh</b> to create the first one.
+                    No snapshots yet. Go to <b>Insights</b> → click <b>Refresh + Save Snapshot</b>.
                   </td>
                 </tr>
               </tbody>
@@ -155,8 +153,10 @@
           </div>
         </div>
 
+        <!-- ✅ FLOW FOOTER (consistent) -->
         <div class="btnRow" style="margin-top:12px;">
-          <a class="btnGhost" href="intelligence.html">← Back to Insights</a>
+          <a class="btnGhost" href="intelligence.html">← Back: Insights</a>
+          <button class="btnPrimary" id="refreshHealthBtn" type="button">Refresh Health</button>
           <a class="btnGhost" href="suggestions.html">Next: Actions →</a>
         </div>
 
@@ -168,7 +168,7 @@
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
 
-  <!-- ✅ History engine must load BEFORE health.js -->
+  <!-- History engine must load BEFORE health.js -->
   <script src="js/history.js"></script>
   <script src="js/health.js"></script>
 
