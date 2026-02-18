@@ -67,7 +67,7 @@
         <!-- Dynamic mode banner -->
         <div class="info-banner" id="modeBanner" style="margin-top:12px; display:none;">
           <div style="font-weight:900;" id="modeTitle">—</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px; white-space:pre-line;" id="modeBody">—</div>
+          <div style="color:var(--text-muted); font-weight:600; margin-top:6px; white-space:pre-line; line-height:1.7;" id="modeBody">—</div>
         </div>
 
         <!-- Ceremony buttons -->
@@ -79,18 +79,19 @@
           <button class="btnGhost" type="button" data-cer="retro">♻️ Retro</button>
         </div>
 
+        <!-- Prompt panel -->
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
-
-          <!-- richer prompt block -->
-          <div style="color:var(--text-muted); font-weight:800; margin-top:8px; white-space:pre-line; line-height:1.7;" id="panelBody">
+          <!-- NOTE: weight controlled by CSS (#panelBody) so only headings/labels in <b> are bold -->
+          <div id="panelBody" style="margin-top:8px;">
             Your prompts will appear here.
           </div>
         </div>
 
+        <!-- Notes -->
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900;">Capture decisions</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
+          <div style="color:var(--text-muted); font-weight:600; margin-top:6px;">
             Saved locally in your browser. (Later we can sync this to cloud too.)
           </div>
 
@@ -102,7 +103,7 @@
           </div>
 
           <div style="margin-top:10px; font-weight:900;" id="saveStatus"></div>
-          <div style="margin-top:6px; color:var(--text-muted); font-weight:800;" id="saveHint"></div>
+          <div style="margin-top:6px; color:var(--text-muted); font-weight:600;" id="saveHint"></div>
         </div>
 
         <div class="btnRow">
@@ -212,170 +213,171 @@
           "Signals look stable.\nCopilot will optimize flow + reduce WIP.\n⭐ Suggested ceremony: 🧠 Refinement";
       }
 
-      // ---------- Prompts ----------
-      function getPrompts(ceremony, mode){
+      // ---------- Prompts as HTML ----------
+      function getPromptsHTML(ceremony, mode){
         const P = {
           planning: {
-            stable:
-`🎯 Sprint Planning (Stable)
-1) Sprint Goal (outcome, not a list)
-   - What user/business value are we shipping?
-
-2) Commitment check
-   - Which 3 items are must-have?
-   - What becomes stretch?
-
-3) Flow plan
-   - Who pairs on the riskiest story?
-   - What gets done first to unblock others?
-
-4) Guardrails
-   - How will we prevent scope creep?
-   - What is our “stop doing” list?`,
-
-            watch:
-`⚠️ Sprint Planning (Watchlist)
-1) Reality check
-   - Forecast capacity vs committed SP?
-   - What can be dropped with least pain?
-
-2) Risk ownership
-   - Top 3 risks + owners
-   - Dependencies + escalation path
-
-3) Checkpoint rule
-   - Day-3 checkpoint:
-     If behind → de-scope immediately.
-
-4) WIP discipline
-   - What WIP limit will we follow?`,
-
-            rescue:
-`🚨 Sprint Planning (Rescue)
-1) Reduce scope NOW
-   - Cut 10–20% immediately
-   - Lock ONLY sprint goal
-
-2) Freeze churn
-   - No new work unless goal is safe
-   - Finish-first rule
-
-3) Escalations
-   - What needs leadership support today?
-   - Who escalates by when?
-
-4) Daily control
-   - Mandatory daily checkpoint owner`
+            stable: `
+              <div><b>🎯 Sprint Planning (Stable)</b></div>
+              <ul>
+                <li><b>Sprint Goal:</b> What user/business outcome are we shipping?</li>
+                <li><b>Commitment:</b> Which 3 items are must-have? What is stretch?</li>
+                <li><b>Flow plan:</b> Who pairs on the riskiest story? What unblocks others first?</li>
+                <li><b>Guardrails:</b> How do we prevent scope creep? What do we stop doing?</li>
+              </ul>
+            `,
+            watch: `
+              <div><b>⚠️ Sprint Planning (Watchlist)</b></div>
+              <ul>
+                <li><b>Reality check:</b> Forecast capacity vs committed SP. What can drop with least pain?</li>
+                <li><b>Risk ownership:</b> Top 3 risks + owners. Dependencies + escalation path.</li>
+                <li><b>Checkpoint:</b> Day-3 rule — if behind, de-scope immediately.</li>
+                <li><b>WIP discipline:</b> What WIP limit will we follow?</li>
+              </ul>
+            `,
+            rescue: `
+              <div><b>🚨 Sprint Planning (Rescue)</b></div>
+              <ul>
+                <li><b>Cut scope now:</b> Remove 10–20% immediately. Lock only the sprint goal.</li>
+                <li><b>Freeze churn:</b> No new work unless the goal is safe. Finish-first rule.</li>
+                <li><b>Escalations:</b> What needs leadership/support today? Who escalates by when?</li>
+                <li><b>Daily control:</b> Assign a checkpoint owner for daily tracking.</li>
+              </ul>
+            `
           },
 
           daily: {
-            stable:
-`🟢 Daily Scrum (Stable)
-1) Are we on track for sprint goal?
-2) Any blocked item > 24h?
-3) WIP check: starting too much?
-4) Who needs pairing/support today?`,
-
-            watch:
-`🟡 Daily Scrum (Watchlist)
-1) Plan vs actual: are we behind today?
-2) Most likely spillover story?
-3) Unplanned work entered yesterday?
-4) If we slip tomorrow → what do we de-scope?`,
-
-            rescue:
-`🔴 Daily Scrum (Rescue)
-1) Goal survival: still achievable?
-2) Cut list: what drops TODAY?
-3) Who owns the top blocker NOW?
-4) What must be escalated before noon?`
+            stable: `
+              <div><b>🟢 Daily Scrum (Stable)</b></div>
+              <ul>
+                <li><b>On track?</b> Are we progressing toward the sprint goal?</li>
+                <li><b>Blockers:</b> Any blocked item > 24h?</li>
+                <li><b>WIP check:</b> Are we starting too much vs finishing?</li>
+                <li><b>Help:</b> Who needs pairing/support today?</li>
+              </ul>
+            `,
+            watch: `
+              <div><b>🟡 Daily Scrum (Watchlist)</b></div>
+              <ul>
+                <li><b>Plan vs actual:</b> Are we behind today?</li>
+                <li><b>Spillover risk:</b> Which story is most likely to slip?</li>
+                <li><b>Interruptions:</b> What unplanned work entered yesterday?</li>
+                <li><b>Decision:</b> If we slip tomorrow, what do we de-scope?</li>
+              </ul>
+            `,
+            rescue: `
+              <div><b>🔴 Daily Scrum (Rescue)</b></div>
+              <ul>
+                <li><b>Goal survival:</b> Is the sprint goal still achievable?</li>
+                <li><b>Cut list:</b> What drops today?</li>
+                <li><b>Ownership:</b> Who takes the top blocker now?</li>
+                <li><b>Escalate:</b> What must be escalated before noon?</li>
+              </ul>
+            `
           },
 
           refine: {
-            stable:
-`🧠 Refinement (Stable)
-1) Slice stories to 1–2 day chunks
-2) Acceptance criteria clarity check
-3) Dependencies: identify + remove early
-4) Define “ready” checklist for next sprint`,
-
-            watch:
-`🧠 Refinement (Watchlist)
-1) Kill ambiguity: missing AC? add now
-2) Identify risk story: spike or split?
-3) Reduce volatility: slice large stories
-4) Remove 16/32 bombs if possible`,
-
-            rescue:
-`🧠 Refinement (Rescue)
-1) Stop big stories entering sprint
-2) Split anything > 2–3 days
-3) Remove dependencies before planning
-4) Default to safest scope`
+            stable: `
+              <div><b>🧠 Refinement (Stable)</b></div>
+              <ul>
+                <li><b>Slicing:</b> Break stories into 1–2 day chunks.</li>
+                <li><b>Criteria:</b> Are acceptance criteria unambiguous?</li>
+                <li><b>Dependencies:</b> Identify + remove early.</li>
+                <li><b>Ready rules:</b> Define a “ready” checklist.</li>
+              </ul>
+            `,
+            watch: `
+              <div><b>🧠 Refinement (Watchlist)</b></div>
+              <ul>
+                <li><b>Kill ambiguity:</b> Missing AC? Add now.</li>
+                <li><b>Risk story:</b> Split or spike?</li>
+                <li><b>Reduce volatility:</b> Slice large stories; avoid 16/32 bombs.</li>
+              </ul>
+            `,
+            rescue: `
+              <div><b>🧠 Refinement (Rescue)</b></div>
+              <ul>
+                <li><b>No big stories:</b> Stop anything > 2–3 days entering sprint.</li>
+                <li><b>De-risk:</b> Remove dependencies before planning.</li>
+                <li><b>Safest scope:</b> Default to minimum viable sprint goal.</li>
+              </ul>
+            `
           },
 
           review: {
-            stable:
-`🎬 Sprint Review (Stable)
-1) Value shipped: what changed for users?
-2) Feedback: what should we adjust next?
-3) Scope lessons: what surprised us?
-4) Follow-ups: owners + dates`,
-
-            watch:
-`🎬 Sprint Review (Watchlist)
-1) What didn’t ship and why?
-2) Was commitment too high?
-3) Where did we lose time?
-4) One change for predictability next sprint`,
-
-            rescue:
-`🎬 Sprint Review (Rescue)
-1) Root causes: why did we slip?
-2) What must change immediately?
-3) What do we STOP next sprint?
-4) Escalation items + owners`
+            stable: `
+              <div><b>🎬 Sprint Review (Stable)</b></div>
+              <ul>
+                <li><b>Value:</b> What changed for users?</li>
+                <li><b>Feedback:</b> What should we adjust next?</li>
+                <li><b>Surprises:</b> What surprised us in scope/time?</li>
+                <li><b>Follow-ups:</b> Capture owners + dates.</li>
+              </ul>
+            `,
+            watch: `
+              <div><b>🎬 Sprint Review (Watchlist)</b></div>
+              <ul>
+                <li><b>Not shipped:</b> What didn’t ship and why?</li>
+                <li><b>Commitment:</b> Was commitment too high?</li>
+                <li><b>Time loss:</b> Where did we lose time (interruptions)?</li>
+                <li><b>One change:</b> Improve predictability next sprint.</li>
+              </ul>
+            `,
+            rescue: `
+              <div><b>🎬 Sprint Review (Rescue)</b></div>
+              <ul>
+                <li><b>Root cause:</b> Why did we slip?</li>
+                <li><b>Immediate change:</b> What must change now?</li>
+                <li><b>Stop doing:</b> What do we stop next sprint?</li>
+                <li><b>Escalations:</b> Owners + deadlines.</li>
+              </ul>
+            `
           },
 
           retro: {
-            stable:
-`♻️ Retro (Stable)
-1) What increased throughput?
-2) What reduced stress?
-3) One improvement to protect flow
-4) One experiment next sprint`,
-
-            watch:
-`♻️ Retro (Watchlist)
-1) Where did volatility come from?
-2) Which risks were missed early?
-3) One guardrail to add next sprint
-4) Owner + date for improvement`,
-
-            rescue:
-`♻️ Retro (Rescue)
-1) Where did process break?
-2) Biggest constraint (WIP/interruptions/deps)?
-3) One non-negotiable rule next sprint
-4) What do we stop immediately?`
+            stable: `
+              <div><b>♻️ Retro (Stable)</b></div>
+              <ul>
+                <li><b>Boosted throughput:</b> What helped us ship more?</li>
+                <li><b>Reduced stress:</b> What kept it calm?</li>
+                <li><b>Protect flow:</b> One improvement to lock in.</li>
+                <li><b>Experiment:</b> One experiment next sprint.</li>
+              </ul>
+            `,
+            watch: `
+              <div><b>♻️ Retro (Watchlist)</b></div>
+              <ul>
+                <li><b>Volatility:</b> Where did it come from?</li>
+                <li><b>Missed risks:</b> Which risks were missed early?</li>
+                <li><b>Guardrail:</b> One guardrail to add next sprint.</li>
+                <li><b>Owner + date:</b> Make it real.</li>
+              </ul>
+            `,
+            rescue: `
+              <div><b>♻️ Retro (Rescue)</b></div>
+              <ul>
+                <li><b>System failure:</b> Where did process break?</li>
+                <li><b>Biggest constraint:</b> WIP, interruptions, dependencies?</li>
+                <li><b>Non-negotiable rule:</b> One rule next sprint.</li>
+                <li><b>Stop now:</b> What do we stop immediately?</li>
+              </ul>
+            `
           }
         };
 
         const group = P[ceremony];
-        if (!group) return "Choose a ceremony.";
+        if (!group) return `<div>Select a ceremony.</div>`;
         return group[mode] || group.stable;
       }
 
       // ---------- Button visuals: recommended + selected ----------
       function clearVisualStates(){
         document.querySelectorAll("[data-cer]").forEach(btn => {
-          btn.classList.remove("cer-active");
-          btn.style.background = "";     // minimal inline polish
+          btn.style.background = "";
           btn.style.borderColor = "";
           btn.style.boxShadow = "";
           btn.style.color = "";
 
-          // remove old badge if any
           const badge = btn.querySelector(".recBadge");
           if (badge) badge.remove();
         });
@@ -386,18 +388,9 @@
         document.querySelectorAll("[data-cer]").forEach(btn => {
           if (btn.getAttribute("data-cer") !== key) return;
 
-          // add badge
           const b = document.createElement("span");
           b.className = "recBadge";
           b.textContent = "⭐ Recommended";
-          b.style.marginLeft = "8px";
-          b.style.padding = "4px 8px";
-          b.style.borderRadius = "999px";
-          b.style.fontSize = "12px";
-          b.style.fontWeight = "900";
-          b.style.border = "1px solid var(--border)";
-          b.style.background = "rgba(11,87,208,.08)";
-          b.style.whiteSpace = "nowrap";
           btn.appendChild(b);
         });
       }
@@ -407,7 +400,6 @@
           const isActive = btn.getAttribute("data-cer") === key;
           if (!isActive) return;
 
-          btn.classList.add("cer-active");
           btn.style.background = "rgba(11,87,208,.10)";
           btn.style.borderColor = "rgba(11,87,208,.30)";
           btn.style.boxShadow = "0 10px 24px rgba(11,87,208,.10)";
@@ -419,7 +411,6 @@
       function onCeremony(key){
         const setup = loadSetup();
 
-        // prefer computeSignals if available
         let risk = null;
         const compute = window.Scrummer && window.Scrummer.computeSignals;
         if (typeof compute === "function") {
@@ -442,18 +433,15 @@
         };
 
         panelTitle.textContent = titles[key] || "Ceremony";
-        panelBody.textContent = getPrompts(key, mode);
+        panelBody.innerHTML = getPromptsHTML(key, mode);   /* HTML enables bold headings/labels only */
 
-        // visuals
         clearVisualStates();
         if (recommendedKey) applyRecommendedBadge(recommendedKey);
         setActiveButton(key);
       }
 
       document.querySelectorAll("[data-cer]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          onCeremony(btn.getAttribute("data-cer"));
-        });
+        btn.addEventListener("click", () => onCeremony(btn.getAttribute("data-cer")));
       });
 
       // ---------- Save decisions ----------
@@ -497,12 +485,12 @@
         renderSaveStatus();
       });
 
-      // Init
+      // Init notes
       const existing = loadNotes();
       notes.value = existing.text || "";
       renderSaveStatus();
 
-      // Auto render mode once + auto-open recommended ceremony
+      // Auto render mode + auto-open recommended ceremony
       (function bootMode(){
         const setup = loadSetup();
 
@@ -522,11 +510,9 @@
         const rec = recommendCeremony(mode);
         recommendedKey = rec;
 
-        // show recommended badge
         clearVisualStates();
         applyRecommendedBadge(rec);
 
-        // ✅ auto-open recommended ceremony so Copilot doesn't feel empty
         onCeremony(rec);
       })();
 
