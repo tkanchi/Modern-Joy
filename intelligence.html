@@ -72,6 +72,12 @@
           <strong>Executive View:</strong> Data-driven sprint signal engine.
         </div>
 
+        <!-- ✅ Toast -->
+        <div class="info-banner" id="toast"
+             style="display:none; margin-top:12px; border-left:4px solid rgba(99,102,241,.55);">
+          —
+        </div>
+
         <div style="display:grid; gap:12px; margin-top:12px;">
 
           <div class="info-banner">
@@ -115,6 +121,8 @@
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
+
+  <!-- ✅ MUST load before inline script -->
   <script src="js/history.js"></script>
 
   <script>
@@ -123,12 +131,18 @@
     const STORAGE_KEY = "scrummer_setup_v1";
     const $ = (id) => document.getElementById(id);
 
+    function showToast(msg){
+      const t = $("toast");
+      if(!t) return;
+      t.style.display = "block";
+      t.innerHTML = msg;
+      clearTimeout(showToast._tm);
+      showToast._tm = setTimeout(() => { t.style.display = "none"; }, 2200);
+    }
+
     function loadSetup() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      } catch {
-        return {};
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+      catch { return {}; }
     }
 
     function num(v) {
@@ -137,31 +151,23 @@
     }
 
     function computeSignals(setup) {
-
       const sprintDays  = num(setup.sprintDays);
       const teamMembers = num(setup.teamMembers);
       const leaveDays   = num(setup.leaveDays);
       const committedSP = num(setup.committedSP);
 
-      const velocities = [num(setup.v1), num(setup.v2), num(setup.v3)]
-        .filter(x => x > 0);
-
-      const avgVelocity = velocities.length
-        ? velocities.reduce((a,b)=>a+b,0) / velocities.length
-        : 0;
+      const velocities = [num(setup.v1), num(setup.v2), num(setup.v3)].filter(x => x > 0);
+      const avgVelocity = velocities.length ? velocities.reduce((a,b)=>a+b,0) / velocities.length : 0;
 
       const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
       const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays));
-      const capacitySP = avgVelocity * (1 - leaveRatio);
 
+      const capacitySP = avgVelocity * (1 - leaveRatio);
       const overcommitRatio = capacitySP > 0 ? committedSP / capacitySP : 0;
 
       let risk = 0;
-
       if (committedSP <= 0 || avgVelocity <= 0) risk += 30;
-      if (overcommitRatio > 1)
-        risk += Math.min(50, (overcommitRatio - 1) * 120);
-
+      if (overcommitRatio > 1) risk += Math.min(50, (overcommitRatio - 1) * 120);
       risk = Math.max(0, Math.min(100, Math.round(risk)));
 
       const confidence = Math.max(10, Math.min(95, 100 - risk));
@@ -196,34 +202,57 @@
     }
 
     function render(saveHistory = false) {
-
       const setup = loadSetup();
 
-      const detected = Object.entries(setup)
-        .filter(([k,v]) => v !== "" && v !== null && v !== undefined)
-        .map(([k,v]) => `${k}: ${v}`)
-        .join(" • ");
+      const detected = [
+        ["sprintDays", setup.sprintDays],
+        ["teamMembers", setup.teamMembers],
+        ["leaveDays", setup.leaveDays],
+        ["committedSP", setup.committedSP],
+        ["v1", setup.v1],
+        ["v2", setup.v2],
+        ["v3", setup.v3]
+      ]
+      .filter(([k,v]) => v !== "" && v !== null && v !== undefined)
+      .map(([k,v]) => `${k}: ${v}`)
+      .join(" • ");
 
-      $("inputsDetected").textContent =
-        detected || "No setup found. Go to 🚀 Setup and Save.";
+      $("inputsDetected").textContent = detected || "No setup found. Go to 🚀 Setup and Save.";
 
-      const signals = computeSignals(setup);
+      const s = computeSignals(setup);
 
-      $("riskScore").textContent = signals.riskScore;
-      $("riskBand").textContent = band(signals.riskScore);
+      $("riskScore").textContent = Number.isFinite(s.riskScore) ? s.riskScore : "—";
+      $("riskBand").textContent = band(Number(s.riskScore || 0));
 
-      $("confidence").textContent = signals.confidence;
-      $("confidenceLabel").textContent = confidenceLabel(signals.confidence);
+      $("confidence").textContent = Number.isFinite(s.confidence) ? s.confidence : "—";
+      $("confidenceLabel").textContent = confidenceLabel(Number(s.confidence || 0));
 
-      $("health").textContent = signals.capacityHealth;
-      $("capacityNote").textContent =
-        signals.capacitySP
-          ? `Capacity ≈ ${Math.round(signals.capacitySP)} SP`
-          : "Capacity unavailable";
+      $("health").textContent = s.capacityHealth || "—";
+      $("capacityNote").textContent = s.capacitySP
+        ? `Capacity ≈ ${Math.round(s.capacitySP)} SP`
+        : "Capacity unavailable";
 
-      if (saveHistory && setup.v1) {
-        const history = window.Scrummer?.history;
-        history?.saveSnapshot(signals);
+      // ✅ Snapshot save (no v1 gating)
+      if (saveHistory) {
+        const history = window.Scrummer && window.Scrummer.history;
+        if (history && typeof history.saveSnapshot === "function") {
+          history.saveSnapshot({
+            riskScore: Number(s.riskScore ?? 0),
+            confidence: Number(s.confidence ?? 0),
+            overcommitRatio: Number(s.overcommitRatio ?? 0),
+            avgVelocity: Number(s.avgVelocity ?? 0),
+            committedSP: Number(s.committedSP ?? 0),
+            capacitySP: Number(s.capacitySP ?? 0)
+          });
+
+          // Note: history.js skips duplicates within 60 seconds
+          const last = history.getLast && history.getLast();
+          showToast(last
+            ? `✅ Snapshot saved (${new Date(last.timestamp).toLocaleString()})`
+            : `✅ Snapshot saved`);
+        } else {
+          showToast("⚠️ history.js not loaded — snapshot not saved.");
+        }
       }
     }
 
