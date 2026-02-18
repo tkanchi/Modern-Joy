@@ -18,7 +18,6 @@
         </div>
       </div>
 
-      <!-- ✅ ONE nav, everything inside -->
       <nav class="nav">
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
@@ -32,15 +31,12 @@
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
 
-      <!-- ✅ XP WIDGET (no inline styles on mood badge) -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
             <div class="lvl" id="xpLevel">Level 1</div>
             <div class="title" id="xpTitle">Rookie</div>
           </div>
-
-          <!-- 🐆 Mood -->
           <div id="moodBadge">🐆 Calm</div>
         </div>
 
@@ -79,9 +75,15 @@
     </main>
   </div>
 
+  <!-- Keep these (local signals + UI) -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
+
+  <!-- OPTIONAL: add this only if you want unified Scrummer.setup/loadSetup behavior
+       (If you already include shell.js globally or in another file, don’t duplicate it.)
+  -->
+  <!-- <script src="js/shell.js"></script> -->
 
   <script>
     (function () {
@@ -132,9 +134,18 @@
         return { riskScore:risk, confidence, capacitySP, overcommitRatio, vol };
       }
 
+      // ✅ FIX: match fallback logic — allow actions with at least 1 velocity
       function hasMinimumSetup(setup) {
-        const needed = ["sprintDays","teamMembers","committedSP","v1","v2","v3"];
-        return needed.every(k => setup[k] !== undefined && setup[k] !== null && setup[k] !== "");
+        const sprintDaysOK = Number(setup.sprintDays) > 0;
+        const teamOK = Number(setup.teamMembers) > 0;
+        const committedOK = setup.committedSP !== undefined && setup.committedSP !== null && setup.committedSP !== "";
+
+        const v1 = Number(setup.v1) || 0;
+        const v2 = Number(setup.v2) || 0;
+        const v3 = Number(setup.v3) || 0;
+        const velCount = [v1, v2, v3].filter(x => x > 0).length;
+
+        return sprintDaysOK && teamOK && committedOK && velCount >= 1;
       }
 
       function card(title, why, how, tier) {
@@ -165,7 +176,7 @@
           wrap.appendChild(card(
             "Setup first",
             "I can’t generate strong actions without your sprint inputs.",
-            "Go to 🚀 Setup → enter sprint days, team members, committed SP, and last 3 velocities.\nThen click Save ✅.",
+            "Go to 🚀 Setup → enter sprint days, team members, committed SP, and at least 1 past velocity.\nThen click Save ✅.",
             "⚠️"
           ));
           return;
@@ -231,14 +242,9 @@
     })();
   </script>
 
-  <!-- Supabase (cloud sync bridge) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supa.js"></script>
+  <!-- ✅ FIX: Removed duplicate Supabase includes from this page.
+       (Only include Supabase where you actually need cloud auth/sync, e.g., auth.html)
+  -->
 
-  <footer>
-  <a href="about.html">About</a> |
-  <a href="feedback.html">Feedback</a>
-</footer>
-  
 </body>
 </html>
