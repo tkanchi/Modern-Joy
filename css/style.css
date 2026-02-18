@@ -594,3 +594,72 @@ hr{
 
 strong{ font-weight: 650; }
 b{ font-weight: 650; }
+
+/* =========================================================
+   TYPOGRAPHY UNIFIER — Slightly gamified, mature
+   Fixes: inconsistent bold + grey text + inline 800/900
+   ========================================================= */
+
+/* Force unified font everywhere (even if some pages forget) */
+body, button, input, textarea, select{
+  font-family: var(--font-ui) !important;
+}
+
+/* Stop “everything is bold” */
+body{
+  font-weight: 400 !important;
+  color: var(--text-main) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings (consistent) */
+h1, h2, h3, .sectionTitle{
+  font-weight: 650 !important;
+}
+
+/* Common subtitle / helper text */
+.sectionSub,
+.brandTag,
+.kvLabel,
+.xpMeta,
+.miniTag{
+  color: var(--text-muted) !important;
+  font-weight: 450 !important;
+}
+
+/* Keys/labels: medium emphasis */
+.kvKey,
+.summaryTitle,
+.brandName{
+  font-weight: 600 !important;
+  color: var(--text-main) !important;
+}
+
+/* Inputs normal */
+input, textarea, select{
+  font-weight: 450 !important;
+  color: var(--text-main) !important;
+}
+
+/* Buttons consistent */
+.btnPrimary, .btnGhost, .themeToggle, .navlink{
+  font-weight: 600 !important;
+}
+
+/* Override inline bold (your pages use 800/900 inline a lot) */
+[style*="font-weight:900"],
+[style*="font-weight:800"]{
+  font-weight: 600 !important;
+}
+
+/* IMPORTANT numbers and values */
+#resultMain, .kvVal, .mono{
+  color: var(--text-main) !important;
+}
+
+/* Prevent normal paragraphs from being grey unless intended */
+p, li{
+  color: var(--text-main);
+  font-weight: 400;
+}
