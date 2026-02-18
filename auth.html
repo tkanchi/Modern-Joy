@@ -4,10 +4,16 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Login</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+
+<body data-page="auth">
   <div class="appShell">
+
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark">🐆</div>
@@ -30,6 +36,26 @@
         <a class="navlink active" href="auth.html">🔐 Account</a>
       </nav>
 
+      <!-- XP WIDGET (keeps sidebar consistent with other pages) -->
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div>
+            <div class="lvl" id="xpLevel">Level 1</div>
+            <div class="title" id="xpTitle">Rookie</div>
+          </div>
+          <div id="moodBadge">🐆 Calm</div>
+        </div>
+
+        <div class="xpBar">
+          <div class="xpFill" id="xpFill"></div>
+        </div>
+
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+
       <button class="themeToggle" id="themeToggle" type="button">
         Theme: <span id="themeMode">Light</span>
       </button>
@@ -37,13 +63,19 @@
 
     <main class="main">
       <div class="sectionCard">
+
+        <div class="btnRow" style="margin-bottom:12px;">
+          <button class="btnGhost" type="button" onclick="history.back()">← Back</button>
+          <a class="btnGhost" href="index.html">🏠 Home</a>
+        </div>
+
         <h1 class="sectionTitle">Account</h1>
         <p class="sectionSub">Sign in to save your sprint data in the cloud.</p>
 
-        <div class="info-banner">
-          <div style="font-weight:900;">Login</div>
+        <div class="info-banner" style="margin-top:12px;">
+          <div class="kvKey">Login</div>
 
-          <div style="display:grid; gap:10px; margin-top:10px;">
+          <div style="display:grid; gap:10px; margin-top:10px; max-width:520px;">
             <input class="fun-input" id="email" type="email" placeholder="Email">
             <input class="fun-input" id="password" type="password" placeholder="Password">
           </div>
@@ -55,14 +87,24 @@
             <a class="btnGhost" href="index.html">Go to Setup ➜</a>
           </div>
 
-          <div id="status" style="margin-top:10px; font-weight:900;"></div>
-          <div id="hint" style="margin-top:6px; color:var(--text-muted); font-weight:800;"></div>
+          <div id="status" style="margin-top:10px; font-weight:650;"></div>
+          <div id="hint" style="margin-top:6px; color:var(--text-muted); font-weight:450;"></div>
         </div>
+
+        <div class="info-banner" style="margin-top:14px;">
+          <div class="kvKey">What does cloud sync mean?</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.6; margin-top:6px;">
+            When logged in, your sprint setup can be synced so it doesn’t disappear when you switch devices or browsers.
+            If you’re not logged in, Scrummer still works locally in your browser.
+          </div>
+        </div>
+
       </div>
     </main>
   </div>
 
   <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supa.js"></script>
@@ -113,7 +155,6 @@
     };
 
     refresh();
-
   </script>
 </body>
 </html>
