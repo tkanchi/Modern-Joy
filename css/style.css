@@ -789,3 +789,73 @@ p, li{
 .btnStage-next:hover {
   transform: translateY(-1px);
 }
+
+/* ==========================================
+   FLOW UX — Stage indicator + unified footer
+   ========================================== */
+
+.stageIndicator{
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 6px;
+  margin-bottom: 10px;
+  letter-spacing: .2px;
+}
+
+/* Unified footer row */
+.stageFooter{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top: 16px;
+}
+
+/* Premium unified buttons */
+.btnStage{
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  transition: transform .12s ease, filter .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.btnStage:hover{ transform: translateY(-1px); }
+
+.btnStage-back{
+  background: transparent;
+  border-color: rgba(17,24,39,.12);
+  color: var(--text-main);
+}
+.btnStage-back:hover{ background: rgba(17,24,39,.04); }
+
+.btnStage-primary{
+  background: #111827;
+  border-color: rgba(17,24,39,.25);
+  color: #fff;
+}
+.btnStage-primary:hover{ filter: brightness(1.05); }
+
+.btnStage-next{
+  background: var(--accent);
+  border-color: rgba(99,102,241,.35);
+  color:#fff;
+}
+.btnStage-next:hover{ filter: brightness(1.05); }
+
+/* Optional: disable state */
+.btnStage[aria-disabled="true"],
+.btnStage:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
