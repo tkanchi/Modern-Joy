@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scrummer — Feedback</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="feedback">
+
+  <div class="workspace">
+    <div class="card" style="max-width:600px;margin:auto;">
+      <h2>We’d Love Your Feedback</h2>
+      <p>
+        Your feedback helps improve Scrummer for Scrum Masters, teams, 
+        and enterprise leaders.
+      </p>
+
+      <form action="https://formspree.io/f/mnjbzjnz" method="POST">
+        
+        <label>Name</label>
+        <input type="text" name="name" required />
+
+        <label>Email</label>
+        <input type="email" name="email" required />
+
+        <label>Your Feedback</label>
+        <textarea name="message" rows="6" required></textarea>
+
+        <!-- Optional: Prevent spam -->
+        <input type="hidden" name="_subject" value="New Scrummer Feedback">
+        <input type="hidden" name="_captcha" value="false">
+
+        <button type="submit" class="btn primary">
+          Send Feedback
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
