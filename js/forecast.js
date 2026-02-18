@@ -1,8 +1,11 @@
 /* =========================================================
    Scrummer — forecast.js (FINAL + ROLES + STORAGE + SUMMARY)
    FIXES:
-   ✅ Formulas reference should be always visible (keep in HTML: #formulaReference)
-   ✅ Actual calculations should render separately into #formulaActual
+   ✅ Reference formulas always visible (#formulaReference in HTML)
+   ✅ Actual calculations render ONLY into #formulaActual
+   ✅ Placeholder updates correctly when mode changes
+   ✅ Reset keeps defaults (focusFactor/spPerDay/weight)
+   ✅ Roles labels no longer hard-bold inline
    ========================================================= */
 
 (() => {
@@ -37,6 +40,10 @@
     const mode = $("forecastMode")?.value || "capacity";
     show($("velocityBox"), mode === "velocity");
     show($("capacityBox"), mode === "capacity");
+
+    // keep placeholder aligned with mode whenever user switches
+    showCalcPlaceholder(mode);
+
     return mode;
   }
 
@@ -147,17 +154,17 @@
     row.innerHTML = `
       <div class="roleRowTop">
         <div>
-          <div style="font-weight:900; margin-bottom:6px;">Role</div>
+          <div class="kvKey" style="margin-bottom:6px;">Role</div>
           <input class="fun-input roleName" placeholder="e.g., Dev / QA / BA" value="${escapeHtml(name)}">
         </div>
 
         <div>
-          <div style="font-weight:900; margin-bottom:6px;">Members</div>
+          <div class="kvKey" style="margin-bottom:6px;">Members</div>
           <input class="fun-input roleMembers mono" type="number" min="0" step="1" placeholder="0" value="${members}">
         </div>
 
         <div>
-          <div style="font-weight:900; margin-bottom:6px;">Leaves</div>
+          <div class="kvKey" style="margin-bottom:6px;">Leaves</div>
           <input class="fun-input roleLeaves mono" type="number" min="0" step="0.5" placeholder="0" value="${leaves}">
         </div>
 
@@ -199,8 +206,7 @@
   }
 
   // ---------------------------
-  // NEW: Render helper for “Your Calculation”
-  // (writes into #formulaActual only)
+  // “Your Calculation” placeholder
   // ---------------------------
   function showCalcPlaceholder(mode){
     const el = $("formulaActual");
@@ -211,8 +217,8 @@
       : "Enter values, then click Calculate to see your step-by-step capacity forecast.";
 
     setHTML("formulaActual", `
-      <div style="font-weight:900; margin-bottom:6px;">🧮 Your Calculation</div>
-      <div style="color:var(--text-muted); font-weight:800; line-height:1.6;">
+      <div class="kvKey" style="margin-bottom:6px;">🧮 Your Calculation</div>
+      <div style="color:var(--text-muted); font-weight:450; line-height:1.6;">
         ${msg}
       </div>
     `);
@@ -242,9 +248,8 @@
     setText("resultTitle", "🔵 Velocity Forecast");
     setText("resultMain", `Forecast SP = ${round2(avgVel)} SP`);
 
-    // ✅ Write ONLY actual calculation to #formulaActual
     setHTML("formulaActual", `
-      <div style="font-weight:900; margin-bottom:6px;">🧮 Your Calculation</div>
+      <div class="kvKey" style="margin-bottom:6px;">🧮 Your Calculation</div>
       <div><b>Average Velocity</b> = (Sprint N + Sprint N-1 + Sprint N-2) / 3</div>
       <div style="margin-top:8px;">
         = (${round2(n)} + ${round2(n1)} + ${round2(n2)}) / 3
@@ -254,11 +259,10 @@
   }
 
   // ---------------------------
-  // Capacity (exact + summaries)
+  // Capacity
   // ---------------------------
   function renderTeamSummary({
-    sprintDays, focusFactor, teamCount, spPerDay, leaves, weight,
-    idealPerPersonDays, totalIdealDays, totalActualDays, forecastSP
+    idealPerPersonDays, totalIdealDays, leaves, weight, totalActualDays, forecastSP
   }){
     setHTML("teamSummary", `
       <div class="kvRow"><div class="kvLabel">Ideal days/person</div><div class="kvVal mono">${round2(idealPerPersonDays)}</div></div>
@@ -272,7 +276,7 @@
   function renderRoleSummary({ idealPerPersonDays, spPerDay, weight }){
     const rows = getRoleRows();
     if(!rows.length){
-      setHTML("roleSummary", `<div style="color:var(--text-muted); font-weight:800;">No roles added.</div>`);
+      setHTML("roleSummary", `<div style="color:var(--text-muted); font-weight:450;">No roles added.</div>`);
       return;
     }
 
@@ -332,7 +336,6 @@
     if(weightRaw < 0 || weightRaw > 1)     { showCalcPlaceholder("capacity"); return warn("Unavailability Weight must be between 0 and 1."); }
     if(leaves < 0) { showCalcPlaceholder("capacity"); return warn("Leaves cannot be negative."); }
 
-    // ✅ EXACT logic (unchanged)
     const idealPerPersonDays = sprintDays * focusFactor;
     const totalIdealDays = teamCount * idealPerPersonDays;
     const totalActualDays = totalIdealDays - (leaves * weight);
@@ -348,15 +351,13 @@
     show($("summaryGrid"), true);
 
     renderTeamSummary({
-      sprintDays, focusFactor, teamCount, spPerDay, leaves, weight,
-      idealPerPersonDays, totalIdealDays, totalActualDays, forecastSP
+      idealPerPersonDays, totalIdealDays, leaves, weight, totalActualDays, forecastSP
     });
 
     renderRoleSummary({ idealPerPersonDays, spPerDay, weight });
 
-    // ✅ Write ONLY actual calculation to #formulaActual (reference stays in HTML)
     setHTML("formulaActual", `
-      <div style="font-weight:900; color:var(--text-main); margin-bottom:6px;">🧮 Your Calculation</div>
+      <div class="kvKey" style="margin-bottom:6px;">🧮 Your Calculation</div>
 
       <div><b>1) Ideal Capacity (Days per person)</b></div>
       <div>= ${round2(sprintDays)} × ${round2(focusFactor)} = <b>${round2(idealPerPersonDays)}</b></div>
@@ -372,7 +373,7 @@
       <div>= max(0, ${round2(totalActualDays)}) × ${round2(spPerDay)}</div>
       <div>= <b>${round2(forecastSP)}</b></div>
 
-      ${roleMeta.hasRoles ? `<div style="margin-top:10px; color:var(--text-muted); font-weight:800;">
+      ${roleMeta.hasRoles ? `<div style="margin-top:10px; color:var(--text-muted); font-weight:450;">
         Role totals auto-fill Team Count & Leaves from Roles.
       </div>` : ``}
     `);
@@ -385,17 +386,21 @@
   }
 
   function reset(){
-    document.querySelectorAll("input.fun-input").forEach(i => i.value = "");
+    // clear only forecast inputs, not everything with fun-input (roles use fun-input too)
+    ["velN","velN1","velN2","sprintDays","teamCount","leaves"].forEach(id => { const el = $(id); if(el) el.value = ""; });
 
-    const wrap = $("rolesContainer");
-    if(wrap) wrap.innerHTML = "";
-    localStorage.removeItem(LS_KEY);
-
+    // restore defaults
     if($("focusFactor")) $("focusFactor").value = "0.60";
     if($("spPerDay")) $("spPerDay").value = "4";
     if($("weight")) $("weight").value = "0.50";
 
+    // roles reset
+    const wrap = $("rolesContainer");
+    if(wrap) wrap.innerHTML = "";
+    localStorage.removeItem(LS_KEY);
+
     updateRoleTags();
+    showCalcPlaceholder($("forecastMode")?.value || "capacity");
     calculate();
   }
 
@@ -406,21 +411,24 @@
 
     $("addRoleBtn")?.addEventListener("click", () => addRoleRow({ name:"Role", members:"", leaves:"" }));
 
-    [
-      "velN","velN1","velN2",
-      "sprintDays","focusFactor","teamCount","spPerDay","leaves","weight"
-    ].forEach(id => $(id)?.addEventListener("input", calculate));
+    ["velN","velN1","velN2","sprintDays","focusFactor","teamCount","spPerDay","leaves","weight"]
+      .forEach(id => $(id)?.addEventListener("input", calculate));
 
+    // load roles once
     const stored = loadRoles();
     if(stored.length){
-      stored.forEach(r => addRoleRow(r));
+      const wrap = $("rolesContainer");
+      if(wrap) wrap.innerHTML = "";
+      stored.forEach(r => {
+        const row = makeRoleRow(r);
+        $("rolesContainer")?.appendChild(row);
+      });
+      updateRoleTags();
     } else {
       updateRoleTags();
     }
 
-    // ✅ On load, show placeholder in “Your Calculation”
     showCalcPlaceholder($("forecastMode")?.value || "capacity");
-
     calculate();
   }
 
