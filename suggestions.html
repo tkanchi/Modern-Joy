@@ -15,28 +15,26 @@
   <div class="appShell">
     <aside class="sideNav">
       <div class="sideBrand">
-       <div class="brandMark"><span>S</span></div>
+        <div class="brandMark"><span>S</span></div>
         <div>
           <div class="brandName">SCRUMMER</div>
           <div class="brandTag">Gamified Scrum OS</div>
         </div>
       </div>
 
-       <!-- Nav Bar -->
+      <!-- Nav Bar (linear order) -->
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="health.html">🛡️ Health</a>
+        <a class="navlink active" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
-    <nav class="nav">
-  <a class="navlink" href="index.html">🚀 Setup</a>
-  <a class="navlink" href="intelligence.html">📊 Insights</a>
-  <a class="navlink" href="health.html">🛡️ Health</a>
-  <a class="navlink active" href="suggestions.html">🎯 Actions</a>
-  <a class="navlink" href="workspace.html">🤖 Copilot</a>
-  <a class="navlink" href="forecast.html">📦 Forecast</a>
-  <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-
-  <hr>
-
-  <a class="navlink" href="auth.html">🔐 Account</a>
-</nav>
+        <hr>
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
 
       <div class="xpWidget">
         <div class="xpTop">
@@ -73,11 +71,18 @@
 
         <div id="actionsWrap" style="display:grid; gap:12px; margin-top:10px;"></div>
 
-        <div class="btnRow" style="margin-top:12px;">
-          <a class="btnGhost" href="intelligence.html">← Back to Insights</a>
-          <button class="btnPrimary" id="refreshBtn" type="button">Refresh Actions</button>
-          <a class="btnGhost" href="workspace.html">Next: Copilot ➜</a>
+        <!-- ✅ STRICT LINEAR FLOW BUTTONS -->
+        <div class="btnRow--split" style="margin-top:14px;">
+          <div class="left">
+            <a class="btnGhost" href="health.html">← Back: Health</a>
+          </div>
+
+          <div class="right">
+            <button class="btnGhost" id="refreshBtn" type="button">↻ Refresh Actions</button>
+            <a class="btnPrimary" href="workspace.html">Next: Copilot →</a>
+          </div>
         </div>
+
       </div>
     </main>
   </div>
@@ -136,7 +141,7 @@
         return { riskScore:risk, confidence, capacitySP, overcommitRatio, vol };
       }
 
-      // ✅ FIX: match fallback logic — allow actions with at least 1 velocity
+      // allow actions with at least 1 velocity
       function hasMinimumSetup(setup) {
         const sprintDaysOK = Number(setup.sprintDays) > 0;
         const teamOK = Number(setup.teamMembers) > 0;
