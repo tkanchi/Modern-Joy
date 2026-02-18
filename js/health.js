@@ -94,7 +94,12 @@
 
     const confScore = clamp01(confLast / 100);
 
-    const idx = (0.45 * clamp01(1 - (riskLast/100))) + (0.25 * trendScore) + (0.20 * overScore) + (0.10 * confScore);
+    const idx =
+      (0.45 * clamp01(1 - (riskLast/100))) +
+      (0.25 * trendScore) +
+      (0.20 * overScore) +
+      (0.10 * confScore);
+
     const pctIdx = Math.round(idx * 100);
 
     let label = "🟢 Stable";
@@ -106,7 +111,8 @@
 
   function buildNarrative(history){
     if (!history.length) {
-      return "No sprint history yet. Open <b>Insights</b> and click <b>Refresh Insights</b> once to create your first snapshot.";
+      return `No sprint history yet. Open <b>Insights</b> and click
+              <b>Refresh + Save Snapshot</b> once to create your first snapshot.`;
     }
 
     const last = history[history.length - 1];
@@ -156,7 +162,9 @@
     const last5 = history.slice(-5).reverse();
 
     if (!last5.length) {
-      tbody.innerHTML = `<tr><td colspan="7" style="padding:10px; color:var(--text-muted);">No history yet. Open Insights and click Refresh once.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="padding:10px; color:var(--text-muted);">
+        No history yet. Go to Insights → <b>Refresh + Save Snapshot</b>.
+      </td></tr>`;
       return;
     }
 
@@ -167,13 +175,13 @@
 
       return `
         <tr>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);">${fmtWhen(s.timestamp)}</td>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);">${emojiMode(s.mode)}</td>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);" align="right">${Number(s.riskScore ?? 0)}</td>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);" align="right">${Number(s.confidence ?? 0)}</td>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);" align="right">${Math.round(Number(s.committedSP ?? 0))}</td>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);" align="right">${Math.round(Number(s.capacitySP ?? 0))}</td>
-          <td style="padding:10px 6px; border-top:1px solid rgba(0,0,0,.06);" align="right">${overText}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);">${fmtWhen(s.timestamp)}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);">${emojiMode(s.mode)}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);" align="right">${Number(s.riskScore ?? 0)}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);" align="right">${Number(s.confidence ?? 0)}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);" align="right">${Math.round(Number(s.committedSP ?? 0))}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);" align="right">${Math.round(Number(s.capacitySP ?? 0))}</td>
+          <td style="padding:10px 6px; border-top:1px solid var(--border);" align="right">${overText}</td>
         </tr>
       `;
     }).join("");
@@ -182,59 +190,88 @@
   function render(){
     const history = window.Scrummer?.history?.getHistory?.() || [];
 
-    // KPIs
     if (!history.length) {
-      $("stabilityIndex").textContent = "—";
-      $("stabilityLabel").textContent = "No data yet";
-      $("latestMode").textContent = "—";
-      $("latestModeHint").textContent = "Open Insights to create a snapshot.";
-      $("overcommitStreak").textContent = "—";
-      $("overcommitHint").textContent = "No data yet";
-      $("predictability").textContent = "—";
-      $("predictabilityHint").textContent = "Need snapshots.";
-      $("narrative").innerHTML = buildNarrative(history);
+      $("stabilityIndex") && ($("stabilityIndex").textContent = "—");
+      $("stabilityLabel") && ($("stabilityLabel").textContent = "No data yet");
+      $("latestMode") && ($("latestMode").textContent = "—");
+      $("latestModeHint") && ($("latestModeHint").textContent = "Open Insights to create a snapshot.");
+      $("overcommitStreak") && ($("overcommitStreak").textContent = "—");
+      $("overcommitHint") && ($("overcommitHint").textContent = "No data yet");
+      $("predictability") && ($("predictability").textContent = "—");
+      $("predictabilityHint") && ($("predictabilityHint").textContent = "Need snapshots.");
+      $("narrative") && ($("narrative").innerHTML = buildNarrative(history));
       renderTable(history);
       return;
     }
 
     const st = computeStabilityIndex(history);
-    $("stabilityIndex").textContent = `${st.pctIdx}`;
-    $("stabilityLabel").textContent = st.label;
+    $("stabilityIndex") && ($("stabilityIndex").textContent = `${st.pctIdx}`);
+    $("stabilityLabel") && ($("stabilityLabel").textContent = st.label);
 
     const last = history[history.length - 1];
-    $("latestMode").textContent = emojiMode(last.mode);
-    $("latestModeHint").textContent = `Latest snapshot: ${fmtWhen(last.timestamp)}`;
+    $("latestMode") && ($("latestMode").textContent = emojiMode(last.mode));
+    $("latestModeHint") && ($("latestModeHint").textContent = `Latest snapshot: ${fmtWhen(last.timestamp)}`);
 
     const streak = computeOvercommitStreak(history);
-    $("overcommitStreak").textContent = `${streak}`;
-    $("overcommitHint").textContent =
+    $("overcommitStreak") && ($("overcommitStreak").textContent = `${streak}`);
+    $("overcommitHint") && ($("overcommitHint").textContent =
       (streak >= 2 ? "Pattern: commitment > capacity repeatedly."
         : streak === 1 ? "Overcommit detected in latest sprint."
-        : "No overcommit streak.");
+        : "No overcommit streak.")
+    );
 
     const pred = computePredictability(history);
-    $("predictability").textContent = pred.score;
-    $("predictabilityHint").textContent = pred.hint;
+    $("predictability") && ($("predictability").textContent = pred.score);
+    $("predictabilityHint") && ($("predictabilityHint").textContent = pred.hint);
 
-    $("narrative").innerHTML = buildNarrative(history);
+    $("narrative") && ($("narrative").innerHTML = buildNarrative(history));
     renderTable(history);
   }
 
-  // Buttons
-  $("refreshHealthBtn")?.addEventListener("click", () => {
+  // ---- Premium safe "double click to confirm" for destructive action ----
+  function confirmBySecondClick(btnEl, label1, label2, windowMs=2500){
+    if(!btnEl) return false;
+    const now = Date.now();
+    const last = Number(btnEl.dataset.confirmTs || 0);
+    if (now - last < windowMs) {
+      btnEl.dataset.confirmTs = "0";
+      btnEl.textContent = label1;
+      return true;
+    }
+    btnEl.dataset.confirmTs = String(now);
+    btnEl.textContent = label2;
+    toast("⚠️ Click again to confirm.");
+    setTimeout(() => {
+      if (Number(btnEl.dataset.confirmTs || 0) === now) {
+        btnEl.dataset.confirmTs = "0";
+        btnEl.textContent = label1;
+      }
+    }, windowMs);
+    return false;
+  }
+
+  // Buttons: support both ids (header + footer)
+  const refreshBtnA = $("refreshHealthBtn");
+  const refreshBtnB = $("refreshHealthBtn2");
+
+  function onRefresh(){
     render();
     toast("✅ Refreshed health view");
-  });
+  }
+
+  refreshBtnA?.addEventListener("click", onRefresh);
+  refreshBtnB?.addEventListener("click", onRefresh);
 
   $("newSprintBtn")?.addEventListener("click", () => {
     const id = window.Scrummer?.history?.resetCurrentSprint?.();
     render();
-    toast(`🆕 New sprint started: <b>${id || "OK"}</b>. Now open Insights → Refresh once to log snapshot.`);
+    toast(`🆕 New sprint started: <b>${id || "OK"}</b>. Now open Insights → <b>Refresh + Save Snapshot</b>.`);
   });
 
-  $("clearHistoryBtn")?.addEventListener("click", () => {
-    const ok = confirm("Clear all local sprint history? This cannot be undone.");
-    if (!ok) return;
+  $("clearHistoryBtn")?.addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    if (!confirmBySecondClick(btn, "🧹 Clear History", "⚠️ Confirm Clear")) return;
+
     window.Scrummer?.history?.clearHistory?.();
     render();
     toast("🧹 Cleared local sprint history");
