@@ -72,7 +72,7 @@
           <strong>Executive View:</strong> Data-driven sprint signal engine.
         </div>
 
-        <!-- ✅ Toast -->
+        <!-- Toast -->
         <div class="info-banner" id="toast"
              style="display:none; margin-top:12px; border-left:4px solid rgba(99,102,241,.55);">
           —
@@ -102,10 +102,17 @@
 
         </div>
 
+        <!-- ✅ FLOW FOOTER (Setup → Insights → Health → Actions) -->
         <div class="btnRow" style="margin-top:16px;">
-          <a class="btnGhost" href="index.html">Back to Setup</a>
-          <button class="btnPrimary" id="refreshBtn" type="button">Refresh Insights</button>
-          <a class="btnGhost" href="suggestions.html">Next: Actions</a>
+          <a class="btnGhost" href="index.html">← Back: Setup</a>
+
+          <!-- Primary action always does the important thing -->
+          <button class="btnPrimary" id="saveSnapshotBtn" type="button">
+            Refresh + Save Snapshot
+          </button>
+
+          <!-- Next step is Health (no skipping) -->
+          <a class="btnGhost" href="health.html">Next: Health →</a>
         </div>
 
         <div class="info-banner" style="margin-top:14px;">
@@ -122,12 +129,11 @@
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
 
-  <!-- ✅ MUST load before inline script -->
+  <!-- MUST load before inline script -->
   <script src="js/history.js"></script>
 
   <script>
   (function () {
-
     const STORAGE_KEY = "scrummer_setup_v1";
     const $ = (id) => document.getElementById(id);
 
@@ -201,7 +207,7 @@
       return "Fragile";
     }
 
-    function render(saveHistory = false) {
+    function render() {
       const setup = loadSetup();
 
       const detected = [
@@ -232,39 +238,37 @@
         ? `Capacity ≈ ${Math.round(s.capacitySP)} SP`
         : "Capacity unavailable";
 
-      // ✅ Snapshot save + correct toast
-      if (saveHistory) {
-        const history = window.Scrummer && window.Scrummer.history;
-
-        if (history && typeof history.saveSnapshot === "function") {
-          // Force save on manual refresh (so user always sees it create)
-          const res = history.saveSnapshot({
-            riskScore: Number(s.riskScore ?? 0),
-            confidence: Number(s.confidence ?? 0),
-            overcommitRatio: Number(s.overcommitRatio ?? 0),
-            avgVelocity: Number(s.avgVelocity ?? 0),
-            committedSP: Number(s.committedSP ?? 0),
-            capacitySP: Number(s.capacitySP ?? 0)
-          }, { force: true });
-
-          if (res && res.ok) {
-            const ts = res.snapshot && res.snapshot.timestamp
-              ? new Date(res.snapshot.timestamp).toLocaleString()
-              : "";
-            showToast(`✅ Snapshot saved ${ts ? "(" + ts + ")" : ""}`);
-          } else {
-            showToast("⚠️ Snapshot not saved.");
-          }
-        } else {
-          showToast("⚠️ history.js not loaded — snapshot not saved.");
-        }
-      }
+      return s;
     }
 
-    render(false);
+    function saveSnapshot(signals){
+      const history = window.Scrummer && window.Scrummer.history;
 
-    $("refreshBtn")?.addEventListener("click", () => {
-      render(true);
+      if (!history || typeof history.saveSnapshot !== "function") {
+        showToast("⚠️ history.js not loaded — snapshot not saved.");
+        return;
+      }
+
+      history.saveSnapshot({
+        riskScore: Number(signals.riskScore ?? 0),
+        confidence: Number(signals.confidence ?? 0),
+        overcommitRatio: Number(signals.overcommitRatio ?? 0),
+        avgVelocity: Number(signals.avgVelocity ?? 0),
+        committedSP: Number(signals.committedSP ?? 0),
+        capacitySP: Number(signals.capacitySP ?? 0)
+      });
+
+      // history.js prevents duplicates within 60 seconds — message should reflect that.
+      showToast("✅ Snapshot attempted (duplicates within 60s are skipped).");
+    }
+
+    // Initial render
+    render();
+
+    // Primary: Refresh + Save Snapshot
+    $("saveSnapshotBtn")?.addEventListener("click", () => {
+      const s = render();
+      saveSnapshot(s);
     });
 
   })();
