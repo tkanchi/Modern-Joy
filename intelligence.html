@@ -7,12 +7,14 @@
 
   <link rel="stylesheet" href="css/style.css?v=3"/>
 
-  <!-- Unified Font (keep this on every page) -->
+  <!-- Unified Executive Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body data-page="insights">
   <div class="appShell">
+
+    <!-- SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark">🐆</div>
@@ -22,23 +24,19 @@
         </div>
       </div>
 
-      <!-- Nav Bar -->
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink active" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="health.html">🛡 Health</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
-    <nav class="nav">
-  <a class="navlink" href="index.html">🚀 Setup</a>
-  <a class="navlink active" href="intelligence.html">📊 Insights</a>
-  <a class="navlink" href="health.html">🛡️ Health</a>
-  <a class="navlink" href="suggestions.html">🎯 Actions</a>
-  <a class="navlink" href="workspace.html">🤖 Copilot</a>
-  <a class="navlink" href="forecast.html">📦 Forecast</a>
-  <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+        <hr>
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
 
-  <hr>
-
-  <a class="navlink" href="auth.html">🔐 Account</a>
-</nav>
-
-      <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
@@ -63,47 +61,52 @@
       </button>
     </aside>
 
+    <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
+
         <h1 class="sectionTitle">Sprint Intelligence</h1>
-        <p class="sectionSub">Risk, confidence, and health signals for this sprint.</p>
+        <p class="sectionSub">Risk, confidence, and capacity signals for this sprint.</p>
 
         <div class="info-banner">
-          <strong>Works offline:</strong> Insights will compute even if <b>metrics.js</b> isn’t available.
+          <strong>Executive View:</strong> Data-driven sprint signal engine.
         </div>
 
-        <div style="display:grid; gap:12px; margin-top:10px;">
+        <div style="display:grid; gap:12px; margin-top:12px;">
+
           <div class="info-banner">
             <div class="kvKey">Risk Score</div>
-            <div style="font-size:24px; font-weight:650; margin-top:4px;" id="riskScore">—</div>
-            <div style="color:var(--text-muted); font-weight:450; margin-top:2px;" id="riskBand">—</div>
+            <div style="font-size:24px; font-weight:600; margin-top:4px;" id="riskScore">—</div>
+            <div style="color:var(--text-muted); margin-top:2px;" id="riskBand">—</div>
           </div>
 
           <div class="info-banner">
             <div class="kvKey">Confidence</div>
-            <div style="font-size:24px; font-weight:650; margin-top:4px;">
+            <div style="font-size:24px; font-weight:600; margin-top:4px;">
               <span id="confidence">—</span>%
             </div>
-            <div style="color:var(--text-muted); font-weight:450; margin-top:2px;" id="confidenceLabel">—</div>
+            <div style="color:var(--text-muted); margin-top:2px;" id="confidenceLabel">—</div>
           </div>
 
           <div class="info-banner">
             <div class="kvKey">Capacity Health</div>
-            <div style="font-size:18px; font-weight:650; margin-top:4px;" id="health">—</div>
-            <div style="color:var(--text-muted); font-weight:450; margin-top:2px;" id="capacityNote">—</div>
+            <div style="font-size:18px; font-weight:600; margin-top:4px;" id="health">—</div>
+            <div style="color:var(--text-muted); margin-top:2px;" id="capacityNote">—</div>
           </div>
+
         </div>
 
-        <div class="btnRow" style="margin-top:12px;">
+        <div class="btnRow" style="margin-top:16px;">
           <a class="btnGhost" href="index.html">Back to Setup</a>
           <button class="btnPrimary" id="refreshBtn" type="button">Refresh Insights</button>
           <a class="btnGhost" href="suggestions.html">Next: Actions</a>
         </div>
 
-        <div class="info-banner" style="margin-top:12px;">
+        <div class="info-banner" style="margin-top:14px;">
           <div class="kvKey">Inputs detected</div>
-          <div style="color:var(--text-muted); font-weight:450; margin-top:6px;" id="inputsDetected">—</div>
+          <div style="color:var(--text-muted); margin-top:6px;" id="inputsDetected">—</div>
         </div>
+
       </div>
     </main>
   </div>
@@ -112,144 +115,129 @@
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
-
-  <!-- ✅ NEW: Sprint History Engine -->
   <script src="js/history.js"></script>
 
   <script>
-    (function () {
-      const STORAGE_KEY = "scrummer_setup_v1";
-      const $ = (id) => document.getElementById(id);
+  (function () {
 
-      function loadSetupUnified() {
-        const api = window.Scrummer && window.Scrummer.setup;
-        if (api && typeof api.loadSetup === "function") {
-          try { return api.loadSetup() || {}; } catch {}
-        }
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
-        catch { return {}; }
+    const STORAGE_KEY = "scrummer_setup_v1";
+    const $ = (id) => document.getElementById(id);
+
+    function loadSetup() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      } catch {
+        return {};
       }
+    }
 
-      function num(v) { const n = Number(v); return Number.isFinite(n) ? n : null; }
+    function num(v) {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    }
 
-      function computeFallback(setup) {
-        const sprintDays = num(setup.sprintDays) ?? 0;
-        const teamMembers = num(setup.teamMembers) ?? 0;
-        const leaveDays = num(setup.leaveDays) ?? 0;
-        const committedSP = num(setup.committedSP) ?? 0;
+    function computeSignals(setup) {
 
-        const v1 = num(setup.v1) ?? 0, v2 = num(setup.v2) ?? 0, v3 = num(setup.v3) ?? 0;
-        const velocities = [v1, v2, v3].filter(x => x > 0);
-        const avgVel = velocities.length ? velocities.reduce((a,b)=>a+b,0) / velocities.length : 0;
+      const sprintDays  = num(setup.sprintDays);
+      const teamMembers = num(setup.teamMembers);
+      const leaveDays   = num(setup.leaveDays);
+      const committedSP = num(setup.committedSP);
 
-        let vol = 0;
-        if (velocities.length >= 2 && avgVel > 0) {
-          const variance = velocities.reduce((acc,x)=>acc + (x-avgVel)*(x-avgVel), 0) / velocities.length;
-          vol = Math.sqrt(variance) / avgVel;
-        }
+      const velocities = [num(setup.v1), num(setup.v2), num(setup.v3)]
+        .filter(x => x > 0);
 
-        const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
-        const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays));
-        const capacitySP = avgVel * (1 - leaveRatio);
+      const avgVelocity = velocities.length
+        ? velocities.reduce((a,b)=>a+b,0) / velocities.length
+        : 0;
 
-        const overcommitRatio = capacitySP > 0 ? committedSP / capacitySP : 0;
+      const teamDays = Math.max(1, sprintDays * Math.max(1, teamMembers));
+      const leaveRatio = Math.min(0.6, Math.max(0, leaveDays / teamDays));
+      const capacitySP = avgVelocity * (1 - leaveRatio);
 
-        let risk = 0;
-        if (committedSP <= 0 || avgVel <= 0) risk += 30;
-        if (overcommitRatio > 1) risk += Math.min(50, (overcommitRatio - 1) * 120);
-        risk += Math.min(30, vol * 80);
-        risk = Math.max(0, Math.min(100, Math.round(risk)));
+      const overcommitRatio = capacitySP > 0 ? committedSP / capacitySP : 0;
 
-        const confidence = Math.max(10, Math.min(95, Math.round(100 - risk)));
-        const capacityHealth =
-          overcommitRatio <= 0 ? "—" :
-          overcommitRatio <= 1 ? "🟢 Healthy" :
-          overcommitRatio <= 1.15 ? "🟡 Tight" : "🔴 Overloaded";
+      let risk = 0;
 
-        return {
-          riskScore:risk,
-          confidence,
-          capacityHealth,
-          capacitySP,
-          overcommitRatio,
-          vol,
-          avgVel,            // ✅ NEW: so we can store in history snapshot
-          committedSP        // ✅ NEW: so we can store in history snapshot
-        };
+      if (committedSP <= 0 || avgVelocity <= 0) risk += 30;
+      if (overcommitRatio > 1)
+        risk += Math.min(50, (overcommitRatio - 1) * 120);
+
+      risk = Math.max(0, Math.min(100, Math.round(risk)));
+
+      const confidence = Math.max(10, Math.min(95, 100 - risk));
+
+      const capacityHealth =
+        overcommitRatio <= 0 ? "—" :
+        overcommitRatio <= 1 ? "🟢 Healthy" :
+        overcommitRatio <= 1.15 ? "🟡 Tight" :
+        "🔴 Overloaded";
+
+      return {
+        riskScore: risk,
+        confidence,
+        capacityHealth,
+        capacitySP,
+        overcommitRatio,
+        avgVelocity,
+        committedSP
+      };
+    }
+
+    function band(score) {
+      if (score >= 70) return "🔴 High Risk";
+      if (score >= 40) return "🟡 Watchlist";
+      return "🟢 Stable";
+    }
+
+    function confidenceLabel(conf) {
+      if (conf >= 80) return "Strong Sprint";
+      if (conf >= 60) return "Balanced";
+      return "Fragile";
+    }
+
+    function render(saveHistory = false) {
+
+      const setup = loadSetup();
+
+      const detected = Object.entries(setup)
+        .filter(([k,v]) => v !== "" && v !== null && v !== undefined)
+        .map(([k,v]) => `${k}: ${v}`)
+        .join(" • ");
+
+      $("inputsDetected").textContent =
+        detected || "No setup found. Go to 🚀 Setup and Save.";
+
+      const signals = computeSignals(setup);
+
+      $("riskScore").textContent = signals.riskScore;
+      $("riskBand").textContent = band(signals.riskScore);
+
+      $("confidence").textContent = signals.confidence;
+      $("confidenceLabel").textContent = confidenceLabel(signals.confidence);
+
+      $("health").textContent = signals.capacityHealth;
+      $("capacityNote").textContent =
+        signals.capacitySP
+          ? `Capacity ≈ ${Math.round(signals.capacitySP)} SP`
+          : "Capacity unavailable";
+
+      if (saveHistory && setup.v1) {
+        const history = window.Scrummer?.history;
+        history?.saveSnapshot(signals);
       }
+    }
 
-      function bandEmoji(score) {
-        if (!Number.isFinite(score)) return "—";
-        if (score >= 70) return "🔴 High Risk";
-        if (score >= 40) return "🟡 Watchlist";
-        return "🟢 Stable";
-      }
+    render(false);
 
-      function confLabel(conf) {
-        if (!Number.isFinite(conf)) return "—";
-        if (conf >= 80) return "🔥 Strong Sprint";
-        if (conf >= 60) return "⚖️ Balanced";
-        return "⚠️ Fragile";
-      }
+    $("refreshBtn").addEventListener("click", () => {
+      render(true);
+    });
 
-      function render() {
-        const setup = loadSetupUnified();
-
-        const detected = [
-          ["sprintDays", setup.sprintDays],
-          ["teamMembers", setup.teamMembers],
-          ["leaveDays", setup.leaveDays],
-          ["committedSP", setup.committedSP],
-          ["v1", setup.v1],
-          ["v2", setup.v2],
-          ["v3", setup.v3]
-        ].filter(([k,v]) => v !== undefined && v !== null && v !== "")
-         .map(([k,v]) => `${k}: ${v}`)
-         .join(" • ");
-
-        $("inputsDetected").textContent = detected || "No setup found. Go to 🚀 Setup and Save.";
-
-        const compute = window.Scrummer && window.Scrummer.computeSignals;
-        let s = null;
-        if (typeof compute === "function") {
-          try { s = compute(setup || {}); } catch { s = null; }
-        }
-        if (!s) s = computeFallback(setup || {});
-
-        const risk = Number(s.riskScore);
-        const conf = Number(s.confidence);
-
-        $("riskScore").textContent = Number.isFinite(risk) ? risk : "—";
-        $("riskBand").textContent = bandEmoji(risk);
-
-        $("confidence").textContent = Number.isFinite(conf) ? conf : "—";
-        $("confidenceLabel").textContent = confLabel(conf);
-
-        $("health").textContent = s.capacityHealth ?? "—";
-        $("capacityNote").textContent =
-          Number.isFinite(s.capacitySP) ? `Capacity ≈ ${Math.round(s.capacitySP)} SP` : "Capacity unavailable";
-
-        // ✅ NEW: Save snapshot to history for Health Dashboard
-        const history = window.Scrummer && window.Scrummer.history;
-        if (history && typeof history.saveSnapshot === "function") {
-          history.saveSnapshot({
-            riskScore: Number(s.riskScore || 0),
-            confidence: Number(s.confidence || 0),
-            overcommitRatio: Number(s.overcommitRatio || 0),
-            avgVelocity: Number(s.avgVel ?? s.avgVelocity ?? 0),  // supports both naming styles
-            committedSP: Number(setup.committedSP || s.committedSP || 0),
-            capacitySP: Number(s.capacitySP || 0)
-          });
-        }
-      }
-
-      $("refreshBtn")?.addEventListener("click", render);
-      render();
-    })();
+  })();
   </script>
 
-  <!-- Supabase (cloud sync bridge) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supa.js"></script>
+
 </body>
 </html>
