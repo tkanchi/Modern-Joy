@@ -6,39 +6,50 @@
   <title>Scrummer — Feedback</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body data-page="feedback">
 
   <div class="workspace">
-    <div class="card" style="max-width:600px;margin:auto;">
-      <h2>We’d Love Your Feedback</h2>
-      <p>
-        Your feedback helps improve Scrummer for Scrum Masters, teams, 
-        and enterprise leaders.
-      </p>
+    <div class="card" style="max-width:720px;margin:auto;">
+      
+      <div class="pageHead">
+        <button class="btn" type="button" onclick="history.back()">← Back</button>
+        <div>
+          <h2 style="margin:0;">We’d Love Your Feedback</h2>
+          <p style="margin:6px 0 0;">
+            Your feedback helps improve Scrummer for Scrum Masters, teams, and enterprise leaders.
+          </p>
+        </div>
+      </div>
 
-      <form action="https://formspree.io/f/mnjbzjnz" method="POST">
+      <form class="formNice" action="https://formspree.io/f/mnjbzjnz" method="POST">
         
         <!-- Redirect after successful submission -->
         <input type="hidden" name="_next" value="thankyou.html">
-
-        <!-- Optional: Email subject -->
         <input type="hidden" name="_subject" value="New Scrummer Feedback">
-
-        <!-- Disable Formspree captcha -->
         <input type="hidden" name="_captcha" value="false">
 
-        <label>Name</label>
-        <input type="text" name="name" required />
+        <div class="formGrid">
+          <div>
+            <label>Name</label>
+            <input type="text" name="name" placeholder="Your name" required />
+          </div>
 
-        <label>Email</label>
-        <input type="email" name="email" required />
+          <div>
+            <label>Email</label>
+            <input type="email" name="email" placeholder="you@example.com" required />
+          </div>
 
-        <label>Your Feedback</label>
-        <textarea name="message" rows="6" required></textarea>
+          <div class="span2">
+            <label>Your Feedback</label>
+            <textarea name="message" rows="7" placeholder="What worked? What felt missing? Any confusion?" required></textarea>
+          </div>
+        </div>
 
-        <button type="submit" class="btn primary">
-          Send Feedback
-        </button>
+        <div class="formActions">
+          <button type="submit" class="btn primary">Send Feedback</button>
+          <a class="btn" href="index.html">Home</a>
+        </div>
 
       </form>
     </div>
