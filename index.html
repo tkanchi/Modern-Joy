@@ -4,16 +4,12 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Setup</title>
-
   <link rel="stylesheet" href="css/style.css?v=3"/>
-
-  <!-- Unified Font (keep this on every page) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body data-page="setup">
   <div class="appShell">
-    <!-- LEFT SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
         <div class="brandMark"><span>S</span></div>
@@ -23,7 +19,6 @@
         </div>
       </div>
 
-      <!-- Nav Bar -->
       <nav class="nav">
         <a class="navlink active" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
@@ -32,27 +27,19 @@
         <a class="navlink" href="workspace.html">🤖 Copilot</a>
         <a class="navlink" href="forecast.html">📦 Forecast</a>
         <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-
         <hr>
-
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
 
-      <!-- ✅ XP WIDGET (with Mood Badge) -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
             <div class="lvl" id="xpLevel">Level 1</div>
             <div class="title" id="xpTitle">Rookie</div>
           </div>
-
           <div id="moodBadge">🐆 Calm</div>
         </div>
-
-        <div class="xpBar">
-          <div class="xpFill" id="xpFill"></div>
-        </div>
-
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
         <div class="xpMeta">
           <span id="xpText">0 / 300 XP</span>
           <span id="streakText">🧊 streak reset</span>
@@ -64,17 +51,13 @@
       </button>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
         <h1 class="sectionTitle">Launchpad</h1>
-        <p class="sectionSub">Enter your sprint basics. This powers Insights + Actions.</p>
-
-        <!-- ✅ Step indicator (Flow UX) -->
-        <div class="stageIndicator">Step 1 of 5 • Setup</div>
+        <p class="sectionSub">Enter sprint basics. This powers Insights → Health → Actions.</p>
 
         <div class="info-banner">
-          <strong>XP Tip:</strong> Accuracy here = better forecasts + fewer surprises. 🏆
+          <strong>Tip:</strong> Accurate setup = better signals + fewer surprises.
         </div>
 
         <div style="margin-top:10px; max-width:720px;">
@@ -92,10 +75,7 @@
 
           <div class="info-banner" style="margin-top:14px;">
             <div class="kvKey">Last 3 sprint velocities (completed SP)</div>
-            <div style="color:var(--text-muted); font-weight:450; margin-top:6px;">
-              Used for average + volatility.
-            </div>
-
+            <div class="mutedText" style="margin-top:6px;">Used for average + volatility.</div>
             <div style="display:grid; gap:10px; margin-top:12px;">
               <input class="fun-input" id="v1" type="number" min="0" placeholder="N-1 velocity (e.g., 36)"/>
               <input class="fun-input" id="v2" type="number" min="0" placeholder="N-2 velocity (e.g., 41)"/>
@@ -112,53 +92,47 @@
             </div>
           </div>
 
-          <!-- ✅ Unified footer (replaces old btnRow) -->
-          <div class="stageFooter">
-            <a class="btnStage btnStage-back" href="index.html" aria-disabled="true">← Setup</a>
-
-            <!-- keep your existing Save button id -->
-            <button class="btnStage btnStage-primary" id="saveBtn" type="button">
-              Save Setup
-            </button>
-
-            <a class="btnStage btnStage-next" href="intelligence.html">
-              Next: Insights →
-            </a>
+          <div class="info-banner" id="toast" style="display:none; margin-top:14px; border-left:4px solid rgba(99,102,241,.55);">
+            —
           </div>
 
-          <!-- (optional) keep Reset, but put it under footer so flow stays clean -->
-          <div class="btnRow" style="margin-top:10px;">
-            <button class="btnGhost" id="resetBtn" type="button">Reset</button>
+          <div class="stageIndicator">Flow: Setup → Insights → 🛡️ Health → Actions</div>
+          <div class="stageFooter">
+            <div class="left">
+              <span class="mutedText">Step 1 of 4</span>
+            </div>
+            <div class="right">
+              <button class="btnStage btnStage-action" id="saveBtn" type="button">Save Setup</button>
+              <a class="btnStage btnStage-next" href="intelligence.html">Next: Insights →</a>
+            </div>
           </div>
 
           <div class="info-banner" style="margin-top:16px;">
             <div class="kvKey">Save status</div>
-            <div id="saveStatus" style="color:var(--text-muted); font-weight:450; margin-top:6px;">
-              Not saved yet.
-            </div>
+            <div id="saveStatus" class="mutedText" style="margin-top:6px;">Not saved yet.</div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Scripts -->
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
-
-  <!-- Supabase (cloud sync bridge) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supa.js"></script>
 
   <script>
     (function () {
       const $ = (id) => document.getElementById(id);
       const status = $("saveStatus");
+      const toast = $("toast");
       const STORAGE_KEY = "scrummer_setup_v1";
 
-      function getApi() {
-        return (window.Scrummer && window.Scrummer.setup) ? window.Scrummer.setup : null;
+      function showToast(msg){
+        if(!toast) return;
+        toast.style.display = "block";
+        toast.innerHTML = msg;
+        clearTimeout(showToast._tm);
+        showToast._tm = setTimeout(() => { toast.style.display = "none"; }, 2200);
       }
 
       function safeNumber(v) {
@@ -191,18 +165,12 @@
       }
 
       function loadSetup() {
-        const api = getApi();
-        if (api && typeof api.loadSetup === "function") {
-          try { return api.loadSetup() || {}; } catch {}
-        }
         try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
         catch { return {}; }
       }
 
       function saveSetup(data) {
-        const api = getApi();
-        if (api && typeof api.saveSetup === "function") api.saveSetup(data);
-        else localStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
       }
 
       function setStatus(msg) { status.textContent = msg; }
@@ -210,13 +178,8 @@
       function onSave() {
         const data = readForm();
         saveSetup(data);
-        setStatus("Saved ✅ Your sprint setup is ready for Insights + Actions.");
-      }
-
-      function onReset() {
-        writeForm({ sprintDays:"", teamMembers:"", leaveDays:"", committedSP:"", v1:"", v2:"", v3:"" });
-        saveSetup({});
-        setStatus("Reset done. Fill again to earn XP. 🎮");
+        setStatus("Saved ✅ Ready for Insights → Health → Actions.");
+        showToast("✅ Setup saved.");
       }
 
       function applyPreset(type) {
@@ -229,7 +192,8 @@
         if (!p) return;
         writeForm(p);
         saveSetup(p);
-        setStatus(\`Preset applied: \${type.toUpperCase()} ✅\`);
+        setStatus(`Preset applied: ${type.toUpperCase()} ✅`);
+        showToast(`✅ Preset applied: ${type.toUpperCase()}`);
       }
 
       const existing = loadSetup();
@@ -239,7 +203,6 @@
       }
 
       $("saveBtn")?.addEventListener("click", onSave);
-      $("resetBtn")?.addEventListener("click", onReset);
       $("presetExcellent")?.addEventListener("click", () => applyPreset("excellent"));
       $("presetNormal")?.addEventListener("click", () => applyPreset("normal"));
       $("presetRisky")?.addEventListener("click", () => applyPreset("risky"));
@@ -255,6 +218,5 @@
       });
     })();
   </script>
-
 </body>
 </html>
