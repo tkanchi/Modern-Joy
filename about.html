@@ -10,12 +10,10 @@
 <body data-page="about">
   <div class="container">
 
-    <!-- Back button -->
-    <div style="margin: 10px 0 16px;">
-      <button type="button" onclick="history.back()"
-        style="cursor:pointer; padding:10px 14px; border-radius:12px; border:1px solid rgba(0,0,0,.12); background:#fff; font-weight:800;">
-        ← Back
-      </button>
+    <!-- Back + Home -->
+    <div style="margin: 10px 0 16px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btnGhost" type="button" onclick="history.back()">← Back</button>
+      <a class="btnGhost" href="index.html">🏠 Home</a>
     </div>
 
     <h1>About Scrummer</h1>
@@ -46,6 +44,7 @@
     </p>
 
     <p>— Tulasi</p>
+
   </div>
 </body>
 </html>
