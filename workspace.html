@@ -18,7 +18,6 @@
         </div>
       </div>
 
-      <!-- ✅ ONE nav, everything inside -->
       <nav class="nav">
         <a class="navlink" href="index.html">🚀 Setup</a>
         <a class="navlink" href="intelligence.html">📊 Insights</a>
@@ -32,7 +31,6 @@
         <a class="navlink" href="auth.html">🔐 Account</a>
       </nav>
 
-      <!-- ✅ XP WIDGET -->
       <div class="xpWidget">
         <div class="xpTop">
           <div>
@@ -66,13 +64,14 @@
           <strong>Pro move:</strong> Use Copilot in Daily Scrum to keep your streak alive. 🏆
         </div>
 
-        <!-- ✅ Dynamic mode banner -->
+        <!-- Dynamic mode banner -->
         <div class="info-banner" id="modeBanner" style="margin-top:12px; display:none;">
           <div style="font-weight:900;" id="modeTitle">—</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:6px;" id="modeBody">—</div>
+          <div style="color:var(--text-muted); font-weight:800; margin-top:6px; white-space:pre-line;" id="modeBody">—</div>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <!-- Ceremony buttons -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;" id="ceremonyRow">
           <button class="btnGhost" type="button" data-cer="planning">🗺️ Planning</button>
           <button class="btnGhost" type="button" data-cer="daily">🧩 Daily</button>
           <button class="btnGhost" type="button" data-cer="refine">🧠 Refinement</button>
@@ -83,7 +82,7 @@
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900; font-size:16px;" id="panelTitle">Choose a ceremony</div>
 
-          <!-- ✅ richer prompt block -->
+          <!-- richer prompt block -->
           <div style="color:var(--text-muted); font-weight:800; margin-top:8px; white-space:pre-line; line-height:1.7;" id="panelBody">
             Your prompts will appear here.
           </div>
@@ -92,7 +91,7 @@
         <div class="info-banner" style="margin-top:14px;">
           <div style="font-weight:900;">Capture decisions</div>
           <div style="color:var(--text-muted); font-weight:800; margin-top:6px;">
-            Saved locally in your browser. If cloud sync is enabled, it can be extended later.
+            Saved locally in your browser. (Later we can sync this to cloud too.)
           </div>
 
           <textarea class="fun-input" id="decisionNotes" rows="5" placeholder="Decisions / risks / owners..."></textarea>
@@ -102,7 +101,6 @@
             <button class="btnGhost" id="clearBtn" type="button">Reset</button>
           </div>
 
-          <!-- ✅ save status -->
           <div style="margin-top:10px; font-weight:900;" id="saveStatus"></div>
           <div style="margin-top:6px; color:var(--text-muted); font-weight:800;" id="saveHint"></div>
         </div>
@@ -135,6 +133,8 @@
 
       const saveStatus = $("saveStatus");
       const saveHint   = $("saveHint");
+
+      let recommendedKey = null;
 
       function safeParse(str, fallback){
         try { return JSON.parse(str); } catch { return fallback; }
@@ -196,76 +196,76 @@
         if (mode === "rescue") {
           modeTitle.textContent = `🔴 Copilot Mode: Rescue (Risk ${risk}/100)`;
           modeBody.textContent =
-            "This sprint looks fragile. Copilot will push de-scope, daily control, and fast escalation.\nSuggested ceremony now: 🧩 Daily Scrum.";
+            "This sprint looks fragile.\nCopilot will push de-scope, daily control, and fast escalation.\n⭐ Suggested ceremony: 🧩 Daily Scrum";
           return;
         }
 
         if (mode === "watch") {
           modeTitle.textContent = `🟡 Copilot Mode: Watchlist (Risk ${risk}/100)`;
           modeBody.textContent =
-            "This sprint is tight. Copilot will focus on commitment discipline, early checkpoints, and risk ownership.\nSuggested ceremony now: 🗺️ Planning.";
+            "This sprint is tight.\nCopilot will focus on commitment discipline + early checkpoints.\n⭐ Suggested ceremony: 🗺️ Planning";
           return;
         }
 
         modeTitle.textContent = `🟢 Copilot Mode: Stable (Risk ${risk}/100)`;
         modeBody.textContent =
-          "Signals look stable. Copilot will optimize flow, reduce WIP, and help you push learning.\nSuggested ceremony now: 🧠 Refinement.";
+          "Signals look stable.\nCopilot will optimize flow + reduce WIP.\n⭐ Suggested ceremony: 🧠 Refinement";
       }
 
-      // ---------- Dynamic prompts ----------
+      // ---------- Prompts ----------
       function getPrompts(ceremony, mode){
         const P = {
           planning: {
             stable:
 `🎯 Sprint Planning (Stable)
-1) Sprint Goal (outcome, not a list):
+1) Sprint Goal (outcome, not a list)
    - What user/business value are we shipping?
 
-2) Commitment check:
+2) Commitment check
    - Which 3 items are must-have?
    - What becomes stretch?
 
-3) Flow plan:
+3) Flow plan
    - Who pairs on the riskiest story?
    - What gets done first to unblock others?
 
-4) Guardrails:
+4) Guardrails
    - How will we prevent scope creep?
    - What is our “stop doing” list?`,
 
             watch:
 `⚠️ Sprint Planning (Watchlist)
-1) Reality check:
-   - What is the forecast capacity vs committed SP?
-   - Which item can be dropped with least pain?
+1) Reality check
+   - Forecast capacity vs committed SP?
+   - What can be dropped with least pain?
 
-2) Risk ownership:
-   - Top 3 risks + named owners
-   - Dependency list + escalation path
+2) Risk ownership
+   - Top 3 risks + owners
+   - Dependencies + escalation path
 
-3) Checkpoint:
-   - Day-3 checkpoint rule:
+3) Checkpoint rule
+   - Day-3 checkpoint:
      If behind → de-scope immediately.
 
-4) WIP discipline:
+4) WIP discipline
    - What WIP limit will we follow?`,
 
             rescue:
 `🚨 Sprint Planning (Rescue)
-1) Reduce scope NOW:
-   - Cut 10–20% immediately.
-   - Lock ONLY the sprint goal.
+1) Reduce scope NOW
+   - Cut 10–20% immediately
+   - Lock ONLY sprint goal
 
-2) Freeze churn:
-   - No new work unless goal is safe.
-   - Force finish-first rule.
+2) Freeze churn
+   - No new work unless goal is safe
+   - Finish-first rule
 
-3) Escalations:
-   - What needs leadership/support today?
-   - Who will escalate by when?
+3) Escalations
+   - What needs leadership support today?
+   - Who escalates by when?
 
-4) Daily control:
-   - Mandatory daily checkpoint owner.`
+4) Daily control
+   - Mandatory daily checkpoint owner`
           },
 
           daily: {
@@ -273,59 +273,38 @@
 `🟢 Daily Scrum (Stable)
 1) Are we on track for sprint goal?
 2) Any blocked item > 24h?
-3) WIP check:
-   - Are we starting too much?
-4) Team help:
-   - Who needs pairing/support today?`,
+3) WIP check: starting too much?
+4) Who needs pairing/support today?`,
 
             watch:
 `🟡 Daily Scrum (Watchlist)
-1) Plan vs actual:
-   - Are we behind today?
-
-2) Risk check:
-   - Which story is most likely to spill?
-
-3) Interruption control:
-   - What unplanned work entered yesterday?
-
-4) Decision:
-   - What do we de-scope if we slip again tomorrow?`,
+1) Plan vs actual: are we behind today?
+2) Most likely spillover story?
+3) Unplanned work entered yesterday?
+4) If we slip tomorrow → what do we de-scope?`,
 
             rescue:
 `🔴 Daily Scrum (Rescue)
-1) Goal survival:
-   - Is sprint goal still achievable?
-
-2) Cut list:
-   - What can we drop TODAY?
-
-3) Ownership:
-   - Who takes the top blocker now?
-
-4) Escalation:
-   - What needs escalation before noon?`
+1) Goal survival: still achievable?
+2) Cut list: what drops TODAY?
+3) Who owns the top blocker NOW?
+4) What must be escalated before noon?`
           },
 
           refine: {
             stable:
 `🧠 Refinement (Stable)
-1) Slice stories smaller (1–2 day chunks)
+1) Slice stories to 1–2 day chunks
 2) Acceptance criteria clarity check
 3) Dependencies: identify + remove early
 4) Define “ready” checklist for next sprint`,
 
             watch:
 `🧠 Refinement (Watchlist)
-1) Kill ambiguity:
-   - Missing AC? Add now.
-
-2) Identify risk story:
-   - Spike or split?
-
-3) Reduce volatility:
-   - Slice large stories.
-   - Remove 16/32 bombs if possible.`,
+1) Kill ambiguity: missing AC? add now
+2) Identify risk story: spike or split?
+3) Reduce volatility: slice large stories
+4) Remove 16/32 bombs if possible`,
 
             rescue:
 `🧠 Refinement (Rescue)
@@ -341,20 +320,20 @@
 1) Value shipped: what changed for users?
 2) Feedback: what should we adjust next?
 3) Scope lessons: what surprised us?
-4) Follow-ups: capture owners + deadlines`,
+4) Follow-ups: owners + dates`,
 
             watch:
 `🎬 Sprint Review (Watchlist)
 1) What didn’t ship and why?
 2) Was commitment too high?
-3) Where did we lose time (interruptions)?
+3) Where did we lose time?
 4) One change for predictability next sprint`,
 
             rescue:
 `🎬 Sprint Review (Rescue)
 1) Root causes: why did we slip?
 2) What must change immediately?
-3) What do we STOP doing next sprint?
+3) What do we STOP next sprint?
 4) Escalation items + owners`
           },
 
@@ -364,19 +343,19 @@
 1) What increased throughput?
 2) What reduced stress?
 3) One improvement to protect flow
-4) One experiment for next sprint`,
+4) One experiment next sprint`,
 
             watch:
 `♻️ Retro (Watchlist)
 1) Where did volatility come from?
 2) Which risks were missed early?
-3) One process guardrail to add
+3) One guardrail to add next sprint
 4) Owner + date for improvement`,
 
             rescue:
 `♻️ Retro (Rescue)
-1) System failure: where did process break?
-2) Biggest constraint (WIP? interruptions? deps?)
+1) Where did process break?
+2) Biggest constraint (WIP/interruptions/deps)?
 3) One non-negotiable rule next sprint
 4) What do we stop immediately?`
           }
@@ -387,11 +366,60 @@
         return group[mode] || group.stable;
       }
 
+      // ---------- Button visuals: recommended + selected ----------
+      function clearVisualStates(){
+        document.querySelectorAll("[data-cer]").forEach(btn => {
+          btn.classList.remove("cer-active");
+          btn.style.background = "";     // minimal inline polish
+          btn.style.borderColor = "";
+          btn.style.boxShadow = "";
+          btn.style.color = "";
+
+          // remove old badge if any
+          const badge = btn.querySelector(".recBadge");
+          if (badge) badge.remove();
+        });
+      }
+
+      function applyRecommendedBadge(key){
+        recommendedKey = key;
+        document.querySelectorAll("[data-cer]").forEach(btn => {
+          if (btn.getAttribute("data-cer") !== key) return;
+
+          // add badge
+          const b = document.createElement("span");
+          b.className = "recBadge";
+          b.textContent = "⭐ Recommended";
+          b.style.marginLeft = "8px";
+          b.style.padding = "4px 8px";
+          b.style.borderRadius = "999px";
+          b.style.fontSize = "12px";
+          b.style.fontWeight = "900";
+          b.style.border = "1px solid var(--border)";
+          b.style.background = "rgba(11,87,208,.08)";
+          b.style.whiteSpace = "nowrap";
+          btn.appendChild(b);
+        });
+      }
+
+      function setActiveButton(key){
+        document.querySelectorAll("[data-cer]").forEach(btn => {
+          const isActive = btn.getAttribute("data-cer") === key;
+          if (!isActive) return;
+
+          btn.classList.add("cer-active");
+          btn.style.background = "rgba(11,87,208,.10)";
+          btn.style.borderColor = "rgba(11,87,208,.30)";
+          btn.style.boxShadow = "0 10px 24px rgba(11,87,208,.10)";
+          btn.style.color = "var(--text-main)";
+        });
+      }
+
       // ---------- Ceremony click ----------
       function onCeremony(key){
         const setup = loadSetup();
 
-        // If you already have computeSignals from metrics.js, use it if present
+        // prefer computeSignals if available
         let risk = null;
         const compute = window.Scrummer && window.Scrummer.computeSignals;
         if (typeof compute === "function") {
@@ -415,6 +443,11 @@
 
         panelTitle.textContent = titles[key] || "Ceremony";
         panelBody.textContent = getPrompts(key, mode);
+
+        // visuals
+        clearVisualStates();
+        if (recommendedKey) applyRecommendedBadge(recommendedKey);
+        setActiveButton(key);
       }
 
       document.querySelectorAll("[data-cer]").forEach(btn => {
@@ -432,10 +465,7 @@
 
       function loadNotes(){
         const obj = safeParse(localStorage.getItem(NOTES_KEY) || "{}", {});
-        return {
-          text: obj.text || "",
-          updatedAt: obj.updatedAt || ""
-        };
+        return { text: obj.text || "", updatedAt: obj.updatedAt || "" };
       }
 
       function saveNotes(text){
@@ -449,7 +479,7 @@
         const n = loadNotes();
         if (!n.text) {
           saveStatus.textContent = "🟡 Nothing saved yet";
-          saveHint.textContent = `Saved locally in this browser (key: ${NOTES_KEY}).`;
+          saveHint.textContent = `Saved locally in this browser (localStorage key: ${NOTES_KEY}).`;
           return;
         }
         saveStatus.textContent = `✅ Saved locally`;
@@ -459,7 +489,6 @@
       $("saveBtn").addEventListener("click", () => {
         saveNotes(notes.value || "");
         renderSaveStatus();
-        alert("Saved locally ✅");
       });
 
       $("clearBtn").addEventListener("click", () => {
@@ -473,9 +502,10 @@
       notes.value = existing.text || "";
       renderSaveStatus();
 
-      // Auto render mode once (suggest ceremony)
+      // Auto render mode once + auto-open recommended ceremony
       (function bootMode(){
         const setup = loadSetup();
+
         let risk = null;
         const compute = window.Scrummer && window.Scrummer.computeSignals;
         if (typeof compute === "function") {
@@ -490,14 +520,19 @@
         renderMode(mode, risk);
 
         const rec = recommendCeremony(mode);
-        // Optional: preselect recommended ceremony if you want it auto-filled:
-        // onCeremony(rec);
+        recommendedKey = rec;
+
+        // show recommended badge
+        clearVisualStates();
+        applyRecommendedBadge(rec);
+
+        // ✅ auto-open recommended ceremony so Copilot doesn't feel empty
+        onCeremony(rec);
       })();
 
     })();
   </script>
 
-  <!-- Supabase (cloud sync bridge) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supa.js"></script>
 </body>
