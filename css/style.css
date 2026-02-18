@@ -829,3 +829,48 @@ body.dark-mode .recBadge{
 #modeTitle .recBadge{
   transform: translateY(-1px);
 }
+
+/* ---- Page header row with Back button ---- */
+.pageHead{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+
+/* ---- Nice form layout ---- */
+.formNice label{
+  display:block;
+  font-weight:700;
+  margin:10px 0 6px;
+}
+
+.formNice input,
+.formNice textarea{
+  width:100%;
+  box-sizing:border-box;
+}
+
+/* 2-col grid for Name/Email, textarea spans full width */
+.formGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px 14px;
+}
+
+.formGrid .span2{
+  grid-column: 1 / -1;
+}
+
+.formActions{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+/* Mobile: stack fields */
+@media (max-width: 720px){
+  .formGrid{ grid-template-columns: 1fr; }
+  .formGrid .span2{ grid-column:auto; }
+  .pageHead{ flex-direction:column; }
+}
