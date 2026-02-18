@@ -7,53 +7,85 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body data-page="feedback">
+<body>
+  <div class="appShell">
 
-  <div class="workspace">
-    <div class="card" style="max-width:720px;margin:auto;">
-      
-      <div class="pageHead">
-        <button class="btn" type="button" onclick="history.back()">← Back</button>
+    <!-- SIDEBAR -->
+    <aside class="sideNav">
+      <div class="sideBrand">
+        <div class="brandMark">🐆</div>
         <div>
-          <h2 style="margin:0;">We’d Love Your Feedback</h2>
-          <p style="margin:6px 0 0;">
-            Your feedback helps improve Scrummer for Scrum Masters, teams, and enterprise leaders.
-          </p>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
         </div>
       </div>
 
-      <form class="formNice" action="https://formspree.io/f/mnjbzjnz" method="POST">
-        
-        <!-- Redirect after successful submission -->
-        <input type="hidden" name="_next" value="thankyou.html">
-        <input type="hidden" name="_subject" value="New Scrummer Feedback">
-        <input type="hidden" name="_captcha" value="false">
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
-        <div class="formGrid">
-          <div>
-            <label>Name</label>
-            <input type="text" name="name" placeholder="Your name" required />
-          </div>
+        <hr>
 
-          <div>
-            <label>Email</label>
-            <input type="email" name="email" placeholder="you@example.com" required />
-          </div>
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
+    </aside>
 
-          <div class="span2">
-            <label>Your Feedback</label>
-            <textarea name="message" rows="7" placeholder="What worked? What felt missing? Any confusion?" required></textarea>
-          </div>
+    <!-- MAIN -->
+    <main class="main">
+      <div class="sectionCard">
+
+        <div class="btnRow" style="margin-bottom:12px;">
+          <button class="btnGhost" type="button" onclick="history.back()">← Back</button>
         </div>
 
-        <div class="formActions">
-          <button type="submit" class="btn primary">Send Feedback</button>
-          <a class="btn" href="index.html">Home</a>
-        </div>
+        <h1 class="sectionTitle">We’d Love Your Feedback</h1>
+        <p class="sectionSub">
+          Your feedback directly shapes how Scrummer evolves.
+        </p>
 
-      </form>
-    </div>
+        <form action="https://formspree.io/f/mnjbzjnz" method="POST">
+
+          <input type="hidden" name="_next" value="thankyou.html">
+          <input type="hidden" name="_subject" value="New Scrummer Feedback">
+          <input type="hidden" name="_captcha" value="false">
+
+          <div style="display:grid; gap:12px; margin-top:14px; max-width:600px;">
+
+            <div>
+              <label style="font-weight:900;">Name</label>
+              <input class="fun-input" type="text" name="name" placeholder="Your name" required>
+            </div>
+
+            <div>
+              <label style="font-weight:900;">Email</label>
+              <input class="fun-input" type="email" name="email" placeholder="you@example.com" required>
+            </div>
+
+            <div>
+              <label style="font-weight:900;">Your Feedback</label>
+              <textarea class="fun-input" name="message" rows="6"
+                placeholder="What worked? What felt confusing? What would make this 10x better?"
+                required></textarea>
+            </div>
+
+          </div>
+
+          <div class="btnRow" style="margin-top:16px;">
+            <button class="btnPrimary" type="submit">Send Feedback</button>
+            <a class="btnGhost" href="index.html">🏠 Home</a>
+          </div>
+
+        </form>
+
+      </div>
+    </main>
+
   </div>
 
+  <script src="js/theme.js"></script>
 </body>
 </html>
