@@ -18,26 +18,13 @@
 
       <form action="https://formspree.io/f/mnjbzjnz" method="POST">
         
-        <label>Name</label>
-        <input type="text" name="name" required />
+        <!-- Redirect after successful submission -->
+        <input type="hidden" name="_next" value="thankyou.html">
 
-        <label>Email</label>
-        <input type="email" name="email" required />
-
-        <label>Your Feedback</label>
-        <textarea name="message" rows="6" required></textarea>
-
-        <!-- Optional: Prevent spam -->
+        <!-- Optional: Email subject -->
         <input type="hidden" name="_subject" value="New Scrummer Feedback">
+
+        <!-- Disable Formspree captcha -->
         <input type="hidden" name="_captcha" value="false">
 
-        <button type="submit" class="btn primary">
-          Send Feedback
-        </button>
-
-      </form>
-    </div>
-  </div>
-
-</body>
-</html>
+        <label>Name</label
