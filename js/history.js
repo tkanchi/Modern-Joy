@@ -19,7 +19,6 @@
 
   function generateSprintId(){
     const d = new Date();
-    // stable, readable, and unique enough
     return `SPRINT_${d.getFullYear()}_${pad(d.getMonth()+1)}_${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
   }
 
@@ -40,7 +39,6 @@
 
   function clearHistory(){
     localStorage.removeItem(KEY);
-    localStorage.removeItem(SPRINT_ID_KEY);
   }
 
   function detectMode(risk){
@@ -50,18 +48,13 @@
     return "stable";
   }
 
-  /**
-   * saveSnapshot(data, opts)
-   * opts.force: boolean -> bypass duplicate 60s protection
-   *
-   * returns:
-   *  { ok:true, reason:"saved", snapshot }
-   *  { ok:false, reason:"invalid_data" }
-   *  { ok:false, reason:"duplicate_60s", snapshot }
-   */
-  function saveSnapshot(data, opts = {}){
+  // ✅ saveSnapshot now supports options + returns result for UI/toast
+  function saveSnapshot(data, opts){
+    const options = opts && typeof opts === "object" ? opts : {};
+    const force = !!options.force;
+
     if (!data || typeof data !== "object") {
-      return { ok:false, reason:"invalid_data" };
+      return { ok:false, reason:"invalid_data", snapshot:null };
     }
 
     const history = loadHistory();
@@ -81,12 +74,10 @@
       mode: detectMode(Number(data.riskScore || 0))
     };
 
-    // Prevent duplicates within 60 seconds unless forced
+    // Prevent duplicates within 60s unless forced
     const last = history[history.length - 1];
-    const within60s = last && Math.abs((last.timestamp || 0) - snapshot.timestamp) < 60000;
-
-    if (within60s && !opts.force) {
-      return { ok:false, reason:"duplicate_60s", snapshot };
+    if (!force && last && Math.abs((last.timestamp || 0) - snapshot.timestamp) < 60000) {
+      return { ok:false, reason:"dedup_60s", snapshot:last };
     }
 
     history.push(snapshot);
@@ -95,6 +86,7 @@
     if (history.length > 30) history.splice(0, history.length - 30);
 
     saveHistory(history);
+
     return { ok:true, reason:"saved", snapshot };
   }
 
