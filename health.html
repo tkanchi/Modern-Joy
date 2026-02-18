@@ -17,31 +17,23 @@
     <!-- SIDEBAR -->
     <aside class="sideNav">
       <div class="sideBrand">
-        <div class="brandMark"><span>S</span></div>
+        <!-- ✅ Keep logo consistent across OS: use text mark instead of emoji -->
+        <div class="brandMark"><span style="font-weight:800;">S</span></div>
         <div>
           <div class="brandName">SCRUMMER</div>
           <div class="brandTag">Gamified Scrum OS</div>
         </div>
       </div>
 
-     <!-- Nav Bar -->
-
-    <nav class="nav">
-  <a class="navlink" href="index.html">🚀 Setup</a>
-  <a class="navlink" href="intelligence.html">📊 Insights</a>
-  <a class="navlink active" href="health.html">🛡️ Health</a>
-  <a class="navlink" href="suggestions.html">🎯 Actions</a>
-  <a class="navlink" href="workspace.html">🤖 Copilot</a>
-  <a class="navlink" href="forecast.html">📦 Forecast</a>
-  <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
-
-  <hr>
-
-  <a class="navlink" href="auth.html">🔐 Account</a>
-
-</nav>
-        <!-- ✅ NEW -->
-        <a class="navlink active" href="health.html">🏛️ Health</a>
+      <!-- ✅ Single clean nav (no duplicates) -->
+      <nav class="nav">
+        <a class="navlink" href="index.html">🚀 Setup</a>
+        <a class="navlink" href="intelligence.html">📊 Insights</a>
+        <a class="navlink active" href="health.html">📈 Health</a>
+        <a class="navlink" href="suggestions.html">🎯 Actions</a>
+        <a class="navlink" href="workspace.html">🤖 Copilot</a>
+        <a class="navlink" href="forecast.html">📦 Forecast</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
 
         <hr>
 
@@ -81,6 +73,12 @@
 
         <div class="info-banner">
           <strong>Tip:</strong> Health improves when risk trends down and commitment matches capacity.
+        </div>
+
+        <!-- ✅ Toast placeholder (use instead of alerts in health.js) -->
+        <div class="info-banner" id="toast"
+             style="display:none; margin-top:12px; border-left:4px solid rgba(99,102,241,.55);">
+          —
         </div>
 
         <!-- TOP: KPI GRID -->
@@ -143,7 +141,11 @@
                 </tr>
               </thead>
               <tbody id="historyRows">
-                <tr><td colspan="7" style="padding:10px; color:var(--text-muted);">No history yet. Open Insights and click Refresh once.</td></tr>
+                <tr>
+                  <td colspan="7" style="padding:10px; color:var(--text-muted);">
+                    No snapshots yet. Click <b>Refresh</b> to create the first one.
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -165,6 +167,8 @@
   <!-- Scripts -->
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
+
+  <!-- ✅ History engine must load BEFORE health.js -->
   <script src="js/history.js"></script>
   <script src="js/health.js"></script>
 
