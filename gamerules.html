@@ -4,10 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Game Rules</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-page="gamerules">
   <div class="appShell">
 
     <!-- SIDEBAR -->
@@ -61,77 +65,99 @@
     <!-- MAIN -->
     <main class="main">
       <div class="sectionCard">
+
+        <div class="btnRow" style="margin-bottom:12px;">
+          <button class="btnGhost" type="button" onclick="history.back()">← Back</button>
+          <a class="btnGhost" href="index.html">🏠 Home</a>
+        </div>
+
         <h1 class="sectionTitle">🎮 Game Rules</h1>
         <p class="sectionSub">
           Scrummer helps you explain sprint performance with context — not blame.
           Use it like a lightweight Scrum Master co-pilot: input → signals → actions.
         </p>
 
-        <!-- ✅ NEW: Help & Info (Visible placement) -->
+        <!-- Help & Info -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">📌 Help & Info</div>
+          <div class="kvKey">📌 Help & Info</div>
+
           <div class="btnRow" style="margin-top:10px;">
             <a class="btnGhost" href="about.html">About</a>
             <a class="btnGhost" href="feedback.html">Feedback</a>
           </div>
-          <div style="margin-top:10px; font-weight:800; color:var(--text-muted); line-height:1.6;">
-            Have a feature idea or found something confusing? Send feedback — it goes straight to my inbox.
+
+          <div style="margin-top:10px; color:var(--text-muted); font-weight:450; line-height:1.6;">
+            Have an idea or something feels confusing? Send feedback — it goes directly to the Scrummer inbox.
           </div>
         </div>
 
-        <!-- SECTION 1 -->
+        <!-- How to use (real world) -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">1️⃣ Setup = Your Sprint Baseline</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
-            Start with your sprint inputs (team size, sprint length, leaves, focus factor, and recent velocities).
-            This becomes the baseline that powers Forecast, Insights, and Actions.
+          <div class="kvKey">🧭 How to use Scrummer in real life</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
+            <b>For Scrum Masters:</b> use it before planning and during the sprint to explain risks early. <br/>
+            <b>For small teams (no Scrum Master):</b> use it as a checklist to avoid unrealistic commitments. <br/>
+            <b>For leaders:</b> use Insights + Actions to understand why metrics shift without default blame on developers.
           </div>
         </div>
 
-        <!-- SECTION 2 -->
+        <!-- 1 -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">📦 Forecast = Realistic Commitment</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+          <div class="kvKey">1️⃣ Setup = your sprint baseline</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
+            Start with sprint inputs (team size, sprint length, leaves, focus factor, and recent velocities).
+            This becomes the baseline used across Forecast, Insights, Actions, and Copilot prompts.
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="info-banner" style="margin-top:14px;">
+          <div class="kvKey">📦 Forecast = realistic commitment</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
             Forecast helps you decide “how much is safe to commit” before planning.
-            It uses transparent math (capacity + focus + leaves + points/day) so you can justify the number confidently.
-            <br/><br/>
-            Use Forecast when:
-            <br/>• the team is unsure what to commit
-            <br/>• there are leaves/interruptions
-            <br/>• velocity is unstable
+            It uses transparent math, so you can justify the number with confidence.
+            <div style="margin-top:10px;">
+              Use Forecast when:
+              <br/>• the team isn’t sure what to commit
+              <br/>• there are leaves/interruptions
+              <br/>• velocity is unstable
+            </div>
           </div>
         </div>
 
-        <!-- SECTION 3 -->
+        <!-- 3 -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">📊 Insights = Trends & Risk Signals</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+          <div class="kvKey">📊 Insights = trends & risk signals</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
             Insights converts your numbers into signals that are easier to explain:
             <br/>• Stability (how predictable the team is)
             <br/>• Confidence (how safe the commitment looks)
-            <br/>• Capacity health (how realistic the plan is)
-            <br/><br/>
-            This is where Scrummer helps you explain “why metrics moved” without default blame.
+            <br/>• Capacity Health (how realistic the plan is)
+            <div style="margin-top:10px;">
+              This is where Scrummer helps you explain <b>why metrics moved</b> without default blame.
+            </div>
           </div>
         </div>
 
-        <!-- SECTION 4 -->
+        <!-- 4 -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">🎯 Actions = What to do next sprint</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+          <div class="kvKey">🎯 Actions = what to do next</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
             Actions gives tactical, sprint-ready moves (not generic Agile advice).
-            Examples:
-            <br/>• reduce commitment by X%
-            <br/>• add a mid-sprint checkpoint
-            <br/>• slice work smaller / limit WIP
-            <br/>• protect focus time for QA / automation
+            <div style="margin-top:10px;">
+              Examples:
+              <br/>• reduce commitment by X%
+              <br/>• add a mid-sprint checkpoint
+              <br/>• slice work smaller / limit WIP
+              <br/>• protect focus time for QA / automation
+            </div>
           </div>
         </div>
 
-        <!-- SECTION 5 -->
+        <!-- 5 -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">🤖 Copilot = Ceremony prompts & talking points</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+          <div class="kvKey">🤖 Copilot = ceremony prompts</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
             Copilot supports your ceremonies with structured prompts so you can:
             <br/>• ask better questions in refinement
             <br/>• steer planning with clarity
@@ -140,23 +166,24 @@
           </div>
         </div>
 
-        <!-- SECTION 6 -->
+        <!-- 6 -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">🏆 XP & Mood = Lightweight gamification</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+          <div class="kvKey">🏆 XP & Mood = lightweight gamification</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
             XP is a fun layer — not the goal.
-            You earn XP for stable, realistic sprint planning and healthier signals over time.
-            <br/><br/>
-            Mood Badge:
-            <br/>🐆 Calm → stable and predictable
-            <br/>⚡ Sprinting → risk rising / chaos incoming
+            You earn XP for stable planning and healthier signals over time.
+            <div style="margin-top:10px;">
+              Mood Badge:
+              <br/>🐆 Calm → stable and predictable
+              <br/>⚡ Sprinting → risk rising / chaos incoming
+            </div>
           </div>
         </div>
 
-        <!-- SECTION 7 -->
+        <!-- 7 -->
         <div class="info-banner" style="margin-top:14px;">
-          <div style="font-weight:900;">🔐 Cloud Sync (Optional)</div>
-          <div style="margin-top:8px; font-weight:800; color:var(--text-muted); line-height:1.6;">
+          <div class="kvKey">🔐 Cloud sync (optional)</div>
+          <div style="color:var(--text-muted); font-weight:450; line-height:1.7;">
             If you log in, your data can sync to the cloud.
             If not, Scrummer still works locally in your browser.
           </div>
@@ -171,13 +198,10 @@
     </main>
   </div>
 
-  <!-- Scripts -->
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supa.js"></script>
-
-
 </body>
 </html>
