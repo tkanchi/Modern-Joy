@@ -118,7 +118,15 @@
 
           <!-- ✅ Saved Decisions History (visible on screen) -->
           <div class="info-banner" style="margin-top:12px;">
-            <div class="kvKey">Saved Decisions</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div class="kvKey">Saved Decisions</div>
+
+              <!-- ✅ Copy Retro Summary -->
+              <button class="btnGhost" id="copyRetroBtn" type="button" style="padding:8px 10px;">
+                📋 Copy Retro Summary
+              </button>
+            </div>
+
             <div id="decisionsEmpty" style="color:var(--text-muted); font-weight:450; margin-top:6px;">
               No saved decisions yet.
             </div>
@@ -258,8 +266,6 @@
 
         let idx = Math.floor(Math.random() * total);
         if (total > 1 && idx === last) idx = (idx + 1) % total;
-
-        // if force and still equals last (edge), shift again
         if (force && total > 1 && idx === last) idx = (idx + 1) % total;
 
         state[key] = idx;
@@ -268,11 +274,114 @@
       }
 
       // -------------------------
+      // Retro selector: template + icebreaker based on insights
+      // -------------------------
+      function retroRecommendation(ctx, mode, force=false){
+        const overCommit = ctx.over > 1.05;
+        const lowData = !(ctx.avgVel > 0 && ctx.committedSP > 0);
+
+        const templates = [];
+
+        if (mode === "rescue" || overCommit) {
+          templates.push({
+            name: "Reset & Recovery (Stop the bleeding)",
+            why: "Use when the sprint slipped, commitment was too high, or the team feels overloaded. Focus on system fixes, not blame.",
+            stages: defaultRetroStages(),
+            icebreakers: [
+              "One-word check-in (no explanations)",
+              "Weather report: sunny / cloudy / stormy",
+              "Energy level (1–5) + one sentence why"
+            ]
+          });
+        }
+
+        if (mode === "watch") {
+          templates.push({
+            name: "Flow & WIP Clinic",
+            why: "Use when predictability is shaky. This retro focuses on finishing, reducing WIP, and removing queues/hand-offs.",
+            stages: defaultRetroStages(),
+            icebreakers: [
+              "Mad / Sad / Glad (quick round)",
+              "Rose / Bud / Thorn",
+              "Two truths and a lie (work edition)"
+            ]
+          });
+
+          templates.push({
+            name: "Interruptions & Shielding",
+            why: "Use when unplanned work or urgent asks keep entering the sprint. Create a shield + escalation policy.",
+            stages: defaultRetroStages(),
+            icebreakers: [
+              "What surprised you this sprint?",
+              "Emoji check-in: 😀😐😣",
+              "Lightning gratitude (30 seconds each)"
+            ]
+          });
+        }
+
+        if (mode === "stable") {
+          templates.push({
+            name: "Amplify Wins (Kaizen)",
+            why: "Use when delivery is stable. Lock in what worked, and pick one improvement that raises the baseline.",
+            stages: defaultRetroStages(),
+            icebreakers: [
+              "Gratitude shout-outs",
+              "Best moment of the sprint",
+              "One thing I’d repeat next sprint"
+            ]
+          });
+
+          templates.push({
+            name: "Quality Loop (Reduce rework)",
+            why: "Use when you want to improve Definition of Done, reduce bug/rework, and speed up validation.",
+            stages: defaultRetroStages(),
+            icebreakers: [
+              "Mad / Sad / Glad",
+              "Rose / Bud / Thorn",
+              "One word: how did quality feel?"
+            ]
+          });
+        }
+
+        if (!templates.length || lowData) {
+          templates.push({
+            name: "Start / Stop / Continue (Universal)",
+            why: "Great default when data is missing or the team is new. Keeps the retro simple and productive.",
+            stages: defaultRetroStages(),
+            icebreakers: [
+              "One-word check-in",
+              "Weather report",
+              "Rose / Bud / Thorn"
+            ]
+          });
+        }
+
+        const tIdx = pickVariantIndex(`retroTemplate:${mode}`, templates.length, force);
+        const t = templates[tIdx];
+
+        const ibIdx = pickVariantIndex(`retroIce:${t.name}`, t.icebreakers.length, force);
+        const ice = t.icebreakers[ibIdx];
+
+        return { template: t, icebreaker: ice };
+      }
+
+      function defaultRetroStages(){
+        return [
+          { stage: "1) Set the stage (5 min)", detail: "Working agreement: assume positive intent, focus on system not blame. State the goal for today." },
+          { stage: "2) Gather data (10–15 min)", detail: "Use the chosen format. Timebox. Capture facts + feelings briefly." },
+          { stage: "3) Generate insights (10 min)", detail: "Cluster themes. Dot-vote. Pick top 1–2 only." },
+          { stage: "4) Decide actions (10–15 min)", detail: "Turn into 1–2 experiments: owner + date + success measure." },
+          { stage: "5) Close (2–3 min)", detail: "Appreciations + confirm who will track experiments." },
+          { stage: "Rule", detail: "Retro without owners + check date = theatre. Keep it real." }
+        ];
+      }
+
+      // -------------------------
       // Prompt bank (multiple variants per ceremony+mode)
       // -------------------------
       function getPromptsHTML(ceremony, mode, ctx, forceRefresh=false){
         const key = `${ceremony}:${mode}`;
-        const banks = buildPromptBanks(ctx);
+        const banks = buildPromptBanks(ctx, mode, forceRefresh);
 
         const variants = (banks[ceremony] && banks[ceremony][mode]) ? banks[ceremony][mode] : null;
         if (!variants || !variants.length) return `<div>Select a ceremony.</div>`;
@@ -281,7 +390,7 @@
         return variants[idx];
       }
 
-      function buildPromptBanks(ctx){
+      function buildPromptBanks(ctx, mode, forceRefresh){
         const capLine = (ctx.avgVel > 0)
           ? `Context: avg velocity ~<b>${round2(ctx.avgVel)}</b> SP, capacity est ~<b>${round2(ctx.capacitySP)}</b> SP, committed <b>${round2(ctx.committedSP)}</b> SP.`
           : `Context: add velocities + committed SP in Setup for sharper prompts.`;
@@ -290,6 +399,54 @@
           ? `You look overcommitted by ~<b>${Math.max(0, ctx.overPct)}%</b>. Treat this as a de-scope trigger.`
           : `Keep commitment disciplined: protect flow and avoid silent scope creep.`;
 
+        const retroRec = retroRecommendation(ctx, mode, forceRefresh);
+        const retroStagesHTML = retroRec.template.stages.map(s =>
+          `<li><b>${s.stage}:</b> ${s.detail}</li>`
+        ).join("");
+
+        const planningMustNotMiss = `
+          <div style="margin-top:10px;"><b>✅ Planning: steps no one should miss</b></div>
+          <ol style="margin-top:8px;">
+            <li><b>Sprint Goal first</b> (1 sentence outcome, not a list of tickets)</li>
+            <li><b>Capacity reality</b> (team, leaves, interruptions buffer)</li>
+            <li><b>Forecast vs Commit</b> (explicit Must-have + Stretch)</li>
+            <li><b>Risks + Dependencies upfront</b> (top 3 + owners + escalation)</li>
+            <li><b>Slice big work</b> (reduce batch size, 1–2 day chunks)</li>
+            <li><b>Definition of Done</b> (quality gates, test expectations)</li>
+            <li><b>Plan day 1–3</b> (who starts what; finish-first rule)</li>
+          </ol>
+        `;
+
+        const dailyPurpose = `
+          <div><b>🎯 Purpose of Daily Scrum</b></div>
+          <div style="margin-top:6px; color:var(--text-muted);">
+            Daily Scrum is not status reporting. It’s a <b>15-minute plan</b> to move toward the <b>Sprint Goal</b>.
+          </div>
+
+          <div style="margin-top:10px;"><b>🧩 The “stay-on-purpose” script</b></div>
+          <ol style="margin-top:8px;">
+            <li><b>Are we on track for the Sprint Goal today?</b></li>
+            <li><b>What is the biggest blocker/risk right now?</b></li>
+            <li><b>What will we finish today (by name)?</b></li>
+          </ol>
+
+          <div style="margin-top:10px;"><b>🚫 Anti-patterns</b></div>
+          <ul style="margin-top:8px;">
+            <li>Status reporting to Scrum Master/manager</li>
+            <li>Problem solving inside the meeting (take offline)</li>
+            <li>Jira micro-updates on every ticket</li>
+            <li>Starting more work without finishing</li>
+          </ul>
+
+          <div style="margin-top:10px;"><b>🛡️ Guardrails</b></div>
+          <ul style="margin-top:8px;">
+            <li><b>60-second rule:</b> If discussion &gt; 60 seconds → park it → take offline</li>
+            <li><b>WIP check:</b> Ask “what finishes today?” before “what starts today?”</li>
+          </ul>
+        `;
+
+        // NOTE: planning/refine/review content kept as-is from previous version (works well).
+        // Retro + Daily + Planning now contain the "must not miss" and purpose content.
         return {
           planning: {
             stable: [
@@ -302,16 +459,7 @@
                   <li><b>Flow:</b> Who pairs on the riskiest story? What finishes first?</li>
                   <li><b>Guardrail:</b> What do we stop doing if scope creeps?</li>
                 </ul>
-              `,
-              `
-                <div><b>🗺️ Planning (Stable) — clarity + ownership</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <ul>
-                  <li><b>Define Done:</b> What does “done” look like for the goal?</li>
-                  <li><b>Ownership map:</b> Who owns each must-have story?</li>
-                  <li><b>Dependencies:</b> What needs unblocking on day 1?</li>
-                  <li><b>Quality:</b> What quality checks are non-negotiable?</li>
-                </ul>
+                ${planningMustNotMiss}
               `
             ],
             watch: [
@@ -320,22 +468,12 @@
                 <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
                 <div style="margin-top:6px;">${overLine}</div>
                 <ul>
-                  <li><b>De-scope now:</b> Remove 10–15% into stretch.</li>
-                  <li><b>Day-3 checkpoint:</b> If behind → de-scope immediately.</li>
+                  <li><b>De-scope now:</b> Move 10–15% into stretch immediately.</li>
+                  <li><b>Day-3 checkpoint:</b> If behind → de-scope fast.</li>
                   <li><b>WIP limit:</b> Agree a WIP cap for the sprint.</li>
                   <li><b>Risks + owners:</b> Top 3 risks + escalation path.</li>
                 </ul>
-              `,
-              `
-                <div><b>⚠️ Planning (Watchlist) — protect the goal</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Goal-only planning:</b> Smallest scope that still achieves the goal?</li>
-                  <li><b>Kill ambiguity:</b> No missing acceptance criteria allowed.</li>
-                  <li><b>Dependency kill list:</b> What must be removed before work starts?</li>
-                  <li><b>Support buffer:</b> Reserve capacity for interruptions.</li>
-                </ul>
+                ${planningMustNotMiss}
               `
             ],
             rescue: [
@@ -344,22 +482,12 @@
                 <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
                 <div style="margin-top:6px;">${overLine}</div>
                 <ul>
-                  <li><b>Cut scope today:</b> Remove 15–25% immediately.</li>
-                  <li><b>Freeze churn:</b> No new work unless goal is safe.</li>
+                  <li><b>Cut scope today:</b> Remove 15–25% immediately. Commit only to the goal.</li>
+                  <li><b>Freeze churn:</b> No new work unless the goal is safe.</li>
                   <li><b>Escalations:</b> What must be escalated before noon?</li>
-                  <li><b>Daily control:</b> Define daily checkpoint owner.</li>
+                  <li><b>Daily control:</b> Define checkpoint owner.</li>
                 </ul>
-              `,
-              `
-                <div><b>🚨 Planning (Rescue) — remove constraints</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Constraint:</b> dependencies, WIP, or interruptions?</li>
-                  <li><b>Stop list:</b> What stops this sprint from collapsing?</li>
-                  <li><b>Owner map:</b> Assign owners for top 2 blockers.</li>
-                  <li><b>Reduce batch size:</b> Slice to 1–2 day pieces.</li>
-                </ul>
+                ${planningMustNotMiss}
               `
             ]
           },
@@ -367,72 +495,25 @@
           daily: {
             stable: [
               `
-                <div><b>🧩 Daily (Stable) — finish-first</b></div>
+                <div><b>🧩 Daily (Stable)</b></div>
                 <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <ul>
-                  <li><b>Sprint goal:</b> Are we moving the goal forward today?</li>
-                  <li><b>Blockers:</b> Anything blocked &gt; 24h?</li>
-                  <li><b>WIP:</b> Are we starting too much vs finishing?</li>
-                  <li><b>Help:</b> Who needs pairing support today?</li>
-                </ul>
-              `,
-              `
-                <div><b>🧩 Daily (Stable) — flow hygiene</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <ul>
-                  <li><b>Aging work:</b> Which item is stuck longest?</li>
-                  <li><b>Hand-offs:</b> Any handoff slowing us down?</li>
-                  <li><b>Next finish:</b> What will we finish today?</li>
-                  <li><b>Risk:</b> Any new risk that changes the plan?</li>
-                </ul>
+                ${dailyPurpose}
               `
             ],
             watch: [
               `
-                <div><b>🟡 Daily (Watchlist) — track slip early</b></div>
+                <div><b>🟡 Daily (Watchlist)</b></div>
                 <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
                 <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Plan vs actual:</b> Are we behind today?</li>
-                  <li><b>Slip candidate:</b> Which story is most likely to slip?</li>
-                  <li><b>Interruptions:</b> What unplanned work entered yesterday?</li>
-                  <li><b>Decision:</b> If we slip tomorrow, what de-scopes?</li>
-                </ul>
-              `,
-              `
-                <div><b>🟡 Daily (Watchlist) — protect capacity</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Top blocker:</b> Who owns it right now?</li>
-                  <li><b>WIP cut:</b> What do we stop starting today?</li>
-                  <li><b>Scope check:</b> Any scope added silently?</li>
-                  <li><b>Checkpoint:</b> What will be true by tomorrow’s daily?</li>
-                </ul>
+                ${dailyPurpose}
               `
             ],
             rescue: [
               `
-                <div><b>🔴 Daily (Rescue) — goal survival</b></div>
+                <div><b>🔴 Daily (Rescue)</b></div>
                 <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
                 <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Goal survival:</b> Is sprint goal still achievable?</li>
-                  <li><b>Cut list:</b> What drops today?</li>
-                  <li><b>Ownership:</b> Who takes the top blocker now?</li>
-                  <li><b>Escalate:</b> What must be escalated before noon?</li>
-                </ul>
-              `,
-              `
-                <div><b>🔴 Daily (Rescue) — unblock-first</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Single unblock:</b> What’s the biggest unblock right now?</li>
-                  <li><b>Pairing:</b> Who pairs to finish the critical item?</li>
-                  <li><b>Cut scope:</b> Remove least user-impactful scope.</li>
-                  <li><b>Update plan:</b> What changes today because of reality?</li>
-                </ul>
+                ${dailyPurpose}
               `
             ]
           },
@@ -440,67 +521,34 @@
           refine: {
             stable: [
               `
-                <div><b>🧠 Refinement (Stable) — slice + ready</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div><b>🧠 Refinement (Stable)</b></div>
                 <ul>
                   <li><b>Slicing:</b> Break stories into 1–2 day chunks.</li>
                   <li><b>AC clarity:</b> Are acceptance criteria unambiguous?</li>
                   <li><b>Dependencies:</b> Identify + remove early.</li>
                   <li><b>Ready checklist:</b> Confirm Definition of Ready.</li>
                 </ul>
-              `,
-              `
-                <div><b>🧠 Refinement (Stable) — de-risk early</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <ul>
-                  <li><b>Risk story:</b> Spike vs split — decide now.</li>
-                  <li><b>Tech unknowns:</b> What needs a quick proof?</li>
-                  <li><b>Testability:</b> Can QA validate easily?</li>
-                  <li><b>Thin slices:</b> Remove “big-bang” stories.</li>
-                </ul>
               `
             ],
             watch: [
               `
-                <div><b>🧠 Refinement (Watchlist) — remove ambiguity</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div><b>🧠 Refinement (Watchlist)</b></div>
                 <div style="margin-top:6px;">${overLine}</div>
                 <ul>
                   <li><b>Kill ambiguity:</b> Missing AC? Add now.</li>
                   <li><b>Stop big stories:</b> Slice anything &gt; 2–3 days.</li>
                   <li><b>Dependency removal:</b> What can we remove today?</li>
                 </ul>
-              `,
-              `
-                <div><b>🧠 Refinement (Watchlist) — protect predictability</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Estimate sanity:</b> Any story too vague to estimate?</li>
-                  <li><b>Split strategy:</b> Must-have vs nice-to-have slices.</li>
-                  <li><b>Ready gate:</b> No “not ready” story enters sprint.</li>
-                </ul>
               `
             ],
             rescue: [
               `
-                <div><b>🧠 Refinement (Rescue) — shrink the batch</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
+                <div><b>🧠 Refinement (Rescue)</b></div>
                 <div style="margin-top:6px;">${overLine}</div>
                 <ul>
                   <li><b>No big stories:</b> Stop anything &gt; 2–3 days entering sprint.</li>
                   <li><b>De-risk:</b> Remove dependencies before planning.</li>
                   <li><b>Safest scope:</b> Default to minimum viable sprint goal.</li>
-                </ul>
-              `,
-              `
-                <div><b>🧠 Refinement (Rescue) — stop future failure</b></div>
-                <div style="margin-top:6px; color:var(--text-muted);">${capLine}</div>
-                <div style="margin-top:6px;">${overLine}</div>
-                <ul>
-                  <li><b>Failure point:</b> What will break the sprint?</li>
-                  <li><b>Prevention:</b> Smallest mitigation action?</li>
-                  <li><b>Ready rule:</b> Make one rule non-negotiable.</li>
                 </ul>
               `
             ]
@@ -509,123 +557,67 @@
           review: {
             stable: [
               `
-                <div><b>🎬 Review (Stable) — value + feedback</b></div>
+                <div><b>🎬 Review (Stable)</b></div>
                 <ul>
                   <li><b>Value:</b> What changed for users?</li>
                   <li><b>Feedback:</b> What should we adjust next?</li>
                   <li><b>Surprises:</b> What surprised us in scope/time?</li>
                   <li><b>Follow-ups:</b> Capture owners + dates.</li>
                 </ul>
-              `,
-              `
-                <div><b>🎬 Review (Stable) — narrative</b></div>
-                <ul>
-                  <li><b>Story:</b> “We aimed for X, shipped Y, learned Z.”</li>
-                  <li><b>Stakeholder asks:</b> Any new ask or shift?</li>
-                  <li><b>Next sprint:</b> What’s the strongest next step?</li>
-                </ul>
               `
             ],
             watch: [
               `
-                <div><b>🎬 Review (Watchlist) — explain gaps safely</b></div>
+                <div><b>🎬 Review (Watchlist)</b></div>
                 <ul>
                   <li><b>Not shipped:</b> What didn’t ship and why (system factors)?</li>
                   <li><b>Commitment:</b> Was commitment too high?</li>
-                  <li><b>Time loss:</b> Where did we lose time (interruptions/dep)?</li>
+                  <li><b>Time loss:</b> Where did we lose time?</li>
                   <li><b>One change:</b> Improve predictability next sprint.</li>
-                </ul>
-              `,
-              `
-                <div><b>🎬 Review (Watchlist) — protect trust</b></div>
-                <ul>
-                  <li><b>Transparent gap:</b> What caused the gap (not who)?</li>
-                  <li><b>Decision:</b> What decision prevents this next sprint?</li>
-                  <li><b>Ask:</b> What help do we need from stakeholders?</li>
                 </ul>
               `
             ],
             rescue: [
               `
-                <div><b>🎬 Review (Rescue) — recovery plan</b></div>
+                <div><b>🎬 Review (Rescue)</b></div>
                 <ul>
                   <li><b>Root cause:</b> Why did we slip (system)?</li>
                   <li><b>Immediate change:</b> What must change now?</li>
                   <li><b>Stop doing:</b> What do we stop next sprint?</li>
                   <li><b>Escalations:</b> Owners + deadlines.</li>
                 </ul>
-              `,
-              `
-                <div><b>🎬 Review (Rescue) — executive clarity</b></div>
-                <ul>
-                  <li><b>Signal:</b> What warned us early?</li>
-                  <li><b>Constraint:</b> What constraint dominated?</li>
-                  <li><b>Action:</b> One action to remove the constraint.</li>
-                </ul>
               `
             ]
           },
 
           retro: {
-            stable: [
-              `
-                <div><b>♻️ Retro (Stable) — lock in wins</b></div>
-                <ul>
-                  <li><b>Boosted throughput:</b> What helped us ship more?</li>
-                  <li><b>Reduced stress:</b> What kept it calm?</li>
-                  <li><b>Protect flow:</b> One improvement to lock in.</li>
-                  <li><b>Experiment:</b> One experiment next sprint.</li>
-                </ul>
-              `,
-              `
-                <div><b>♻️ Retro (Stable) — quality & flow</b></div>
-                <ul>
-                  <li><b>Flow:</b> What improved flow?</li>
-                  <li><b>Quality:</b> What reduced rework?</li>
-                  <li><b>Next:</b> One small change with big impact.</li>
-                </ul>
-              `
-            ],
-            watch: [
-              `
-                <div><b>♻️ Retro (Watchlist) — predictability</b></div>
-                <ul>
-                  <li><b>Volatility:</b> Where did it come from?</li>
-                  <li><b>Missed risks:</b> Which risks were missed early?</li>
-                  <li><b>Guardrail:</b> One guardrail next sprint.</li>
-                  <li><b>Owner + date:</b> Make it real.</li>
-                </ul>
-              `,
-              `
-                <div><b>♻️ Retro (Watchlist) — interruptions</b></div>
-                <ul>
-                  <li><b>Interruptions:</b> What interrupted us most?</li>
-                  <li><b>Shield:</b> How do we shield the sprint?</li>
-                  <li><b>Agreement:</b> What agreement with stakeholders?</li>
-                </ul>
-              `
-            ],
-            rescue: [
-              `
-                <div><b>♻️ Retro (Rescue) — system failure</b></div>
-                <ul>
-                  <li><b>System failure:</b> Where did process break?</li>
-                  <li><b>Constraint:</b> WIP, interruptions, dependencies?</li>
-                  <li><b>Non-negotiable:</b> One rule next sprint.</li>
-                  <li><b>Stop now:</b> What do we stop immediately?</li>
-                </ul>
-              `,
-              `
-                <div><b>♻️ Retro (Rescue) — prevent repeat</b></div>
-                <ul>
-                  <li><b>Early warning:</b> What did we ignore?</li>
-                  <li><b>Decision:</b> What decision changes the outcome?</li>
-                  <li><b>Commitment rule:</b> What prevents overcommit?</li>
-                </ul>
-              `
-            ]
+            stable: [ buildRetroHTML(retroRec, retroStagesHTML) ],
+            watch:  [ buildRetroHTML(retroRec, retroStagesHTML) ],
+            rescue: [ buildRetroHTML(retroRec, retroStagesHTML) ]
           }
         };
+      }
+
+      function buildRetroHTML(retroRec, retroStagesHTML){
+        return `
+          <div><b>♻️ Retro — Suggested Template</b></div>
+          <div style="margin-top:6px; color:var(--text-muted);">
+            <b>${retroRec.template.name}</b> — ${retroRec.template.why}
+          </div>
+
+          <div style="margin-top:10px;"><b>🧊 Icebreaker (based on insights)</b></div>
+          <div style="margin-top:6px;">${retroRec.icebreaker}</div>
+
+          <div style="margin-top:10px;"><b>🧭 Stages to follow (don’t skip)</b></div>
+          <ul style="margin-top:8px;">${retroStagesHTML}</ul>
+
+          <div style="margin-top:10px;"><b>🧾 Output checklist</b></div>
+          <ul style="margin-top:8px;">
+            <li>1–2 experiments max</li>
+            <li>Owner + due date</li>
+            <li>Success measure (“we’ll know it worked if…”) </li>
+          </ul>
+        `;
       }
 
       function setButtonStates(){
@@ -740,7 +732,6 @@
           `;
         }).join("");
 
-        // event delegation
         list.querySelectorAll("button[data-act]").forEach(btn => {
           btn.addEventListener("click", () => {
             const act = btn.getAttribute("data-act");
@@ -775,7 +766,6 @@
         });
       }
 
-      // Save button -> append to history
       $("saveBtn").addEventListener("click", () => {
         const text = (notes.value || "").trim();
         if(!text){
@@ -799,29 +789,85 @@
         renderDecisionHistory();
       });
 
-      // Reset -> clear editor only
       $("clearBtn").addEventListener("click", () => {
         notes.value = "";
         saveStatus.textContent = "🟦 Cleared editor";
         saveHint.textContent = "Saved Decisions history is unchanged.";
       });
 
-      // New angle button (re-roll variant)
       $("newAngleBtn").addEventListener("click", () => {
         if (!activeKey) return;
         onCeremony(activeKey, true);
       });
 
-      // Bind ceremony buttons
+      // ✅ Copy Retro Summary button
+      $("copyRetroBtn").addEventListener("click", () => {
+        const setup = loadSetup();
+        const ctx = buildContext(setup);
+        const risk = computeRisk(setup);
+        const mode = modeFromRisk(risk);
+
+        const arr = loadDecisionHistory();
+        const findLatest = (ceremony) => {
+          for (let i = arr.length - 1; i >= 0; i--) {
+            if ((arr[i].ceremony || "").toLowerCase() === ceremony) return arr[i];
+          }
+          return null;
+        };
+
+        const latestRetro = findLatest("retro");
+        const latestActive = activeKey ? findLatest(activeKey) : null;
+        const best = latestRetro || latestActive || (arr.length ? arr[arr.length - 1] : null);
+
+        const retroRec = retroRecommendation(ctx, mode, false);
+
+        const header = `# Sprint Retro Summary
+Date: ${nowStamp()}
+Mode: ${mode.toUpperCase()} (Risk ${risk}/100)
+Template: ${retroRec.template.name}
+Icebreaker: ${retroRec.icebreaker}
+
+## Context
+- Avg velocity: ${ctx.avgVel > 0 ? round2(ctx.avgVel) + " SP" : "—"}
+- Capacity est: ${ctx.capacitySP > 0 ? round2(ctx.capacitySP) + " SP" : "—"}
+- Committed: ${ctx.committedSP > 0 ? round2(ctx.committedSP) + " SP" : "—"}
+- Overcommit: ${ctx.over > 0 ? (ctx.over > 1 ? ("YES (~" + Math.max(0, ctx.overPct) + "%)") : "No") : "—"}
+
+## What happened (facts)
+- [Add 2–4 factual observations]
+
+## Themes (top 1–2)
+- Theme 1:
+- Theme 2:
+
+## Decisions / Actions (experiments)
+- Experiment 1: [If we do X, then Y improves] | Owner: ___ | Due: ___ | Measure: ___
+- Experiment 2: [Optional] | Owner: ___ | Due: ___ | Measure: ___
+
+## Notes captured
+`;
+
+        const body = best ? (best.text || "").trim() : "— (No saved notes yet. Use this section to paste your decision notes.)";
+
+        const out = header + body + `
+
+## Follow-up
+- Check progress in: [Next Retro / Mid-sprint checkpoint]
+`;
+
+        navigator.clipboard?.writeText(out);
+        saveStatus.textContent = "📋 Retro Summary copied";
+        saveHint.textContent = best
+          ? "Copied using your latest saved notes."
+          : "Copied a ready-to-fill template (no notes found yet).";
+      });
+
       document.querySelectorAll(".cerBtn").forEach(btn => {
         btn.addEventListener("click", () => onCeremony(btn.getAttribute("data-cer"), false));
       });
 
-      // Boot: open daily by default, but don’t show “recommended”
       (function boot(){
         renderDecisionHistory();
-
-        // Default to a ceremony (daily feels most useful)
         onCeremony("daily", false);
 
         saveStatus.textContent = "🟡 Ready";
