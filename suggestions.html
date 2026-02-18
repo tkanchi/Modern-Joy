@@ -4,10 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Scrummer — Actions</title>
+
   <link rel="stylesheet" href="css/style.css?v=3"/>
+
+  <!-- Unified Font (keep this on every page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body data-page="actions">
   <div class="appShell">
     <aside class="sideNav">
       <div class="sideBrand">
@@ -66,7 +70,7 @@
 
         <div id="actionsWrap" style="display:grid; gap:12px; margin-top:10px;"></div>
 
-        <div class="btnRow">
+        <div class="btnRow" style="margin-top:12px;">
           <a class="btnGhost" href="intelligence.html">← Back to Insights</a>
           <button class="btnPrimary" id="refreshBtn" type="button">Refresh Actions</button>
           <a class="btnGhost" href="workspace.html">Next: Copilot ➜</a>
@@ -79,11 +83,6 @@
   <script src="js/metrics.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
-
-  <!-- OPTIONAL: add this only if you want unified Scrummer.setup/loadSetup behavior
-       (If you already include shell.js globally or in another file, don’t duplicate it.)
-  -->
-  <!-- <script src="js/shell.js"></script> -->
 
   <script>
     (function () {
@@ -152,11 +151,13 @@
         const el = document.createElement("div");
         el.className = "info-banner";
         el.innerHTML = `
-          <div style="font-weight:900; font-size:16px;">${tier} ${title}</div>
-          <div style="margin-top:8px; font-weight:900;">Why</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:4px; white-space:pre-line;">${why}</div>
-          <div style="margin-top:10px; font-weight:900;">How</div>
-          <div style="color:var(--text-muted); font-weight:800; margin-top:4px; white-space:pre-line;">${how}</div>
+          <div class="kvKey" style="font-size:16px;">${tier} ${title}</div>
+
+          <div style="margin-top:10px; font-weight:600;">Why</div>
+          <div style="color:var(--text-muted); font-weight:450; margin-top:4px; white-space:pre-line; line-height:1.7;">${why}</div>
+
+          <div style="margin-top:12px; font-weight:600;">How</div>
+          <div style="color:var(--text-muted); font-weight:450; margin-top:4px; white-space:pre-line; line-height:1.7;">${how}</div>
         `;
         return el;
       }
@@ -241,10 +242,5 @@
       render();
     })();
   </script>
-
-  <!-- ✅ FIX: Removed duplicate Supabase includes from this page.
-       (Only include Supabase where you actually need cloud auth/sync, e.g., auth.html)
-  -->
-
 </body>
 </html>
