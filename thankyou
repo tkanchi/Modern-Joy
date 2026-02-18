@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scrummer — Thank You</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="feedback">
+
+  <div class="workspace">
+    <div class="card" style="max-width:600px;margin:auto;text-align:center;">
+      
+      <h2>Thank You 🙌</h2>
+
+      <p style="margin-top:10px;">
+        Your feedback has been submitted successfully.
+      </p>
+
+      <p style="opacity:.8;">
+        Scrummer is evolving based on real practitioner insights like yours.
+      </p>
+
+      <div style="margin-top:20px;">
+        <a href="index.html" class="btn primary">Back to Scrummer</a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
