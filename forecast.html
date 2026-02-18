@@ -212,7 +212,28 @@
 
             <hr style="margin:12px 0; opacity:.2;">
 
-            <div id="formulaBox" style="color:var(--text-muted); font-weight:800; line-height:1.7;"></div>
+            <!-- 📘 STATIC FORMULA REFERENCE (Always Visible) -->
+            <div id="formulaReference" class="info-banner" style="margin-bottom:12px;">
+              <div style="font-weight:900; margin-bottom:6px;">📘 Forecast Formulas (Reference)</div>
+
+              <div><b>1) Ideal Capacity (Days per person)</b></div>
+              <div>Ideal = Sprint Days × Focus Factor</div>
+
+              <div style="margin-top:8px;"><b>2) Total Ideal Capacity (Days)</b></div>
+              <div>Total Ideal Days = Team Count × Ideal</div>
+
+              <div style="margin-top:8px;"><b>3) Total Actual Capacity (Days)</b></div>
+              <div>Total Actual Days = Total Ideal Days − (Leaves × Weight)</div>
+
+              <div style="margin-top:8px;"><b>4) Total Actual Capacity (SP)</b></div>
+              <div>Forecast SP = max(0, Total Actual Days) × SP/day</div>
+            </div>
+
+            <!-- 🧮 DYNAMIC ACTUAL CALCULATION -->
+            <div id="formulaActual" class="info-banner" style="color:var(--text-muted); font-weight:800; line-height:1.7;">
+              Enter values and click Calculate to see step-by-step calculation.
+            </div>
+
           </div>
         </div>
 
@@ -223,7 +244,5 @@
   <script src="js/theme.js"></script>
   <script src="js/xp.js"></script>
   <script src="js/forecast.js"></script>
-
-
 </body>
 </html>
