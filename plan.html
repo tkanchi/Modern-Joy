@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Scrummer — Plan</title>
+  <link rel="stylesheet" href="css/style.css?v=3"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .comboStack{display:grid;gap:16px;margin-top:14px}
+    .comboFrame{width:100%;height:840px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .comboJump{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  </style>
+</head>
+<body data-page="plan">
+  <div class="appShell">
+    <aside class="sideNav">
+      <div class="sideBrand">
+        <div class="brandMark"><span>S</span></div>
+        <div>
+          <div class="brandName">SCRUMMER</div>
+          <div class="brandTag">Gamified Scrum OS</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="navlink active" href="plan.html">🧭 Plan</a>
+        <a class="navlink" href="coach.html">🧠 Coach</a>
+        <a class="navlink" href="gamerules.html">🎮 Game Rules</a>
+        <hr>
+        <a class="navlink" href="index.html">🚀 Setup (single)</a>
+        <a class="navlink" href="forecast.html">📦 Forecast (single)</a>
+        <a class="navlink" href="auth.html">🔐 Account</a>
+      </nav>
+      <div class="xpWidget">
+        <div class="xpTop">
+          <div>
+            <div class="lvl" id="xpLevel">Level 1</div>
+            <div class="title" id="xpTitle">Rookie</div>
+          </div>
+          <div id="moodBadge">🐆 Calm</div>
+        </div>
+        <div class="xpBar"><div class="xpFill" id="xpFill"></div></div>
+        <div class="xpMeta">
+          <span id="xpText">0 / 300 XP</span>
+          <span id="streakText">🧊 streak reset</span>
+        </div>
+      </div>
+      <button class="themeToggle" id="themeToggle" type="button">Theme: <span id="themeMode">Light</span></button>
+    </aside>
+
+    <main class="main">
+      <div class="sectionCard">
+        <h1 class="sectionTitle">Plan Workspace</h1>
+        <p class="sectionSub">Combined flow: Setup + Forecast in one place.</p>
+
+        <div class="info-banner"><strong>Target structure:</strong> <code>plan.html = index.html + forecast.html</code></div>
+
+        <div class="comboJump">
+          <a class="btnGhost" href="#setup">Jump to Setup</a>
+          <a class="btnGhost" href="#forecast">Jump to Forecast</a>
+        </div>
+
+        <div class="comboStack">
+          <section id="setup" class="info-banner">
+            <div class="kvKey">🚀 Setup</div>
+            <iframe class="comboFrame" src="index.html" title="Setup"></iframe>
+          </section>
+
+          <section id="forecast" class="info-banner">
+            <div class="kvKey">📦 Forecast</div>
+            <iframe class="comboFrame" src="forecast.html" title="Forecast"></iframe>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/xp.js"></script>
+</body>
+</html>
