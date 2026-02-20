@@ -392,6 +392,105 @@ body.dark-mode .healthTable tr:hover{
   background: rgba(255,255,255,0.06);
 }
 
+/* =======================
+   NEON FORECAST FX (spark ONLY on update)
+   Works with: <div class="forecastNumber neonFx">
+   JS adds/removes: .spark
+   ======================= */
+
+:root[data-theme="neon"] .forecastNumber.neonFx{
+  position: relative;
+  isolation: isolate;
+}
+
+/* default: OFF */
+:root[data-theme="neon"] .forecastNumber.neonFx::before,
+:root[data-theme="neon"] .forecastNumber.neonFx::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* crackle streak (only when .spark is added) */
+:root[data-theme="neon"] .forecastNumber.neonFx::before{
+  left:-10px;
+  right:-10px;
+  top: 50%;
+  height: 26px;
+  transform: translateY(-50%);
+
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(34,211,238,0.00) 18%,
+      rgba(34,211,238,0.25) 40%,
+      rgba(167,139,250,0.20) 55%,
+      rgba(34,211,238,0.18) 70%,
+      transparent 100%),
+    repeating-linear-gradient(135deg,
+      transparent 0 10px,
+      rgba(34,211,238,0.18) 10px 11px,
+      transparent 11px 18px),
+    repeating-linear-gradient(-135deg,
+      transparent 0 12px,
+      rgba(167,139,250,0.14) 12px 13px,
+      transparent 13px 22px);
+
+  border-radius: 14px;
+  filter:
+    blur(0.2px)
+    drop-shadow(0 0 10px rgba(34,211,238,0.25))
+    drop-shadow(0 0 18px rgba(34,211,238,0.18));
+}
+
+/* shimmer sweep */
+:root[data-theme="neon"] .forecastNumber.neonFx::after{
+  inset:-6px -12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(34,211,238,0.18), transparent 60%),
+    radial-gradient(circle at 80% 50%, rgba(167,139,250,0.14), transparent 60%);
+}
+
+/* ON: spark burst animation */
+:root[data-theme="neon"] .forecastNumber.neonFx.spark::before{
+  opacity: 0.75;
+  animation: neonCrackleOnce 520ms ease;
+}
+:root[data-theme="neon"] .forecastNumber.neonFx.spark::after{
+  opacity: 0.60;
+  animation: neonSweepOnce 700ms ease;
+}
+
+@keyframes neonCrackleOnce{
+  0%   { opacity:0; transform: translateY(-50%) scaleX(0.96); }
+  35%  { opacity:0.85; transform: translateY(-50%) scaleX(1.03); }
+  100% { opacity:0; transform: translateY(-50%) scaleX(0.99); }
+}
+@keyframes neonSweepOnce{
+  0%   { opacity:0; filter: blur(0.0px); }
+  50%  { opacity:0.7; filter: blur(0.2px); }
+  100% { opacity:0; filter: blur(0.0px); }
+}
+
+/* Optional digit glow (still OK to keep always-on in Neon) */
+:root[data-theme="neon"] #forecast_value{
+  text-shadow:
+    0 0 10px rgba(34,211,238,0.28),
+    0 0 18px rgba(34,211,238,0.14);
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  :root[data-theme="neon"] .forecastNumber.neonFx.spark::before,
+  :root[data-theme="neon"] .forecastNumber.neonFx.spark::after{
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
 /* =========================================================
    FLOW UX — Stage indicator + unified footer buttons
    Use on ALL step pages: Setup/Insights/Health/Actions
